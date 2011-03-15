@@ -22,5 +22,5 @@ MainWindow::MainWindow(QWidget *parent) {
     centralWidget->setLayout(layout);
 }
 
-//MainWindow::~MainWindow() {
-//}
+MainWindow::~MainWindow() {
+}

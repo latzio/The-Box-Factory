@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(HelloWorldQt)
+PROJECT(PLAYBOOK)
  
-SET(CMAKE_BUILD_TYPE Release)
+SET(CMAKE_BUILD_TYPE Debug)
   
 SET(CMAKE_CXX_FLAGS "-Wall")
    
@@ -9,8 +9,12 @@ SET(CMAKE_CXX_FLAGS "-Wall")
 FIND_PACKAGE(Qt4 REQUIRED)
     
 INCLUDE(${QT_USE_FILE})
-     
+
+ADD_SUBDIRECTORY( src )
+
 SET( HWQ_Qt4_SRC
+    MainWindow.h
+	HelloWidget.h
 )
 SET( HWQ_Qt4_UI
 )
@@ -21,13 +25,12 @@ QT4_WRAP_CPP(HWQ_MOC_CPP ${HWQ_Qt4_SRC})
 QT4_WRAP_UI(HWQ_UI_CPP ${HWQ_Qt4_UI})
 QT4_ADD_RESOURCES(HWQ_RES_H ${HWQ_Qt4_RES})
        
-INCLUDE_DIRECTORIES( . )
         
 # General
 SET( HWQ_SRC
-    src/main.cpp
-    src/HelloWidget.cpp
-    src/MainWindow.cpp
+    main.cpp
+    HelloWidget.cpp
+    MainWindow.cpp
     ${HWQ_MOC_CPP}
     ${HWQ_UI_CPP}
     ${HWQ_RES_H}

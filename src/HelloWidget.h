@@ -1,3 +1,6 @@
+#ifndef HELLO_WIDGET_H
+#define HELLO_WIDGET_H
+
 #include <QLabel>
 #include <QString>
  
@@ -6,7 +9,7 @@ Q_OBJECT
  
 public:
     HelloWidget(QWidget * parent = 0);
-    //virtual ~HelloWidget();
+    ~HelloWidget();
  
 public slots:
     void showNewLetter();
@@ -15,3 +18,5 @@ protected:
     QString _msg;
     unsigned short _pos;
 };
+
+#endif

@@ -7,8 +7,8 @@ HelloWidget::HelloWidget(QWidget * parent)
 {
 }
  
-//HelloWidget::~HelloWidget() {
-//}
+HelloWidget::~HelloWidget() {
+}
  
 void HelloWidget::showNewLetter() {
     _pos++;
