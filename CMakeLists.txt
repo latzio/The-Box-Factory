@@ -21,11 +21,13 @@ QT4_WRAP_CPP(HWQ_MOC_CPP ${HWQ_Qt4_SRC})
 QT4_WRAP_UI(HWQ_UI_CPP ${HWQ_Qt4_UI})
 QT4_ADD_RESOURCES(HWQ_RES_H ${HWQ_Qt4_RES})
        
-INCLUDE_DIRECTORIES( src )
+INCLUDE_DIRECTORIES( . )
         
 # General
 SET( HWQ_SRC
-    main.cpp
+    src/main.cpp
+    src/HelloWidget.cpp
+    src/MainWindow.cpp
     ${HWQ_MOC_CPP}
     ${HWQ_UI_CPP}
     ${HWQ_RES_H}
