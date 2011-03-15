@@ -1,8 +1,6 @@
-#include <iostream>
-
-int main(int argc, char* argv[]) {
-
-    std::cout << "Hello world with cmake!" << std::endl;
-
-    return 0;
+#include <QtGui/QApplication>
+ 
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
 }
