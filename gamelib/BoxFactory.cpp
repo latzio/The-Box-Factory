@@ -1,5 +1,7 @@
 #include "BoxFactory.h"
 
+using namespace Box::Game;
+
 BoxFactory::BoxFactory()
 {
 }

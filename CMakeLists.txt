@@ -7,5 +7,13 @@ SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 SET(CMAKE_BUILD_TYPE Debug)
   
 SET(CMAKE_CXX_FLAGS "-Wall")
+
+LINK_DIRECTORIES( ${PROJECT_BINARY_DIR}/lib )
+
+INCLUDE_DIRECTORIES( ${PROJECT_BINARY_DIR}/gamelib )
    
+# Build gamelib first
+ADD_SUBDIRECTORY( gamelib )
+
+# GUI loads from the gamelib library
 ADD_SUBDIRECTORY( gui )

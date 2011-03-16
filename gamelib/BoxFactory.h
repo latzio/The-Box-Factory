@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace BoxFactory {
+namespace Box {
 namespace Game {
 
 class BoxFactory {

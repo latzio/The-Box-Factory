@@ -2,6 +2,7 @@
 FIND_PACKAGE(Qt4 REQUIRED)
     
 INCLUDE(${QT_USE_FILE})
+INCLUDE(${CMAKE_BINARY_DIR}/gamelib)
 
 SET( PLAY_Qt4_SRC
     MainWindow.h
@@ -28,8 +29,8 @@ SET( PLAY_SRC
          
 SET( PLAY_LIB
     ${QT_LIBRARIES}
+    ${LIBRARY_OUTPUT_PATH}/libboxfactory.a
 )
           
 ADD_EXECUTABLE( out ${PLAY_SRC} )
 TARGET_LINK_LIBRARIES( out ${PLAY_LIB} )
-#INSTALL_TARGETS( ${PLAYBOOK_SOURCE_DIR}/bin out )
