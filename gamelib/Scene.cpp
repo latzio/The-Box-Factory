@@ -55,8 +55,8 @@ void SceneNode::render_shadow_volume( Point3D cube[][4],
                                       Point3D& centre, 
                                       Point3D& light)
 {
-		int i;
-		float v[4][3];
+		//int i;
+		//float v[4][3];
 
 }
 

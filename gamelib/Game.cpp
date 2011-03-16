@@ -742,7 +742,7 @@ void Game::PlaySFX( MoveableSubscriber::SFX id ) {
 
 		case MoveableSubscriber::SFX_CAROM:
     {
-        int nRand = ((double)(rand() / (double)RAND_MAX) * 16) + SFX_CAROM0;
+        // int nRand = ((double)(rand() / (double)RAND_MAX) * 16) + SFX_CAROM0;
         // SM.PlaySound( m_nSFX[ nRand ] );
         break;
     }
