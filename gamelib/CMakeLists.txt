@@ -1,9 +1,19 @@
 # FIXME Need openGL, GLUT, SDL, etc. Lots of shit.
-# FIND_PACKAGE(Qt4 REQUIRED)
+
+FIND_LIBRARY(OpenGL REQUIRED)
     
 # General
 SET( GAMELIB_SRC
+    AI.cpp
+    Algebra.cpp    
     BoxFactory.cpp
+    Game.cpp
+    Image.cpp
+    Material.cpp
+    Object.cpp
+    Primitive.cpp
+    Scene.cpp
+#    SoundManager.cpp
 )
          
 SET( GAMELIB_LIB
