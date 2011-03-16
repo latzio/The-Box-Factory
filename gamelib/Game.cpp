@@ -33,7 +33,7 @@ Game::Game( int nPlayers )
   , m_nLives( LIFE_CAP )
   , m_nScore( 0 )
 {
-
+    /*
   // Import the level
   m_pLevel = new Level( import_lua( "models/level.lua" ), this );;
 
@@ -170,6 +170,7 @@ Game::Game( int nPlayers )
 		m_nJoystickPlayer[i] = (i + 1) % nPlayers;
 	}
 */
+
 }
 
 Game::~Game() {
@@ -407,6 +408,9 @@ void Game::handleJoystick(Joystick* joy, PC * pc){
 }
 */
 void Game::walk_gl() {
+
+    if (!m_pLevel)
+        return;
 
 	// draw the level
 	glPushMatrix();

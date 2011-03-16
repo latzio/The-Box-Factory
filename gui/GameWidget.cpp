@@ -1,9 +1,18 @@
 #include "GameWidget.h"
 
+#include "Algebra.h"
+#include "Game.h"
+#include "Image.h"
+#include "SceneLua.h"
+#include "Textures.h"
+
 #include <iostream>
 #include <QtGui>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 GameWidget::GameWidget(QWidget* parent)
+:m_game(1)
 {
 
 }
@@ -22,20 +31,50 @@ void GameWidget::initializeGL()
     // Set up the rendering context, define display lists etc.:
     std::cout << "Initialize GL called." << std::endl;
     
-    glClearColor(0.0, 0.3, 0.1, 0.0);
+    glShadeModel(GL_SMOOTH);
+    glClearColor(0, 0, 0, 0);
+    glEnable(GL_DEPTH_TEST);
 
     //logo = new QtLogo(this, 64);
     //logo->setColor(qtGreen.dark());
 
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glShadeModel(GL_SMOOTH);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_MULTISAMPLE);
+    // glEnable(GL_CULL_FACE);
+    //glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHT0);
+    //glEnable(GL_MULTISAMPLE);
     
-    static GLfloat lightPosition[4] = { 0.5, 5.0, 7.0, 1.0 };
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+    //static GLfloat lightPosition[4] = { 0.5, 5.0, 7.0, 1.0 };
+    //glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+
+    // DISPLAY LIST
+    SceneNode::setupDL();
+
+    // IMAGE LOADER
+    Image * i = new Image();
+
+    // Texture mapping
+    glEnable(GL_TEXTURE_2D);
+
+    std::cout << "Textures: " << TEXTURE_COUNT << std::endl;
+
+    for( int c = 1; c < TEXTURE_COUNT; c++ ) {
+
+        // Load into OpenGL
+        i->loadPng( Textures::texFolder + Textures::texPaths[ c ] );
+        std::cout << "Loading texture from: " << Textures::texFolder + Textures::texPaths[ c ] << std::endl;
+        glBindTexture(GL_TEXTURE_2D, Textures::TEX_NO_TEXTURE + c );
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, i->width(), i->height(), 
+        0, (i->elements() == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, i->byteData());
+
+    }
+
+
 
 }
 
@@ -57,12 +96,89 @@ void GameWidget::resizeGL(int width, int height)
 void GameWidget::paintGL()
 {
     // draw the scene:
-    
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-    glTranslatef(0.0, 0.0, -10.0);
-    glRotatef(16.0, 1.0, 0.0, 0.0);
-    glRotatef(16.0, 0.0, 1.0, 0.0);
-    glRotatef(16.0, 0.0, 0.0, 1.0);
+    int width = 640; //get_width();
+    int height = 480; //get_height();
 
+    // Set up for perspective drawing 
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    // Set up culling!
+    glDisable(GL_CULL_FACE);
+
+    glViewport(0, 0, width, height);
+    // gluPerspective(40.0, (GLfloat)width/(GLfloat)height, .1, 1000.0);
+
+    // change to model view for drawing
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    // Clear framebuffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Apply user camera changes
+    // glTranslated( m_nTrans[0], m_nTrans[1], m_nTrans[2] );
+
+    // Back up the camera
+    glTranslated( 0, 0, -40 );
+    glRotated( 60, 1, 0, 0 );
+
+
+    // Apply user rotation
+    // glMultMatrixd( m_rotate.transpose().begin() );
+
+    /*/ Draw stuff
+    glPushMatrix();
+    glScaled( .2, .2, .2 );
+    glTranslated( 0, 7, 0 );
+    m_objects->walk_gl( picking );
+    glPopMatrix();
+
+    glPushMatrix();
+    m_scene->walk_gl( picking );
+    glPopMatrix();
+
+    */
+    // Set up lighting
+    glEnable ( GL_LIGHTING ) ;
+    glEnable ( GL_COLOR_MATERIAL ) ;
+
+    // Enable normalizing of normals
+    glEnable(GL_NORMALIZE);
+    // glEnable(GL_RESCALE_NORMAL);
+    // glEnable(GL_AUTO_NORMAL);
+
+    // Light 0 // Ambient
+    GLfloat light0[] = { .12, .12, .08, 1 };
+    glLightfv( GL_LIGHT0, GL_AMBIENT, light0);
+    glEnable(GL_LIGHT0);
+
+    GLfloat light[] = { 0.9, 0.9, 0.7, 1 };
+    //									{ 0.8, 0.8, 0.6, 1 },
+    //									{ 0.8, 0.8, 0.6, 1 },
+    //									{ 0.8, 0.8, 0.6, 1 } };
+
+    GLfloat pos[][4]  =  { { -8, 10, -8, 1 },
+                              { 7, 10, -7, 1 },
+                              { -7, 10, 7, 1 },
+                              { 8, 10, 8, 1 }};
+
+    GLfloat dir[] = {0, -1, 0};
+
+    for (int i = 0; i < 4; i++) {
+     for (int j = 0; j < 2; j++) {
+        glLightfv( GL_LIGHT1 + i, GL_DIFFUSE, light);
+        glLightfv( GL_LIGHT1 + i, GL_POSITION, pos[i]);
+         glLightfv( GL_LIGHT1 + i, GL_SPOT_DIRECTION, dir);
+         glLightf ( GL_LIGHT1 + i, GL_SPOT_CUTOFF, 45.f);
+         //glLightf ( GL_LIGHT1 + i, GL_CONSTANT_ATTENUATION, 0.95);
+        glEnable(GL_LIGHT1 + i);
+     }
+    }
+
+    glPushMatrix();
+    m_game.walk_gl();
+    glPopMatrix();
+    
 }

@@ -1,6 +1,8 @@
 #ifndef GAME_WIDGET_H
 #define GAME_WIDGET_H
 
+#include "Game.h"
+
 #include <QSize>
 #include <QtOpenGL/QGLWidget>
  
@@ -34,6 +36,10 @@ protected:
     QSize minimumSizeHint() const { return QSize(640, 480); }
     QSize maximumSizeHint() const { return QSize(640, 480); }
     QSize sizeHint() const { return QSize(640, 480); }
+
+private:
+    
+    Game m_game;
 };
 
 #endif

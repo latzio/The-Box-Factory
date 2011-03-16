@@ -78,16 +78,17 @@ void SceneNode::setupDL() {
   // DISPLAY LIST
   // create one display list
   SceneNode::DL_INDEX = glGenLists( DL_INDEX );
-  GLUquadric* gluq = gluNewQuadric();
+  
+  //GLUquadric* gluq = gluNewQuadric();
 
   // compile the display list, for a sphere
-  glNewList(DL_INDEX + DL_SPHERE, GL_COMPILE);
+  //glNewList(DL_INDEX + DL_SPHERE, GL_COMPILE);
     // Draw a simple sphere
-    gluSphere(  gluq,
-                SPHERE_RADIUS,
-                SPHERE_SLICES,
-                SPHERE_STACKS );
-  glEndList();
+  //  gluSphere(  gluq,
+        //        SPHERE_RADIUS,
+    //            SPHERE_SLICES,
+      //          SPHERE_STACKS );
+  //glEndList();
 
   // compile the display list, for a plane
   glNewList(DL_INDEX + DL_PLANE, GL_COMPILE);

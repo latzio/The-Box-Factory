@@ -1,7 +1,8 @@
 # FIXME Need openGL, GLUT, SDL, etc. Lots of shit.
 
 FIND_LIBRARY(OpenGL REQUIRED)
-    
+FIND_LIBRARY(Lua51 REQUIRED)
+
 # General
 SET( GAMELIB_SRC
     AI.cpp
@@ -13,6 +14,7 @@ SET( GAMELIB_SRC
     Object.cpp
     Primitive.cpp
     Scene.cpp
+#    SceneLua.cpp Uncomment once libs are working.
 #    SoundManager.cpp
 )
          
