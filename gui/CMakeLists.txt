@@ -1,10 +1,14 @@
 # QT4 Handling
+FIND_PACKAGE(OpenGL REQUIRED)
 FIND_PACKAGE(Qt4 REQUIRED)
+FIND_PACKAGE(Qt COMPONENTS QtOpenGL REQUIRED)
     
 INCLUDE(${QT_USE_FILE})
+INCLUDE(${QT_QTOPENGL_INCLUDE_DIR})
 INCLUDE(${CMAKE_BINARY_DIR}/gamelib)
 
 SET( PLAY_Qt4_SRC
+    GameWidget.h
     MainWindow.h
 	HelloWidget.h
 )
@@ -20,6 +24,7 @@ QT4_ADD_RESOURCES(PLAY_RES_H ${PLAY_Qt4_RES})
 # General
 SET( PLAY_SRC
     main.cpp
+    GameWidget.cpp
     HelloWidget.cpp
     MainWindow.cpp
     ${PLAY_MOC_CPP}
@@ -29,8 +34,9 @@ SET( PLAY_SRC
          
 SET( PLAY_LIB
     ${QT_LIBRARIES}
+    ${QT_QTOPENGL_LIBRARY}
     ${LIBRARY_OUTPUT_PATH}/libboxfactory.a
 )
-          
+
 ADD_EXECUTABLE( out ${PLAY_SRC} )
 TARGET_LINK_LIBRARIES( out ${PLAY_LIB} )

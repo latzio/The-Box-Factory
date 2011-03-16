@@ -1,9 +1,11 @@
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
+#include "HelloWidget.h"
+#include "GameWidget.h"
+
 #include <QtGui/QMainWindow>
 #include <QPushButton>
-#include "HelloWidget.h"
  
 class MainWindow : public QMainWindow {
 Q_OBJECT
@@ -15,6 +17,7 @@ public:
 protected:
     HelloWidget* _helloWidget;
     QPushButton* _button;
+    GameWidget*  _gameWidget;
 
 };
 

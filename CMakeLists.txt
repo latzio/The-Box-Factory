@@ -16,4 +16,4 @@ INCLUDE_DIRECTORIES( ${PROJECT_BINARY_DIR}/gamelib )
 ADD_SUBDIRECTORY( gamelib )
 
 # GUI loads from the gamelib library
-ADD_SUBDIRECTORY( gui )
+# ADD_SUBDIRECTORY( gui )

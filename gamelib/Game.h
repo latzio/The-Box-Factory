@@ -116,8 +116,8 @@ class Game : public MoveableSubscriber{
 	 int m_nJoystickPlayer[2];
 
 	 // JOYSTICK!
-	 Joystick * m_pJoystick[2];
-	 void handleJoystick( Joystick* joy, PC * pc );
+	 // Joystick * m_pJoystick[2];
+	 // void handleJoystick( Joystick* joy, PC * pc );
 
    // SHIELDS!
    SceneNode* m_pShield[2];

@@ -150,7 +150,7 @@ Game::Game( int nPlayers )
   // JOYSTICK STUFF
   //
  //enable joysticks (yes, video is required)
-	
+ /*	
 	if(initSdlForJoysticks() != 0){
 		printf("SDL can't init.\n");
 		exit(1);
@@ -169,7 +169,7 @@ Game::Game( int nPlayers )
 		m_pJoystick[i] = loadJoystick( i );
 		m_nJoystickPlayer[i] = (i + 1) % nPlayers;
 	}
-
+*/
 }
 
 Game::~Game() {
@@ -179,6 +179,7 @@ Game::~Game() {
 void Game::play() {
 
 	//int music = SM.LoadMusic("data/WOM.XM");
+    /*
 	int music = SM.LoadMusic("data/UNREAL.S3M");
 
   SM.VolumeMusic( 128 );
@@ -205,7 +206,7 @@ void Game::play() {
 
   m_nSFX[ SFX_HUMAN_DEATH ] = SM.LoadSound( "data/player_death.wav" );
   m_nSFX[ SFX_ROBOT_DEATH ] = SM.LoadSound( "data/robot_death.wav" );
-
+*/
 }
 
 // Increment one unit of the time in the game world.
@@ -215,6 +216,7 @@ void Game::play() {
 bool Game::tick() {
 
   // Check joystick
+  /*
   JoystickEvent* event;
   while ( (event = getJoystickEvent()) ) {
     int joystickId = event->getJoystickId();
@@ -223,6 +225,7 @@ bool Game::tick() {
       handleJoystick(m_pJoystick[joystickId], m_PCs[ m_nJoystickPlayer[ joystickId ]]);
     }
   }
+  */
 
   // Now stop if paused
   if (!m_bRunning) {
@@ -360,6 +363,7 @@ void Game::input( Action action, int nPlayer ) {
 
 }
 
+/*
 void Game::handleJoystick(Joystick* joy, PC * pc){
   
   if (!pc->isHumanControlled()) {
@@ -401,13 +405,15 @@ void Game::handleJoystick(Joystick* joy, PC * pc){
 	pc->setAiming( NPC::LEFT,  joy->getButtonDown( Joystick::Y ) ? true : false );
 		
 }
-
+*/
 void Game::walk_gl() {
 
 	// draw the level
 	glPushMatrix();
 	  m_pLevel->walk_gl();
 	glPopMatrix();
+
+    return;
 
 	// DRAW PLAYERS 
    // They require scaling down from the lua file
@@ -611,7 +617,7 @@ void Game::DamageEnemy( NPC * pNPC, int nDamage, const Point3D& p3d ) {
     // Enemy is destroyed, show explosion effects
     CreateParticles( SIZE_MEDIUM, 2, v );
 
-    SM.PlaySound( m_nSFX[ SFX_ROBOT_DEATH ] );
+    // SM.PlaySound( m_nSFX[ SFX_ROBOT_DEATH ] );
 
     // Score
     m_nScore++;
@@ -627,7 +633,7 @@ void Game::DamageEnemy( NPC * pNPC, int nDamage, const Point3D& p3d ) {
 
     pc->die();
 
-    SM.PlaySound( m_nSFX[ SFX_HUMAN_DEATH ] );
+    // SM.PlaySound( m_nSFX[ SFX_HUMAN_DEATH ] );
   }
 
 
@@ -731,18 +737,18 @@ void Game::PlaySFX( MoveableSubscriber::SFX id ) {
 		case MoveableSubscriber::SFX_BULLET:
 		case MoveableSubscriber::SFX_BLAST:
 		case MoveableSubscriber::SFX_BOMB:
-  			SM.PlaySound(m_nSFX[0] );
+  			// SM.PlaySound(m_nSFX[0] );
 			break;
 
 		case MoveableSubscriber::SFX_CAROM:
     {
         int nRand = ((double)(rand() / (double)RAND_MAX) * 16) + SFX_CAROM0;
-        SM.PlaySound( m_nSFX[ nRand ] );
+        // SM.PlaySound( m_nSFX[ nRand ] );
         break;
     }
 		case MoveableSubscriber::SFX_HUMAN_DEATH:
     {
-        SM.PlaySound( m_nSFX[ SFX_HUMAN_DEATH ] );
+        // SM.PlaySound( m_nSFX[ SFX_HUMAN_DEATH ] );
         break;
     }
 		
