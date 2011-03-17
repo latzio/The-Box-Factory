@@ -705,8 +705,6 @@ void GeometryNode::draw_gl() const
     
   // Draw my primitive
   m_primitive->walk_gl( );
-
-
 }
  
 void GeometryNode::set_shadow( bool b ) {

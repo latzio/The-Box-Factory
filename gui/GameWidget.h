@@ -4,6 +4,7 @@
 #include "Game.h"
 
 #include <QSize>
+#include <QTimer>
 #include <QtOpenGL/QGLWidget>
  
 
@@ -15,7 +16,7 @@ public:
     virtual ~GameWidget();
  
 public slots:
-    void showGame() const;
+    void tick();
  
 protected:
 
@@ -40,6 +41,7 @@ protected:
 private:
     
     Game m_game;
+    QTimer* m_gameTimer;
 };
 
 #endif

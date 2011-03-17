@@ -35,9 +35,11 @@ SET( PLAY_SRC
 SET( PLAY_LIB
     ${QT_LIBRARIES}
     ${QT_QTOPENGL_LIBRARY}
-    ${LIBRARY_OUTPUT_PATH}/libboxfactory.a
     ${LUA_LIBRARIES}
+    ${OPENGL_LIBRARIES}
 )
 
 ADD_EXECUTABLE( out ${PLAY_SRC} )
-TARGET_LINK_LIBRARIES( out ${PLAY_LIB} )
+TARGET_LINK_LIBRARIES( out 
+                       ${PLAY_LIB}
+                       ${LIBRARY_OUTPUT_PATH}/libboxfactory.a )

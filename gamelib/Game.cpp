@@ -35,6 +35,7 @@ Game::Game( int nPlayers )
 {
   // Import the level
   m_pLevel = new Level( import_lua( "models/level.lua" ), this );;
+    std::cout << "Creating " << nPlayers << " players." << std::endl;
 
   // Set up shield lua files
   m_pShield[ 0 ] = import_lua( "models/shield.lua" );
@@ -68,13 +69,13 @@ Game::Game( int nPlayers )
   m_NPCs.reserve( ENEMY_CAP );
 
   // Create All bullets
-  // for (int i = 0; i < BULLET_CAP; i++ ) {
-  //	 Bullet * b = Bullet::CreateBullet( this, (Moveable*)0 );
-  //	 b->set_id( i );
- // 	 b->set_joint();
-  //	 b->set_dead( true );
-	 //m_Bullets.push_back( b );
-  //}
+  /*for (int i = 0; i < BULLET_CAP; i++ ) {
+  Bullet * b = Bullet::CreateBullet( this, (Moveable*)0 );
+ 	 b->set_id( i );
+  	 b->set_joint();
+  	 b->set_dead( true );
+	 m_Bullets.push_back( b );
+  }*/
 
   // Copies of stuff that will be re-used
   m_pModels[ MODEL_ENEMY_SWORD ] =       import_lua( "models/enemy_sword.lua" );
@@ -90,19 +91,19 @@ Game::Game( int nPlayers )
   // Import a bullet
   // m_pDefaultBullet = Bullet::CreateBullet( this, (Moveable*)0 );
   // Import an enemy
-  // m_pDefaultEnemy = new NPC( import_lua( "models/enemy.lua" ), this );
+  m_pDefaultEnemy = new NPC( import_lua( "models/enemy.lua" ), this );
 
   // Create all enemies
-  //for( int i = 0; i < ENEMY_CAP; i++ ) {
-  //  NPC * npc = new NPC( import_lua( "models/enemy_pistol.lua" ), this );
-  //
-  //  npc->set_id( i );
-//	  npc->set_dead( true );
-//
- //   m_NPCs.push_back( npc );
-//
- //   m_EnemyIndex.push_back( i );
-  //}
+  for( int i = 0; i < ENEMY_CAP; i++ ) {
+    NPC * npc = new NPC( import_lua( "models/enemy_pistol.lua" ), this );
+  
+   npc->set_id( i );
+	  npc->set_dead( true );
+
+    m_NPCs.push_back( npc );
+
+    m_EnemyIndex.push_back( i );
+  }
 
   m_nParticleIndex[0] = 0;
   m_nParticleIndex[1] = LITTLE_PARTICLES;
@@ -130,9 +131,9 @@ Game::Game( int nPlayers )
     m_Particles.push_back( p );
   }
 
-  //for (int i = 0; i < 100; i++) {
+ // for (int i = 0; i < 100; i++) {
   //  CreateEnemy();
-  //}
+ // }
   
   // Create AI
   m_AIs.push_back( new AutoAI( AI::UP ) );
@@ -141,10 +142,10 @@ Game::Game( int nPlayers )
   m_AIs.push_back( new AutoAI( AI::RIGHT ) );
 
   // Create enemies 
-  // for(int i = 0; i < MOBS; i++) {
-  //
-  //  CreateMob( );
-  // }
+   for(int i = 0; i < MOBS; i++) {
+  
+   CreateMob( );
+   }
 
   // JOYSTICK STUFF
   //
@@ -416,8 +417,6 @@ void Game::walk_gl() {
 	  m_pLevel->walk_gl();
 	glPopMatrix();
 
-    return;
-
 	// DRAW PLAYERS 
    // They require scaling down from the lua file
   	glPushMatrix();
@@ -582,6 +581,8 @@ AISubscriber * Game::CreateEnemy(int x, int z) {
 }
 
 void Game::DamageEnemy( NPC * pNPC, int nDamage, const Point3D& p3d ) {
+
+    return;
  
   Vector3D v = p3d - Point3D(0,0,0);
   CreateParticles( SIZE_LITTLE, 2, v );

@@ -13,17 +13,23 @@
 
 GameWidget::GameWidget(QWidget* parent)
 :m_game(1)
+,m_gameTimer(new QTimer(this))
 {
-
+    connect(m_gameTimer, SIGNAL(timeout()), this, SLOT(tick()));
+    m_gameTimer->start(20);
 }
 
 GameWidget::~GameWidget()
 {
+    m_gameTimer->stop();
+    delete m_gameTimer;
+    m_gameTimer = 0;
 }
 
-void GameWidget::showGame() const
+void GameWidget::tick()
 {
-    std::cout << "Whoo!" << std::endl;
+    m_game.tick();
+    updateGL();
 }
      
 void GameWidget::initializeGL()
@@ -74,7 +80,7 @@ void GameWidget::initializeGL()
 
     }
 
-
+    m_game.play();
 
 }
 
@@ -95,6 +101,7 @@ void GameWidget::resizeGL(int width, int height)
 
 void GameWidget::paintGL()
 {
+
     // draw the scene:
     int width = 640; //get_width();
     int height = 480; //get_height();
@@ -108,7 +115,7 @@ void GameWidget::paintGL()
     glDisable(GL_CULL_FACE);
 
     glViewport(0, 0, width, height);
-    // gluPerspective(40.0, (GLfloat)width/(GLfloat)height, .1, 1000.0);
+    gluPerspective(40.0, (GLfloat)width/(GLfloat)height, .1, 1000.0);
 
     // change to model view for drawing
     glMatrixMode(GL_MODELVIEW);

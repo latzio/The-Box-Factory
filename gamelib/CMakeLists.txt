@@ -18,7 +18,6 @@ SET( GAMELIB_SRC
 )
          
 SET( GAMELIB_LIB
-    /usr/lib/liblua5.1.a
 )
           
 ADD_LIBRARY( boxfactory ${GAMELIB_SRC} )
