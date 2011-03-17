@@ -36,6 +36,7 @@ SET( PLAY_LIB
     ${QT_LIBRARIES}
     ${QT_QTOPENGL_LIBRARY}
     ${LIBRARY_OUTPUT_PATH}/libboxfactory.a
+    ${LUA_LIBRARIES}
 )
 
 ADD_EXECUTABLE( out ${PLAY_SRC} )

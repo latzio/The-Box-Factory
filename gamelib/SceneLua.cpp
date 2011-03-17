@@ -40,7 +40,9 @@
 #include <cctype>
 #include <cstring>
 #include <cstdio>
-#include "Lua488.h"
+//#include "Lua488.h"
+
+#include "/usr/include/lua5.1/lua.hpp"
 
 // Uncomment the following line to enable debugging messages
 // #define GRLUA_ENABLE_DEBUG

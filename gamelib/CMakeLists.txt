@@ -1,7 +1,6 @@
 # FIXME Need openGL, GLUT, SDL, etc. Lots of shit.
 
-FIND_LIBRARY(OpenGL REQUIRED)
-FIND_LIBRARY(Lua51 REQUIRED)
+FIND_PACKAGE(Lua51 REQUIRED)
 
 # General
 SET( GAMELIB_SRC
@@ -14,11 +13,12 @@ SET( GAMELIB_SRC
     Object.cpp
     Primitive.cpp
     Scene.cpp
-#    SceneLua.cpp Uncomment once libs are working.
+    SceneLua.cpp
 #    SoundManager.cpp
 )
          
 SET( GAMELIB_LIB
+    /usr/lib/liblua5.1.a
 )
           
 ADD_LIBRARY( boxfactory ${GAMELIB_SRC} )

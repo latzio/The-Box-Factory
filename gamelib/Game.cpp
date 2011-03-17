@@ -33,7 +33,6 @@ Game::Game( int nPlayers )
   , m_nLives( LIFE_CAP )
   , m_nScore( 0 )
 {
-    /*
   // Import the level
   m_pLevel = new Level( import_lua( "models/level.lua" ), this );;
 
