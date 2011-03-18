@@ -32,3 +32,44 @@ MainWindow::MainWindow(QWidget *parent) {
 
 MainWindow::~MainWindow() {
 }
+
+void MainWindow::keyPressEvent(QKeyEvent* event)
+{
+    switch (event->key()) {
+    case 87:
+        sendKeyToGame(GameWidget::UP, true);
+        break;
+    case 65:
+        sendKeyToGame(GameWidget::LEFT, true);
+        break;
+    case 83:
+        sendKeyToGame(GameWidget::DOWN, true);
+        break;
+    case 68:
+        sendKeyToGame(GameWidget::RIGHT, true);
+        break;
+    }
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent* event)
+{
+    switch (event->key()) {
+    case 87:
+        sendKeyToGame(GameWidget::UP, false);
+        break;
+    case 65:
+        sendKeyToGame(GameWidget::LEFT, false);
+        break;
+    case 83:
+        sendKeyToGame(GameWidget::DOWN, false);
+        break;
+    case 68:
+        sendKeyToGame(GameWidget::RIGHT, false);
+        break;
+    }
+}
+
+bool MainWindow::sendKeyToGame(GameWidget::GameKey key, bool pressed)
+{
+    return _gameWidget->handleKeyEvent(key, pressed);
+}

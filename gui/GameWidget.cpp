@@ -26,6 +26,31 @@ GameWidget::~GameWidget()
     m_gameTimer = 0;
 }
 
+bool GameWidget::handleKeyEvent(GameWidget::GameKey key, bool pressed)
+{
+    Game::Action action = Game::ACTION_MOVE_LEFT;
+    switch (key) {
+    case UP:
+        action = Game::ACTION_MOVE_UP;
+        break;
+    case DOWN:
+        action = Game::ACTION_MOVE_DOWN;
+        break;
+    case RIGHT:
+        action = Game::ACTION_MOVE_RIGHT;
+        break;
+    case LEFT:
+        action = Game::ACTION_MOVE_LEFT;
+        break;
+    }
+    if (!pressed)
+        action = (Game::Action)((int)action + 1);
+
+    m_game.input(action, 0);
+        
+    return true;
+}
+
 void GameWidget::tick()
 {
     m_game.tick();

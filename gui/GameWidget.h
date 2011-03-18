@@ -15,6 +15,9 @@ public:
     GameWidget(QWidget * parent = 0);
     virtual ~GameWidget();
  
+    enum GameKey { UP, DOWN, LEFT, RIGHT };
+    bool handleKeyEvent(GameKey key, bool pressed);
+
 public slots:
     void tick();
  

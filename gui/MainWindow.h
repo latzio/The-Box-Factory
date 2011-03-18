@@ -4,6 +4,7 @@
 #include "HelloWidget.h"
 #include "GameWidget.h"
 
+#include <QKeyEvent>
 #include <QtGui/QMainWindow>
 #include <QPushButton>
  
@@ -15,6 +16,12 @@ public:
     ~MainWindow();
  
 protected:
+
+    void keyPressEvent(QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent*event);
+
+    bool sendKeyToGame(GameWidget::GameKey key, bool pressed);
+
     HelloWidget* _helloWidget;
     QPushButton* _button;
     GameWidget*  _gameWidget;
