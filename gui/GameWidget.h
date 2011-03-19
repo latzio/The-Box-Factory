@@ -20,6 +20,7 @@ public:
 
 public slots:
     void tick();
+    void paint();
  
 protected:
 
@@ -44,7 +45,8 @@ protected:
 private:
     
     Game m_game;
-    QTimer* m_gameTimer;
+    QTimer* m_tickTimer;
+    QTimer* m_paintTimer;
 };
 
 #endif

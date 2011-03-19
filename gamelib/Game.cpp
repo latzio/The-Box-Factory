@@ -428,7 +428,7 @@ void Game::walk_gl() {
 		(*it)->walk_gl();
 	}
   	
-	
+/*	
 	// Draw the enemies
 	for (	EnemyList::iterator it = m_NPCs.begin(); 
 			it != m_NPCs.end(); it++) {
@@ -451,6 +451,7 @@ void Game::walk_gl() {
       (*it)->walk_gl();
 	  }
   }
+  */
   glPopMatrix();
 
 }

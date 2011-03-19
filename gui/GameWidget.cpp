@@ -13,17 +13,23 @@
 
 GameWidget::GameWidget(QWidget* parent)
 :m_game(1)
-,m_gameTimer(new QTimer(this))
+,m_tickTimer(new QTimer(this))
+,m_paintTimer(new QTimer(this))
 {
-    connect(m_gameTimer, SIGNAL(timeout()), this, SLOT(tick()));
-    m_gameTimer->start(20);
+    connect(m_tickTimer, SIGNAL(timeout()), this, SLOT(tick()));
+    m_tickTimer->start(16);
+    connect(m_paintTimer, SIGNAL(timeout()), this, SLOT(paint()));
+    m_paintTimer->start(32);
 }
 
 GameWidget::~GameWidget()
 {
-    m_gameTimer->stop();
-    delete m_gameTimer;
-    m_gameTimer = 0;
+    m_tickTimer->stop();
+    delete m_tickTimer;
+    m_tickTimer = 0;
+    m_paintTimer->stop();
+    delete m_paintTimer;
+    m_paintTimer = 0;
 }
 
 bool GameWidget::handleKeyEvent(GameWidget::GameKey key, bool pressed)
@@ -54,6 +60,10 @@ bool GameWidget::handleKeyEvent(GameWidget::GameKey key, bool pressed)
 void GameWidget::tick()
 {
     m_game.tick();
+}
+     
+void GameWidget::paint()
+{
     updateGL();
 }
      
@@ -69,7 +79,7 @@ void GameWidget::initializeGL()
     //logo = new QtLogo(this, 64);
     //logo->setColor(qtGreen.dark());
 
-    // glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     //glEnable(GL_LIGHTING);
     //glEnable(GL_LIGHT0);
     //glEnable(GL_MULTISAMPLE);
@@ -137,7 +147,7 @@ void GameWidget::paintGL()
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     // Set up culling!
-    glDisable(GL_CULL_FACE);
+    // glDisable(GL_CULL_FACE);
 
     glViewport(0, 0, width, height);
     gluPerspective(40.0, (GLfloat)width/(GLfloat)height, .1, 1000.0);

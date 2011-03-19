@@ -35,6 +35,9 @@ MainWindow::~MainWindow() {
 
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
+    if (event->isAutoRepeat())
+        return;
+
     switch (event->key()) {
     case 87:
         sendKeyToGame(GameWidget::UP, true);
@@ -53,6 +56,9 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
 
 void MainWindow::keyReleaseEvent(QKeyEvent* event)
 {
+    if (event->isAutoRepeat())
+        return;
+
     switch (event->key()) {
     case 87:
         sendKeyToGame(GameWidget::UP, false);
