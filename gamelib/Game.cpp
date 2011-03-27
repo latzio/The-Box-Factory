@@ -32,6 +32,8 @@ Game::Game( int nPlayers )
   , m_nPlayers( nPlayers )
   , m_nLives( LIFE_CAP )
   , m_nScore( 0 )
+  , m_frames( 0 )
+  , m_movements( 0 )
 {
   // Import the level
   m_pLevel = new Level( import_lua( "models/level.lua" ), this );;
@@ -69,7 +71,7 @@ Game::Game( int nPlayers )
   m_NPCs.reserve( ENEMY_CAP );
 
   // Create All bullets
-  /*for (int i = 0; i < BULLET_CAP; i++ ) {
+ /* for (int i = 0; i < BULLET_CAP; i++ ) {
   Bullet * b = Bullet::CreateBullet( this, (Moveable*)0 );
  	 b->set_id( i );
   	 b->set_joint();
@@ -361,7 +363,7 @@ void Game::input( Action action, int nPlayer ) {
 
 	}
 
-
+    m_movements++;
 }
 
 /*
@@ -412,6 +414,8 @@ void Game::walk_gl() {
     if (!m_pLevel)
         return;
 
+    m_frames++;
+
 	// draw the level
 	glPushMatrix();
 	  m_pLevel->walk_gl();
@@ -428,7 +432,6 @@ void Game::walk_gl() {
 		(*it)->walk_gl();
 	}
   	
-/*	
 	// Draw the enemies
 	for (	EnemyList::iterator it = m_NPCs.begin(); 
 			it != m_NPCs.end(); it++) {
@@ -451,7 +454,6 @@ void Game::walk_gl() {
       (*it)->walk_gl();
 	  }
   }
-  */
   glPopMatrix();
 
 }
@@ -791,4 +793,20 @@ Shield* Game::RequestShield( MoveableSubscriber::ShieldType s ) {
 
   return shield;
 
+}
+
+void Game::dumpStats() {
+
+
+    std::cout << "Game Stats:" << std::endl;
+    std::cout << "-------------------------------------------:" << std::endl;
+    std::cout << "Frames Rendered: " << m_frames << std::endl;
+    std::cout << "Player Movements: " << m_movements << std::endl;
+    std::cout << "-------------------------------------------:" << std::endl;
+
+}
+
+void Game::clearStats() {
+    m_frames = 0;
+    m_movements = 0;
 }

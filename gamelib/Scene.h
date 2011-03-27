@@ -129,6 +129,7 @@ protected:
 
   // Transformations
   Matrix4x4 m_trans;
+  mutable Matrix4x4 m_transTranspose;
   Matrix4x4 m_invtrans;
 
   // Hierarchy
@@ -139,6 +140,9 @@ protected:
 
   // Collisions
   double m_nRadius;
+
+  // Optimization
+  mutable bool m_dirty;
 
 };
 

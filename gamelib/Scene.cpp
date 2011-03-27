@@ -12,6 +12,7 @@ SceneNode::SceneNode(const std::string& name)
   , m_bPicked( false )
   , m_parent( 0 )
   , m_nRadius( 0.0 )
+  , m_dirty( true )
 {
 }
 
@@ -79,16 +80,16 @@ void SceneNode::setupDL() {
   // create one display list
   SceneNode::DL_INDEX = glGenLists( DL_INDEX );
   
-  //GLUquadric* gluq = gluNewQuadric();
+  GLUquadric* gluq = gluNewQuadric();
 
   // compile the display list, for a sphere
-  //glNewList(DL_INDEX + DL_SPHERE, GL_COMPILE);
+  glNewList(DL_INDEX + DL_SPHERE, GL_COMPILE);
     // Draw a simple sphere
-  //  gluSphere(  gluq,
-        //        SPHERE_RADIUS,
-    //            SPHERE_SLICES,
-      //          SPHERE_STACKS );
-  //glEndList();
+    gluSphere(  gluq,
+                SPHERE_RADIUS,
+                SPHERE_SLICES,
+                SPHERE_STACKS );
+  glEndList();
 
   // compile the display list, for a plane
   glNewList(DL_INDEX + DL_PLANE, GL_COMPILE);
@@ -189,6 +190,9 @@ void SceneNode::setupDL() {
 
 void SceneNode::tick() {
   // recursively call on my children
+  if (!m_children.size())
+    return;
+
   ChildList::iterator it;
   for (it = m_children.begin(); it != m_children.end(); it++) {
     (*it)->tick( );
@@ -216,7 +220,11 @@ void SceneNode::walk_gl() const
   // Apply my transformation
   glPushMatrix();
 
-  glMultMatrixd( m_trans.transpose().begin() );
+  if (m_dirty) {
+      m_transTranspose = m_trans.transpose();
+      m_dirty = false;
+  }
+  glMultMatrixd( m_transTranspose.begin() );
 
   /*
   if (is_joint() && m_bPicked) {
@@ -366,9 +374,8 @@ bool SceneNode::pick( int id )
 }
 
 void SceneNode::applyAction( Matrix4x4* pTransform ) {
-      
       m_trans = m_trans * *pTransform;
-  
+      m_dirty = true;
 }
 
 void SceneNode::rotatePicked( int degrees ) {
@@ -404,6 +411,7 @@ void SceneNode::resetOrientation() {
 
   Matrix4x4 reset;
   m_trans = reset;
+  m_dirty = true;
 
 }
 
@@ -452,7 +460,7 @@ void SceneNode::rotate(char axis, double angle)
   r[bottomRow][rightCol] = cos( radAngle );
 
   m_trans = m_trans * r;
-
+  m_dirty = true;
 }
 
 void SceneNode::scale(const Vector3D& amount)
@@ -467,6 +475,7 @@ void SceneNode::scale(const Vector3D& amount)
   }
   
   m_trans = m_trans * s;
+  m_dirty = true;
 }
 
 void SceneNode::translate(const Vector3D& amount)
@@ -482,6 +491,7 @@ void SceneNode::translate(const Vector3D& amount)
   }
 
   m_trans = m_trans * t;
+  m_dirty = true;
 }
 
 bool SceneNode::is_joint() const

@@ -40,16 +40,28 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
 
     switch (event->key()) {
     case 87:
-        sendKeyToGame(GameWidget::UP, true);
+        sendKeyToGame(GameWidget::MOVE_UP, true);
         break;
     case 65:
-        sendKeyToGame(GameWidget::LEFT, true);
+        sendKeyToGame(GameWidget::MOVE_LEFT, true);
         break;
     case 83:
-        sendKeyToGame(GameWidget::DOWN, true);
+        sendKeyToGame(GameWidget::MOVE_DOWN, true);
         break;
     case 68:
-        sendKeyToGame(GameWidget::RIGHT, true);
+        sendKeyToGame(GameWidget::MOVE_RIGHT, true);
+        break;
+    case 'I':
+        sendKeyToGame(GameWidget::SHOOT_UP, true);
+        break;
+    case 'J':
+        sendKeyToGame(GameWidget::SHOOT_LEFT, true);
+        break;
+    case 'K':
+        sendKeyToGame(GameWidget::SHOOT_DOWN, true);
+        break;
+    case 'L':
+        sendKeyToGame(GameWidget::SHOOT_RIGHT, true);
         break;
     }
 }
@@ -61,16 +73,28 @@ void MainWindow::keyReleaseEvent(QKeyEvent* event)
 
     switch (event->key()) {
     case 87:
-        sendKeyToGame(GameWidget::UP, false);
+        sendKeyToGame(GameWidget::MOVE_UP, false);
         break;
     case 65:
-        sendKeyToGame(GameWidget::LEFT, false);
+        sendKeyToGame(GameWidget::MOVE_LEFT, false);
         break;
     case 83:
-        sendKeyToGame(GameWidget::DOWN, false);
+        sendKeyToGame(GameWidget::MOVE_DOWN, false);
         break;
     case 68:
-        sendKeyToGame(GameWidget::RIGHT, false);
+        sendKeyToGame(GameWidget::MOVE_RIGHT, false);
+        break;
+    case 'I':
+        sendKeyToGame(GameWidget::SHOOT_UP, false);
+        break;
+    case 'J':
+        sendKeyToGame(GameWidget::SHOOT_LEFT, false);
+        break;
+    case 'K':
+        sendKeyToGame(GameWidget::SHOOT_DOWN, false);
+        break;
+    case 'L':
+        sendKeyToGame(GameWidget::SHOOT_RIGHT, false);
         break;
     }
 }

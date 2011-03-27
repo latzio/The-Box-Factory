@@ -3,7 +3,7 @@
 myroot = gr.node('root') -- The root node of the pupppet
 
 -- Material         COLOUR__________  LIGHTING________  SHININESS
-shirt = gr.material({ 0.1, 0.2, 0.4}, { 0.2, 0.2, 0.2}, 20)
+shirt = gr.material({ 0.1, 0.2, 0.4}, { 0.2, 0.2, 0.2}, 20, 9)
 flesh = gr.material({ 0.4, 0.2, 0.1}, { 0.1, 0.1, 0.1}, 80)
 pants = gr.material({ 0.05, 0.05, 0.075}, { 0.2, 0.2, 0.2}, 10)
 shoes = gr.material({ 0.03, 0.03, 0.03}, { 0.4, 0.4, 0.4}, 40)

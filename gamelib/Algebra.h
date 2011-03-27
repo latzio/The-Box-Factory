@@ -349,18 +349,18 @@ public:
     return getRow(row);
   }
 
-  Matrix4x4 transpose() const
+  const Matrix4x4 transpose() const
   {
     return Matrix4x4(getColumn(0), getColumn(1), 
                       getColumn(2), getColumn(3));
   }
   Matrix4x4 invert() const;
 
-  const double *begin() const
+  double *begin() const
   {
     return (double*)v_;
   }
-  const double *end() const
+  double *end() const
   {
     return begin() + 16;
   }
@@ -369,16 +369,21 @@ private:
   double v_[16];
 };
 
-inline Matrix4x4 operator *(const Matrix4x4& a, const Matrix4x4& b)
+inline Matrix4x4 operator *(const Matrix4x4& aMatrix, const Matrix4x4& bMatrix)
 {
   Matrix4x4 ret;
+  double* data  = ret.begin();
+  double* a = aMatrix.begin();
+  double* b = bMatrix.begin();
 
   for(size_t i = 0; i < 4; ++i) {
-    Vector4D row = a.getRow(i);
+    // Vector4D row = a.getRow(i);
+    int row = i * 4;
+
 		
-    for(size_t j = 0; j < 4; ++j) {
-      ret[i][j] = row[0] * b[0][j] + row[1] * b[1][j] + 
-        row[2] * b[2][j] + row[3] * b[3][j];
+    for(size_t j = 0; j < 4; ++j) {      
+      //ret[i][j] = a[i][0] * b[0][j] + a[i][1] * b[1][j] + a[i][2] * b[2][j] + a[i][3] * b[3][j];
+      data[row + j] = a[row] * b[j] + a[row + 1] * b[4 + j] + a[row + 2] * b[8 + j] + a[row + 3] * b[12 + j];
     }
   }
 

@@ -15,12 +15,14 @@ public:
     GameWidget(QWidget * parent = 0);
     virtual ~GameWidget();
  
-    enum GameKey { UP, DOWN, LEFT, RIGHT };
+    enum GameKey { MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT,
+                   SHOOT_UP, SHOOT_DOWN, SHOOT_LEFT, SHOOT_RIGHT };
     bool handleKeyEvent(GameKey key, bool pressed);
 
 public slots:
     void tick();
     void paint();
+    void stats();
  
 protected:
 
@@ -47,6 +49,7 @@ private:
     Game m_game;
     QTimer* m_tickTimer;
     QTimer* m_paintTimer;
+    QTimer* m_statsTimer;
 };
 
 #endif

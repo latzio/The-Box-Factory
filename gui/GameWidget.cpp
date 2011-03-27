@@ -15,11 +15,14 @@ GameWidget::GameWidget(QWidget* parent)
 :m_game(1)
 ,m_tickTimer(new QTimer(this))
 ,m_paintTimer(new QTimer(this))
+,m_statsTimer(new QTimer(this))
 {
     connect(m_tickTimer, SIGNAL(timeout()), this, SLOT(tick()));
-    m_tickTimer->start(16);
-    connect(m_paintTimer, SIGNAL(timeout()), this, SLOT(paint()));
-    m_paintTimer->start(32);
+    m_tickTimer->start(20);
+//    connect(m_paintTimer, SIGNAL(timeout()), this, SLOT(paint()));
+//    m_paintTimer->start(32);
+    connect(m_statsTimer, SIGNAL(timeout()), this, SLOT(stats()));
+    m_statsTimer->start(10000);
 }
 
 GameWidget::~GameWidget()
@@ -30,23 +33,38 @@ GameWidget::~GameWidget()
     m_paintTimer->stop();
     delete m_paintTimer;
     m_paintTimer = 0;
+    m_statsTimer->stop();
+    delete m_statsTimer;
+    m_statsTimer = 0;
 }
 
 bool GameWidget::handleKeyEvent(GameWidget::GameKey key, bool pressed)
 {
     Game::Action action = Game::ACTION_MOVE_LEFT;
     switch (key) {
-    case UP:
+    case MOVE_UP:
         action = Game::ACTION_MOVE_UP;
         break;
-    case DOWN:
+    case MOVE_DOWN:
         action = Game::ACTION_MOVE_DOWN;
         break;
-    case RIGHT:
+    case MOVE_RIGHT:
         action = Game::ACTION_MOVE_RIGHT;
         break;
-    case LEFT:
+    case MOVE_LEFT:
         action = Game::ACTION_MOVE_LEFT;
+        break;
+    case SHOOT_UP:
+        action = Game::ACTION_SHOOT_UP;
+        break;
+    case SHOOT_DOWN:
+        action = Game::ACTION_SHOOT_DOWN;
+        break;
+    case SHOOT_RIGHT:
+        action = Game::ACTION_SHOOT_RIGHT;
+        break;
+    case SHOOT_LEFT:
+        action = Game::ACTION_SHOOT_LEFT;
         break;
     }
     if (!pressed)
@@ -60,11 +78,18 @@ bool GameWidget::handleKeyEvent(GameWidget::GameKey key, bool pressed)
 void GameWidget::tick()
 {
     m_game.tick();
+    paint();
 }
      
 void GameWidget::paint()
 {
     updateGL();
+}
+
+void GameWidget::stats()
+{
+    m_game.dumpStats();
+    m_game.clearStats();
 }
      
 void GameWidget::initializeGL()
@@ -164,7 +189,7 @@ void GameWidget::paintGL()
 
     // Back up the camera
     glTranslated( 0, 0, -40 );
-    glRotated( 60, 1, 0, 0 );
+    glRotated( 70, 1, 0, 0 );
 
 
     // Apply user rotation

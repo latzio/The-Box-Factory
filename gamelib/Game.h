@@ -66,6 +66,11 @@ class Game : public MoveableSubscriber{
     virtual void pause() { m_bRunning = false; }
     virtual void unpause() { m_bRunning = true; }
     virtual void togglePause() { m_bRunning = !m_bRunning; }
+
+
+    void dumpStats();
+    void clearStats();
+
   protected:
 
     // This is the level we are playing
@@ -132,6 +137,11 @@ class Game : public MoveableSubscriber{
    int m_nLives;
 
    int m_nScore;
+
+   // Stat tracking
+   int m_frames;
+   int m_movements;
+
 
 };
 #endif
