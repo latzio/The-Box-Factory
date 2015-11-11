@@ -11,7 +11,6 @@ INCLUDE(${CMAKE_BINARY_DIR}/gamelib)
 SET( PLAY_Qt4_SRC
     GameWidget.h
     MainWindow.h
-	HelloWidget.h
 )
 SET( PLAY_Qt4_UI
 )
@@ -26,7 +25,6 @@ QT4_ADD_RESOURCES(PLAY_RES_H ${PLAY_Qt4_RES})
 SET( PLAY_SRC
     main.cpp
     GameWidget.cpp
-    HelloWidget.cpp
     MainWindow.cpp
     ${PLAY_MOC_CPP}
     ${PLAY_UI_CPP}

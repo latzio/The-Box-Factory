@@ -11,6 +11,8 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+static QSize s_widgetSize(800, 600);
+
 GameWidget::GameWidget(QWidget* parent)
 :m_game(1)
 ,m_tickTimer(new QTimer(this))
@@ -71,7 +73,7 @@ bool GameWidget::handleKeyEvent(GameWidget::GameKey key, bool pressed)
         action = (Game::Action)((int)action + 1);
 
     m_game.input(action, 0);
-        
+
     return true;
 }
 
@@ -80,7 +82,7 @@ void GameWidget::tick()
     m_game.tick();
     paint();
 }
-     
+
 void GameWidget::paint()
 {
     updateGL();
@@ -91,12 +93,12 @@ void GameWidget::stats()
     m_game.dumpStats();
     m_game.clearStats();
 }
-     
+
 void GameWidget::initializeGL()
 {
     // Set up the rendering context, define display lists etc.:
     std::cout << "Initialize GL called." << std::endl;
-    
+
     glShadeModel(GL_SMOOTH);
     glClearColor(0, 0, 0, 0);
     glEnable(GL_DEPTH_TEST);
@@ -108,7 +110,7 @@ void GameWidget::initializeGL()
     //glEnable(GL_LIGHTING);
     //glEnable(GL_LIGHT0);
     //glEnable(GL_MULTISAMPLE);
-    
+
     //static GLfloat lightPosition[4] = { 0.5, 5.0, 7.0, 1.0 };
     //glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 
@@ -135,7 +137,7 @@ void GameWidget::initializeGL()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-        glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, i->width(), i->height(), 
+        glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, i->width(), i->height(),
         0, (i->elements() == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, i->byteData());
 
     }
@@ -148,7 +150,7 @@ void GameWidget::resizeGL(int width, int height)
 {
     // setup viewport, projection etc.:
     std::cout << "Resize GL called." << std::endl;
-    
+
     int side = qMin(width, height);
     glViewport((width - side) / 2, (height - side) / 2, side, side);
 
@@ -161,12 +163,11 @@ void GameWidget::resizeGL(int width, int height)
 
 void GameWidget::paintGL()
 {
-
     // draw the scene:
-    int width = 640; //get_width();
-    int height = 480; //get_height();
+    int width = s_widgetSize.width();
+    int height = s_widgetSize.height();
 
-    // Set up for perspective drawing 
+    // Set up for perspective drawing
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -247,5 +248,20 @@ void GameWidget::paintGL()
     glPushMatrix();
     m_game.walk_gl();
     glPopMatrix();
-    
+
+}
+
+QSize GameWidget::minimumSizeHint() const
+{
+    return s_widgetSize;
+}
+
+QSize GameWidget::maximumSizeHint() const
+{
+    return s_widgetSize;
+}
+
+QSize GameWidget::sizeHint() const
+{
+    return s_widgetSize;
 }
