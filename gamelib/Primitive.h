@@ -4,7 +4,6 @@
 #include "Algebra.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glut.h>
 
 class Primitive {
 public:

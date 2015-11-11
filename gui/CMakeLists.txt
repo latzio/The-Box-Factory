@@ -2,7 +2,8 @@
 FIND_PACKAGE(OpenGL REQUIRED)
 FIND_PACKAGE(Qt4 REQUIRED)
 FIND_PACKAGE(Qt COMPONENTS QtOpenGL REQUIRED)
-    
+FIND_PACKAGE(PNG REQUIRED)
+
 INCLUDE(${QT_USE_FILE})
 INCLUDE(${QT_QTOPENGL_INCLUDE_DIR})
 INCLUDE(${CMAKE_BINARY_DIR}/gamelib)
@@ -16,11 +17,11 @@ SET( PLAY_Qt4_UI
 )
 SET( PLAY_Qt4_RES
 )
-      
+
 QT4_WRAP_CPP(PLAY_MOC_CPP ${PLAY_Qt4_SRC})
 QT4_WRAP_UI(PLAY_UI_CPP ${PLAY_Qt4_UI})
 QT4_ADD_RESOURCES(PLAY_RES_H ${PLAY_Qt4_RES})
-       
+
 # General
 SET( PLAY_SRC
     main.cpp
@@ -31,15 +32,16 @@ SET( PLAY_SRC
     ${PLAY_UI_CPP}
     ${PLAY_RES_H}
 )
-         
+
 SET( PLAY_LIB
     ${QT_LIBRARIES}
     ${QT_QTOPENGL_LIBRARY}
     ${LUA_LIBRARIES}
     ${OPENGL_LIBRARIES}
+    ${PNG_LIBRARIES}
 )
 
 ADD_EXECUTABLE( out ${PLAY_SRC} )
-TARGET_LINK_LIBRARIES( out 
-                       ${PLAY_LIB}
-                       ${LIBRARY_OUTPUT_PATH}/libboxfactory.a )
+TARGET_LINK_LIBRARIES( out
+                       ${LIBRARY_OUTPUT_PATH}/libboxfactory.a
+                       ${PLAY_LIB})

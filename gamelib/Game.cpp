@@ -8,10 +8,10 @@
 // #include "SoundManager.h"
 // #include "joystick/include.h"
 
-#define BULLET_CAP 128 
+#define BULLET_CAP 128
 #define ENEMY_CAP  64
 
-#define LITTLE_PARTICLES 92 
+#define LITTLE_PARTICLES 92
 #define MEDIUM_PARTICLES 116
 #define BIGGER_PARTICLES 128
 #define SPARKS_PARTICLES 156
@@ -24,7 +24,7 @@
 #define LEVEL_DELAY 300
 #define LIFE_CAP 10
 
-Game::Game( int nPlayers ) 
+Game::Game( int nPlayers )
   : m_nBulletCounter(0)
   , m_nEnemyCounter(0)
   , m_nKeyboardPlayer(0)
@@ -98,7 +98,7 @@ Game::Game( int nPlayers )
   // Create all enemies
   for( int i = 0; i < ENEMY_CAP; i++ ) {
     NPC * npc = new NPC( import_lua( "models/enemy_pistol.lua" ), this );
-  
+
    npc->set_id( i );
 	  npc->set_dead( true );
 
@@ -136,23 +136,23 @@ Game::Game( int nPlayers )
  // for (int i = 0; i < 100; i++) {
   //  CreateEnemy();
  // }
-  
+
   // Create AI
   m_AIs.push_back( new AutoAI( AI::UP ) );
   m_AIs.push_back( new AutoAI( AI::LEFT ) );
   m_AIs.push_back( new AutoAI( AI::DOWN ) );
   m_AIs.push_back( new AutoAI( AI::RIGHT ) );
 
-  // Create enemies 
+  // Create enemies
    for(int i = 0; i < MOBS; i++) {
-  
+
    CreateMob( );
    }
 
   // JOYSTICK STUFF
   //
  //enable joysticks (yes, video is required)
- /*	
+ /*
 	if(initSdlForJoysticks() != 0){
 		printf("SDL can't init.\n");
 		exit(1);
@@ -165,7 +165,7 @@ Game::Game( int nPlayers )
 
 	int numJoys = getNumJoysticks();
 	printf("Number of joysticks found: %d\n", numJoys);
-	
+
 	for(int i = 0; i < numJoys && i < 2 ; i++){
 		printf("Joystick %d: %s\n", i, getJoystickName(i));
 		m_pJoystick[i] = loadJoystick( i );
@@ -236,24 +236,24 @@ bool Game::tick() {
   }
 
   // Fire AI
-  for (	AIList::iterator it = m_AIs.begin(); 
+  for (	AIList::iterator it = m_AIs.begin();
 			it != m_AIs.end(); it++) {
   		(*it)->tick();
 	}
 
 	// Attempt to move players
-	for (	PCList::iterator it = m_PCs.begin(); 
+	for (	PCList::iterator it = m_PCs.begin();
 			it != m_PCs.end(); it++) {
 		(*it)->tick();
 	}
 
 	// Attempt to move enemies
-	for (	EnemyList::iterator it = m_NPCs.begin(); 
+	for (	EnemyList::iterator it = m_NPCs.begin();
 			it != m_NPCs.end(); it++) {
 		  (*it)->tick();
 	}
-	
-  // Attempt to move bullets 
+
+  // Attempt to move bullets
   for (unsigned int i = 0; i < m_Bullets.size(); i++) {
     if ( i < m_Bullets.size() ) {
       (m_Bullets[i])->tick();
@@ -261,7 +261,7 @@ bool Game::tick() {
   }
 
 	// Attempt to move particles
-  for (	ParticleList::iterator it = m_Particles.begin(); 
+  for (	ParticleList::iterator it = m_Particles.begin();
 			it != m_Particles.end(); it++) {
 
 	  if (!(*it)->is_dead()) {
@@ -270,15 +270,15 @@ bool Game::tick() {
   }
 
   // Create some more mobs if we are low on enemies
-  while (m_NPCs.size() < ENEMY_WATERMARK) {   
-	 for (int i = 0; i < MOBS; i++) { 
+  while (m_NPCs.size() < ENEMY_WATERMARK) {
+	 for (int i = 0; i < MOBS; i++) {
 	    CreateMob();
 	 }
   }
 
   // Make sure doors are opened and closed
   for (int i = 0; i < 4; i++ ) {
-    (m_AIs[i]->isActive()) ? m_pLevel->openDoor( (Level::Door)i) 
+    (m_AIs[i]->isActive()) ? m_pLevel->openDoor( (Level::Door)i)
                            : m_pLevel->closeDoor( (Level::Door)i);
   }
 
@@ -289,15 +289,15 @@ bool Game::tick() {
     std::cout << "  -> Final score: " << m_nScore << std::endl;
   }
 
-	return m_nLives;	
+	return m_nLives;
 }
 
 void Game::input( Action action, int nPlayer ) {
 
-  if ((unsigned int)nPlayer > m_PCs.size()) { 
+  if ((unsigned int)nPlayer > m_PCs.size()) {
     return;
   }
-	
+
 	PC* pc = m_PCs[ nPlayer ];
 
   if (!pc->isHumanControlled()) {
@@ -332,7 +332,7 @@ void Game::input( Action action, int nPlayer ) {
 			pc->setAiming( NPC::DOWN, true );
 			break;
 
-		// Stops 
+		// Stops
 		case ACTION_STOP_MOVE_LEFT:
 			pc->setMoving( NPC::LEFT, false );
 			break;
@@ -368,7 +368,7 @@ void Game::input( Action action, int nPlayer ) {
 
 /*
 void Game::handleJoystick(Joystick* joy, PC * pc){
-  
+
   if (!pc->isHumanControlled()) {
     return;
   }
@@ -390,7 +390,7 @@ void Game::handleJoystick(Joystick* joy, PC * pc){
 		pc->setMoving( NPC::LEFT, false );
 		pc->setMoving( NPC::RIGHT, false );
 	}
-	
+
 	if ( y > 0 ) {
 		pc->setMoving( NPC::DOWN, true );
 		pc->setMoving( NPC::UP, false );
@@ -406,7 +406,7 @@ void Game::handleJoystick(Joystick* joy, PC * pc){
 	pc->setAiming( NPC::RIGHT, joy->getButtonDown( Joystick::A ) ? true : false );
 	pc->setAiming( NPC::UP,    joy->getButtonDown( Joystick::X ) ? true : false );
 	pc->setAiming( NPC::LEFT,  joy->getButtonDown( Joystick::Y ) ? true : false );
-		
+
 }
 */
 void Game::walk_gl() {
@@ -421,33 +421,33 @@ void Game::walk_gl() {
 	  m_pLevel->walk_gl();
 	glPopMatrix();
 
-	// DRAW PLAYERS 
+	// DRAW PLAYERS
    // They require scaling down from the lua file
   	glPushMatrix();
   	glScaled( .2, .2, .2 );
   	glTranslated( 0, 7, 0 );
 
-	for (	PCList::iterator it = m_PCs.begin(); 
+	for (	PCList::iterator it = m_PCs.begin();
 			it != m_PCs.end(); it++) {
 		(*it)->walk_gl();
 	}
-  	
+
 	// Draw the enemies
-	for (	EnemyList::iterator it = m_NPCs.begin(); 
+	for (	EnemyList::iterator it = m_NPCs.begin();
 			it != m_NPCs.end(); it++) {
   		(*it)->walk_gl();
 	}
-	
+
 	// END DRAW PLAYERS AND ENEMIES
 
 	// Draw all projectiles
-	for (	BulletList::iterator it = m_Bullets.begin(); 
+	for (	BulletList::iterator it = m_Bullets.begin();
 		it != m_Bullets.end(); it++) {
 			(*it)->walk_gl();
 	}
 
 	// Attempt to draw particles
-  for (	ParticleList::iterator it = m_Particles.begin(); 
+  for (	ParticleList::iterator it = m_Particles.begin();
 			it != m_Particles.end(); it++) {
 
 	  if (!(*it)->is_dead()) {
@@ -461,7 +461,7 @@ void Game::walk_gl() {
 void Game::CreateBullet( const Point3D& origin, double dDegrees, NPC* source ) {
   int nQuantity = 1;
 
-  if (m_Bullets.size() + nQuantity > BULLET_CAP) { 
+  if (m_Bullets.size() + nQuantity > BULLET_CAP) {
     return;
   }
 
@@ -491,15 +491,15 @@ void Game::CreateBullet( const Point3D& origin, double dDegrees, NPC* source ) {
 
 void Game::DeleteBullet( Bullet * pBullet ) {
 	// Find and delete bullet
-	for (	BulletList::iterator it = m_Bullets.begin(); 
+	for (	BulletList::iterator it = m_Bullets.begin();
 			it != m_Bullets.end(); it++) {
-      
+
         if (*it == pBullet) {
           delete *it;
           m_Bullets.erase( it );
           return;
         }
-	}		 
+	}
 
 }
 
@@ -527,7 +527,7 @@ Moveable* Game::DetectCollision( Point3D p, double r, Moveable* pExcluded ) {
         return m;
       }
   }
-	
+
   // Check for collision with player
   for( PCList::iterator it = m_PCs.begin(); it != m_PCs.end(); it++) {
       m = (*it)->IsHit( p, r );
@@ -586,7 +586,7 @@ AISubscriber * Game::CreateEnemy(int x, int z) {
 void Game::DamageEnemy( NPC * pNPC, int nDamage, const Point3D& p3d ) {
 
     return;
- 
+
   Vector3D v = p3d - Point3D(0,0,0);
   CreateParticles( SIZE_LITTLE, 2, v );
   CreateParticles( SIZE_SPARKS, 3, v );
@@ -606,7 +606,7 @@ void Game::DamageEnemy( NPC * pNPC, int nDamage, const Point3D& p3d ) {
       if (!ai->isAuto() && !ai->isActive()) {
         DeleteAI( ai );
       }
-         
+
      for (EnemyList::iterator it = m_NPCs.begin();
         it != m_NPCs.end(); it++) {
        if (*it == pNPC) {
@@ -614,13 +614,13 @@ void Game::DamageEnemy( NPC * pNPC, int nDamage, const Point3D& p3d ) {
          break;
        }
      }
-    
-    if (npc->getType() == Moveable::TYPE_NPC) { 
+
+    if (npc->getType() == Moveable::TYPE_NPC) {
       CreateParticles( SIZE_BIGGER, 1, v );
     }
 
-     delete npc; 
-    
+     delete npc;
+
     // Enemy is destroyed, show explosion effects
     CreateParticles( SIZE_MEDIUM, 2, v );
 
@@ -644,11 +644,11 @@ void Game::DamageEnemy( NPC * pNPC, int nDamage, const Point3D& p3d ) {
   }
 
 
-   }   
+   }
 }
 
 void Game::CreateParticles( ParticleSize eSize, int nQuantity, const Vector3D& v ) {
-  
+
   for (int i = 0; i < nQuantity; i++) {
     Particle * p = m_Particles[ m_nParticleIndex[eSize] ];
 
@@ -728,7 +728,7 @@ void Game::CreateAI( NPC * npc ) {
 
 void Game::DeleteAI( AI * ai ) {
 
-  for( AIList::iterator it = m_AIs.begin(); 
+  for( AIList::iterator it = m_AIs.begin();
        it != m_AIs.end(); it++ ) {
     if (*it == ai) {
       delete *it;
@@ -758,7 +758,7 @@ void Game::PlaySFX( MoveableSubscriber::SFX id ) {
         // SM.PlaySound( m_nSFX[ SFX_HUMAN_DEATH ] );
         break;
     }
-		
+
     case MoveableSubscriber::SFX_ROBOT_HIT:
     case MoveableSubscriber::SFX_ROBOT_DEATH:
         // SM.PlaySound( SFX_ROBOT_DEATH );
@@ -768,9 +768,9 @@ void Game::PlaySFX( MoveableSubscriber::SFX id ) {
 
 }
 
-void Game::CreateObstacle( Moveable* pObstacle ) { 
+void Game::CreateObstacle( Moveable* pObstacle ) {
   pObstacle->set_id ( m_Objs.size() );
-  m_Objs.push_back( pObstacle ); 
+  m_Objs.push_back( pObstacle );
   pObstacle->set_dead( false );
 }
 
