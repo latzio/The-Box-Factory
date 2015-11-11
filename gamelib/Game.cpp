@@ -17,9 +17,9 @@
 #define SPARKS_PARTICLES 156
 #define PARTICLES        156
 
-#define MOBS     1
-#define MOB_SIZE 1
-#define ENEMY_WATERMARK 0
+#define MOBS     2
+#define MOB_SIZE 12
+#define ENEMY_WATERMARK 5
 
 #define LEVEL_DELAY 300
 #define LIFE_CAP 10
@@ -94,18 +94,6 @@ Game::Game( int nPlayers )
   // m_pDefaultBullet = Bullet::CreateBullet( this, (Moveable*)0 );
   // Import an enemy
   m_pDefaultEnemy = new NPC( import_lua( "models/enemy.lua" ), this );
-
-  // Create all enemies
-  for( int i = 0; i < ENEMY_CAP; i++ ) {
-    NPC * npc = new NPC( import_lua( "models/enemy_pistol.lua" ), this );
-
-   npc->set_id( i );
-	  npc->set_dead( true );
-
-    m_NPCs.push_back( npc );
-
-    m_EnemyIndex.push_back( i );
-  }
 
   m_nParticleIndex[0] = 0;
   m_nParticleIndex[1] = LITTLE_PARTICLES;
@@ -585,8 +573,6 @@ AISubscriber * Game::CreateEnemy(int x, int z) {
 
 void Game::DamageEnemy( NPC * pNPC, int nDamage, const Point3D& p3d ) {
 
-    return;
-
   Vector3D v = p3d - Point3D(0,0,0);
   CreateParticles( SIZE_LITTLE, 2, v );
   CreateParticles( SIZE_SPARKS, 3, v );
@@ -600,11 +586,13 @@ void Game::DamageEnemy( NPC * pNPC, int nDamage, const Point3D& p3d ) {
       // If dead
       npc->set_dead( true );
       AI* ai = npc->getAI();
-      ai->remove( npc );
+      if (ai) {
+          ai->remove( npc );
 
-      // Delete ai if not auto
-      if (!ai->isAuto() && !ai->isActive()) {
-        DeleteAI( ai );
+          // Delete ai if not auto
+          if (!ai->isAuto() && !ai->isActive()) {
+            DeleteAI( ai );
+          }
       }
 
      for (EnemyList::iterator it = m_NPCs.begin();
