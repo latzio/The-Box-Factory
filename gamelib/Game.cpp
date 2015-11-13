@@ -219,19 +219,15 @@ bool Game::tick() {
         ai->tick();
     }
 
-    // Attempt to move players
-    for (PCList::iterator it = m_PCs.begin();
-        it != m_PCs.end(); it++) {
-        (*it)->tick();
+    // Move Everything
+    for (auto& pc : m_PCs) {
+        pc->tick();
     }
 
-    // Attempt to move enemies
-    for (EnemyList::iterator it = m_NPCs.begin();
-        it != m_NPCs.end(); it++) {
-        (*it)->tick();
+    for (auto& npc : m_NPCs) {
+        npc->tick();
     }
 
-    // Attempt to move bullets
     for (unsigned int i = 0; i < m_Bullets.size(); i++) {
         if (i < m_Bullets.size()) {
             (m_Bullets[i])->tick();
