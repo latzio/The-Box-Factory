@@ -299,10 +299,10 @@ int gr_node_set_material_cmd(lua_State* L)
   luaL_argcheck(L, matdata != 0, 2, "Material expected");
  
   if (matdata->material->get_type() == Material::PHONG) {
-  		self->set_material(new PhongMaterial((PhongMaterial&)(*(matdata->material))));
+          self->set_material(new PhongMaterial((PhongMaterial&)(*(matdata->material))));
   } else {
-  		self->set_material(new TextureMaterial((TextureMaterial&)(*(matdata->material))));
-	}
+          self->set_material(new TextureMaterial((TextureMaterial&)(*(matdata->material))));
+    }
 
   return 0;
 }
@@ -324,10 +324,10 @@ int gr_node_set_map_cmd(lua_State* L)
   luaL_argcheck(L, matdata != 0, 2, "Material expected");
  
   if (matdata->material->get_type() == Material::PHONG) {
-  		self->set_map(new PhongMaterial((PhongMaterial&)(*(matdata->material))));
+          self->set_map(new PhongMaterial((PhongMaterial&)(*(matdata->material))));
   } else {
-  		self->set_map(new TextureMaterial((TextureMaterial&)(*(matdata->material))));
-	}
+          self->set_map(new TextureMaterial((TextureMaterial&)(*(matdata->material))));
+    }
 
   return 0;
 }

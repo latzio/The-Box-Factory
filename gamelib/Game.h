@@ -15,7 +15,7 @@ class Game : public MoveableSubscriber{
 
   public:
     // Create a new game
-    Game( int nPlayers );
+    Game(int nPlayers);
     ~Game();
 
     // Initiate the game and start timers
@@ -40,28 +40,28 @@ class Game : public MoveableSubscriber{
                  ACTION_SHOOT_DOWN, ACTION_STOP_SHOOT_DOWN,
                  ACTION_TOGGLE_PAUSE };
     // Input
-    void input( Action action, int nPlayer );
+    void input(Action action, int nPlayer);
 
     // Create Enemies
     virtual AISubscriber * CreateEnemy(int x, int z);
-    virtual void DamageEnemy( NPC* pNPC, int nDamage, const Point3D& p3d );
+    virtual void DamageEnemy(NPC* pNPC, int nDamage, const Point3D& p3d);
 
     // Subscribe to game events
-    virtual void CreateBullet( const Point3D& origin, double dDegrees, NPC* source );
-    virtual void DeleteBullet( Bullet* pBullet );
+    virtual void CreateBullet(const Point3D& origin, double dDegrees, NPC* source);
+    virtual void DeleteBullet(Bullet* pBullet);
 
-    virtual Moveable* DetectCollision( Point3D p, double r, Moveable* pExcluded );
+    virtual Moveable* DetectCollision(Point3D p, double r, Moveable* pExcluded);
 
-    virtual void CreateMob( );
-    virtual void CreateAI( NPC * npc );
-    virtual void DeleteAI( AI * ai );
+    virtual void CreateMob();
+    virtual void CreateAI(NPC * npc);
+    virtual void DeleteAI(AI * ai);
 
-    virtual Shield* RequestShield( MoveableSubscriber::ShieldType s );
+    virtual Shield* RequestShield(MoveableSubscriber::ShieldType s);
 
-    virtual void CreateParticles( ParticleSize eSize, int nQuantity, const Vector3D& v );
-    virtual void CreateObstacle( Moveable* pObstacle ); 
+    virtual void CreateParticles(ParticleSize eSize, int nQuantity, const Vector3D& v);
+    virtual void CreateObstacle(Moveable* pObstacle); 
   
- 	  virtual void PlaySFX( MoveableSubscriber::SFX id );
+       virtual void PlaySFX(MoveableSubscriber::SFX id);
 
     virtual void pause() { m_bRunning = false; }
     virtual void unpause() { m_bRunning = true; }
@@ -109,7 +109,7 @@ class Game : public MoveableSubscriber{
      SFX_CAROM10, SFX_CAROM11, SFX_CAROM12, SFX_CAROM13, SFX_HIT0 = 17,
      SFX_HIT1 = 18, SFX_HUMAN_DEATH, SFX_ROBOT_DEATH };
 
-	  int m_nSFX[22];
+      int m_nSFX[22];
 
     // Copies of stuff that will be re-used
     enum MODELS{ MODEL_ENEMY_SWORD, MODEL_ENEMY_SWORD_BOSS, MODEL_ENEMY_SWORD_FAST,
@@ -117,12 +117,12 @@ class Game : public MoveableSubscriber{
                  MODEL_BULLET, MODEL_ENEMY_BULLET };
     SceneNode* m_pModels[7];
 
-	 int m_nKeyboardPlayer;
-	 int m_nJoystickPlayer[2];
+     int m_nKeyboardPlayer;
+     int m_nJoystickPlayer[2];
 
-	 // JOYSTICK!
-	 // Joystick * m_pJoystick[2];
-	 // void handleJoystick( Joystick* joy, PC * pc );
+     // JOYSTICK!
+     // Joystick * m_pJoystick[2];
+     // void handleJoystick(Joystick* joy, PC * pc);
 
    // SHIELDS!
    SceneNode* m_pShield[2];

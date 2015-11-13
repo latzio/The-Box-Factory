@@ -18,8 +18,8 @@ Sphere::~Sphere()
 void Sphere::walk_gl() const
 {
   // draw the display list
-  glBindTexture( GL_TEXTURE_2D, Textures::TEX_NO_TEXTURE );
-  glCallList( SceneNode::DL_INDEX + SceneNode::DL_SPHERE );
+  glBindTexture(GL_TEXTURE_2D, Textures::TEX_NO_TEXTURE);
+  glCallList(SceneNode::DL_INDEX + SceneNode::DL_SPHERE);
 }
 
 Plane::~Plane()
@@ -28,7 +28,7 @@ Plane::~Plane()
 
 void Plane::walk_gl() const
 {
-  glCallList( SceneNode::DL_INDEX + SceneNode::DL_PLANE );
+  glCallList(SceneNode::DL_INDEX + SceneNode::DL_PLANE);
 }
 
 Cube::~Cube()
@@ -37,7 +37,7 @@ Cube::~Cube()
 
 void Cube::walk_gl() const
 {
-  glCallList( SceneNode::DL_INDEX + SceneNode::DL_CUBE );
+  glCallList(SceneNode::DL_INDEX + SceneNode::DL_CUBE);
 
   if (m_bShadow) {
     std::cout << "Rendering shadow volume." << std::endl;
@@ -82,8 +82,8 @@ void Cube::walk_gl() const
     cube[5][2] = Point3D(HBOUND, HBOUND, HBOUND);
     cube[5][3] = Point3D(HBOUND, HBOUND, LBOUND);
 
-    Point3D light( 0, 20, 0 );
+    Point3D light(0, 20, 0);
     Point3D centre;
-    //get_centre( centre );
+    //get_centre(centre);
 }
 }

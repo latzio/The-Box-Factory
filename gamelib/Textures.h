@@ -8,7 +8,7 @@ namespace Textures {
 
   enum Texture{
     TEX_NO_TEXTURE = 0,
-    TEX_WALL1		   = 1, // Grim Metal Wall
+    TEX_WALL1           = 1, // Grim Metal Wall
     TEX_WALL2      = 2, // Red Metal Wall
     TEX_WALL3      = 3, // Metal plate wall
     TEX_WALL4      = 4, // Rusty Nasty wall

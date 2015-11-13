@@ -3,7 +3,7 @@
  * File : SoundManager.cpp
  *
  * Author : Tiberiu Popa
- * 	    J. Alexander Clarke
+ *         J. Alexander Clarke
 
  * Date   : June 18th, 2002
  *
@@ -58,7 +58,7 @@ int SoundManager::ResetSound(int snd){
 int SoundManager::LoadSound(const std::string& file){
  
     chunks[nSounds] = Mix_LoadWAV(file.c_str());
-    Mix_VolumeChunk( chunks[nSounds], 48);
+    Mix_VolumeChunk(chunks[nSounds], 48);
 
     channel[nSounds] = -1;
 
@@ -137,6 +137,6 @@ int SoundManager::ResumeMusic(int snd){
 
 int SoundManager::VolumeMusic(int snd) {
     if(snd<0) return -1;
-    Mix_VolumeMusic( snd );
+    Mix_VolumeMusic(snd);
     return 0;
 }

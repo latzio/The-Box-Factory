@@ -28,7 +28,7 @@ class AI {
     // is our leader, naturally
     void addSubscriber(AISubscriber * subscriber);
 
-	  void remove( AISubscriber * subscriber );
+      void remove(AISubscriber * subscriber);
 
     // Add an enemy to our processing list, 
     void addTarget(AISubscriber * target) {
@@ -40,9 +40,9 @@ class AI {
       return (m_pSubscribers.size() > 0);
     }
 
-	 void setTicks( int tickTotal ) {
-		 m_nProcessCount = tickTotal;
-	 }
+     void setTicks(int tickTotal) {
+         m_nProcessCount = tickTotal;
+     }
 
     virtual bool isAuto() { return false; }
 
@@ -53,8 +53,8 @@ class AI {
     SubscriberList m_pSubscribers; // These are the mob
 
 
-	 int m_nProcessCount;
-	 int m_nProcessTicks;
+     int m_nProcessCount;
+     int m_nProcessTicks;
 
 
 };
@@ -63,7 +63,7 @@ class AutoAI : public AI {
 
   public: 
 
-    AutoAI( Direction d );
+    AutoAI(Direction d);
     virtual ~AutoAI();
 
     virtual void tick();
@@ -71,17 +71,17 @@ class AutoAI : public AI {
    
   protected: 
 
-	 Direction m_eDirection;
+     Direction m_eDirection;
 };
 
 class AISubscriber {
 
   public:
     // Where is this unit
-    virtual void getCentre( Point3D& p ) = 0;
+    virtual void getCentre(Point3D& p) = 0;
 
     // Move this unit, true if success, false if impeded
-    virtual bool move( AI::Direction ePrimary, AI::Direction eSecondary ) = 0;
+    virtual bool move(AI::Direction ePrimary, AI::Direction eSecondary) = 0;
 
     // Is this unit alive?
     virtual bool isActive() = 0;
@@ -89,11 +89,11 @@ class AISubscriber {
     // Revert to general purpose ai
     virtual void revertToAI() = 0;
 
-	  void setAI( AI* ai ) { m_pAI = ai; }
+      void setAI(AI* ai) { m_pAI = ai; }
     AI* getAI() { return m_pAI; }
 
   protected:
-  	 AI* m_pAI;
+       AI* m_pAI;
 
 };
 

@@ -10,7 +10,7 @@ public:
   Primitive();
   virtual ~Primitive();
   virtual void walk_gl() const = 0;
-  void set_shadow( bool b ) { m_bShadow = b; }
+  void set_shadow(bool b) { m_bShadow = b; }
 
 protected:
   bool m_bShadow;

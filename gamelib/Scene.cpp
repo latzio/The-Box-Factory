@@ -9,28 +9,28 @@ int SceneNode::DL_INDEX = 3;
 SceneNode::SceneNode(const std::string& name)
   : m_id(SCENE_NODE_COUNTER++)
   , m_name(name)
-  , m_bPicked( false )
-  , m_parent( 0 )
-  , m_nRadius( 0.0 )
-  , m_dirty( true )
+  , m_bPicked(false)
+  , m_parent(0)
+  , m_nRadius(0.0)
+  , m_dirty(true)
 {
 }
 
 SceneNode::~SceneNode()
 {
   if (m_children.size() > 0) {
-	  // I can't remember if this is legit
-	  ChildList::iterator it;
-	  for (it = m_children.begin(); it != m_children.end(); it++) {
-	    delete *it;
-	  }
+      // I can't remember if this is legit
+      ChildList::iterator it;
+      for (it = m_children.begin(); it != m_children.end(); it++) {
+        delete *it;
+      }
   }
   
 }
 
-SceneNode* SceneNode::clone( )
+SceneNode* SceneNode::clone()
 {
-  SceneNode * pNode = new SceneNode( *this );
+  SceneNode * pNode = new SceneNode(*this);
   pNode->remove_children();
 
   // recursively call on my children
@@ -47,17 +47,17 @@ void SceneNode::get_centre(Point3D &p) {
   p = m_trans * p;
 
   if (m_parent) {
-    m_parent->get_centre( p );
+    m_parent->get_centre(p);
   }
 
 }
 
-void SceneNode::render_shadow_volume( Point3D cube[][4], 
+void SceneNode::render_shadow_volume(Point3D cube[][4], 
                                       Point3D& centre, 
                                       Point3D& light)
 {
-		//int i;
-		//float v[4][3];
+        //int i;
+        //float v[4][3];
 
 }
 
@@ -78,17 +78,17 @@ double SceneNode::get_radius() {
 void SceneNode::setupDL() {
   // DISPLAY LIST
   // create one display list
-  SceneNode::DL_INDEX = glGenLists( DL_INDEX );
+  SceneNode::DL_INDEX = glGenLists(DL_INDEX);
   
   GLUquadric* gluq = gluNewQuadric();
 
   // compile the display list, for a sphere
   glNewList(DL_INDEX + DL_SPHERE, GL_COMPILE);
     // Draw a simple sphere
-    gluSphere(  gluq,
+    gluSphere(gluq,
                 SPHERE_RADIUS,
                 SPHERE_SLICES,
-                SPHERE_STACKS );
+                SPHERE_STACKS);
   glEndList();
 
   // compile the display list, for a plane
@@ -96,18 +96,18 @@ void SceneNode::setupDL() {
   
     glBegin(GL_QUADS);
 
-    glNormal3d( 0.0, 1.0, 0.0 );
-    glTexCoord2f( 0, 0 );
-    glVertex3d( -1, 0, -1 );
+    glNormal3d(0.0, 1.0, 0.0);
+    glTexCoord2f(0, 0);
+    glVertex3d(-1, 0, -1);
 
-    glTexCoord2f( 0, 1 );
-    glVertex3d( -1, 0, 1 );
+    glTexCoord2f(0, 1);
+    glVertex3d(-1, 0, 1);
 
-    glTexCoord2f( 1, 1 );
-    glVertex3d( 1, 0, 1 );
+    glTexCoord2f(1, 1);
+    glVertex3d(1, 0, 1);
 
-    glTexCoord2f( 1, 0 );
-    glVertex3d( 1, 0, -1 );
+    glTexCoord2f(1, 0);
+    glVertex3d(1, 0, -1);
 
     glEnd();
 
@@ -118,7 +118,7 @@ void SceneNode::setupDL() {
   glBegin(GL_QUADS);
 
   // Front
-  glNormal3d( 0, 0, 1 );
+  glNormal3d(0, 0, 1);
   glTexCoord2f(0,0);
   glVertex3d(LBOUND, LBOUND, HBOUND);
   glTexCoord2f(0,1);
@@ -129,58 +129,58 @@ void SceneNode::setupDL() {
   glVertex3d(LBOUND, HBOUND, HBOUND);
   
   // Back
-  glNormal3d( 0, 0, -1 );
-  glTexCoord2f( 0, 0 );
+  glNormal3d(0, 0, -1);
+  glTexCoord2f(0, 0);
   glVertex3d(LBOUND, LBOUND, LBOUND);
-  glTexCoord2f( 1, 0 );
+  glTexCoord2f(1, 0);
   glVertex3d(LBOUND, HBOUND, LBOUND);
-  glTexCoord2f( 1, 1 );
+  glTexCoord2f(1, 1);
   glVertex3d(HBOUND, HBOUND, LBOUND);
-  glTexCoord2f( 0, 1 );
+  glTexCoord2f(0, 1);
   glVertex3d(HBOUND, LBOUND, LBOUND);
   
   // Left
-  glNormal3d( -1, 0, 0 );
-  glTexCoord2f( 0, 0 );
+  glNormal3d(-1, 0, 0);
+  glTexCoord2f(0, 0);
   glVertex3d(LBOUND, LBOUND, HBOUND);
-  glTexCoord2f( 1, 0 );
+  glTexCoord2f(1, 0);
   glVertex3d(LBOUND, HBOUND, HBOUND);
-  glTexCoord2f( 1, 1 );
+  glTexCoord2f(1, 1);
   glVertex3d(LBOUND, HBOUND, LBOUND);
-  glTexCoord2f( 0, 1 );
+  glTexCoord2f(0, 1);
   glVertex3d(LBOUND, LBOUND, LBOUND);
 
   // Right
-  glNormal3d( 1, 0, 0);
-  glTexCoord2f( 0, 0 );
+  glNormal3d(1, 0, 0);
+  glTexCoord2f(0, 0);
   glVertex3d(HBOUND, LBOUND, HBOUND);
-  glTexCoord2f( 0, 1 );
+  glTexCoord2f(0, 1);
   glVertex3d(HBOUND, LBOUND, LBOUND);
-  glTexCoord2f( 1, 1 );
+  glTexCoord2f(1, 1);
   glVertex3d(HBOUND, HBOUND, LBOUND);
-  glTexCoord2f( 1, 0 );
+  glTexCoord2f(1, 0);
   glVertex3d(HBOUND, HBOUND, HBOUND);
 
   // Bottom
-  glNormal3d( 0, -1, 0);
-  glTexCoord2f( 0, 0 );
+  glNormal3d(0, -1, 0);
+  glTexCoord2f(0, 0);
   glVertex3d(LBOUND, LBOUND, LBOUND);
-  glTexCoord2f( 0, 1 );
+  glTexCoord2f(0, 1);
   glVertex3d(HBOUND, LBOUND, LBOUND);
-  glTexCoord2f( 1, 1 );
+  glTexCoord2f(1, 1);
   glVertex3d(HBOUND, LBOUND, HBOUND);
-  glTexCoord2f( 1, 0 );
+  glTexCoord2f(1, 0);
   glVertex3d(LBOUND, LBOUND, HBOUND);
   
   // Top
-  glNormal3d( 0, 1, 0);
-  glTexCoord2f( 0, 0 );
+  glNormal3d(0, 1, 0);
+  glTexCoord2f(0, 0);
   glVertex3d(LBOUND, HBOUND, LBOUND);
-  glTexCoord2f( 1, 0 );
+  glTexCoord2f(1, 0);
   glVertex3d(LBOUND, HBOUND, HBOUND);
-  glTexCoord2f( 1, 1 );
+  glTexCoord2f(1, 1);
   glVertex3d(HBOUND, HBOUND, HBOUND);
-  glTexCoord2f( 0, 1 );
+  glTexCoord2f(0, 1);
   glVertex3d(HBOUND, HBOUND, LBOUND);
 
   glEnd();
@@ -195,7 +195,7 @@ void SceneNode::tick() {
 
   ChildList::iterator it;
   for (it = m_children.begin(); it != m_children.end(); it++) {
-    (*it)->tick( );
+    (*it)->tick();
   }
 }
 
@@ -203,15 +203,15 @@ void SceneNode::colour(const Colour &c) {
   // recursively call on my children
   ChildList::iterator it;
   for (it = m_children.begin(); it != m_children.end(); it++) {
-    (*it)->colour( c );
+    (*it)->colour(c);
   }
 }
 
-void SceneNode::set_shadow( bool b ) {
+void SceneNode::set_shadow(bool b) {
   // recursively call on my children
   ChildList::iterator it;
   for (it = m_children.begin(); it != m_children.end(); it++) {
-    (*it)->set_shadow( b );
+    (*it)->set_shadow(b);
   }
 }
 
@@ -224,7 +224,7 @@ void SceneNode::walk_gl() const
       m_transTranspose = m_trans.transpose();
       m_dirty = false;
   }
-  glMultMatrixd( m_transTranspose.begin() );
+  glMultMatrixd(m_transTranspose.begin());
 
   /*
   if (is_joint() && m_bPicked) {
@@ -236,52 +236,52 @@ void SceneNode::walk_gl() const
   }
   */
 
-  draw_gl( );
+  draw_gl();
 
   // Default assumption - walk_gl on my children
   ChildList::const_iterator it;
   for (it = m_children.begin(); it != m_children.end(); it++) {
-    (*it)->walk_gl( );
+    (*it)->walk_gl();
   }
 
   glPopMatrix();
 }
 
-SceneNode* SceneNode::find( const std::string& aName ) {
-	SceneNode* node = 0;
+SceneNode* SceneNode::find(const std::string& aName) {
+    SceneNode* node = 0;
 
-	if (aName == m_name) {
-		return this;
-	}
-	
+    if (aName == m_name) {
+        return this;
+    }
+    
   // Default assumption - walk_gl on my children
   ChildList::const_iterator it;
   for (it = m_children.begin(); it != m_children.end(); it++) {
-    node = (*it)->find( aName );
+    node = (*it)->find(aName);
 
-	 if (node) {
-		 return node;
-	 }
+     if (node) {
+         return node;
+     }
   }
 
   return node;
 }
 
-void SceneNode::find_all( std::vector<SceneNode*> &v, const std::string &name ) {
+void SceneNode::find_all(std::vector<SceneNode*> &v, const std::string &name) {
   
   if (m_name == name) { // add me to vector
-    v.push_back( this );
+    v.push_back(this);
   }
 
   // walk the children
   ChildList::const_iterator it;
   for (it = m_children.begin(); it != m_children.end(); it++) {
-    (*it)->find_all( v, name );
+    (*it)->find_all(v, name);
   }
 
 }
 
-void SceneNode::draw_gl( ) const 
+void SceneNode::draw_gl() const 
 {
 
 }
@@ -306,23 +306,23 @@ void SceneNode::toggle_picked() {
   // Set my children to be picked
   ChildList::iterator it;
   for (it = m_children.begin(); it != m_children.end(); it++) {
-    if ( ! (*it)->is_joint() ) {
-      (*it)->set_picked( m_bPicked );
+    if (! (*it)->is_joint()) {
+      (*it)->set_picked(m_bPicked);
     }
   }
 
 }
 
-void SceneNode::get_picked_joints( std::list< SceneNode * > * pickedJoints ) {
+void SceneNode::get_picked_joints(std::list< SceneNode * > * pickedJoints) {
 
   if (is_joint() && m_bPicked) {
-    pickedJoints->push_back( this );
+    pickedJoints->push_back(this);
   }
   // Set my children to be picked
   ChildList::iterator it;
   for (it = m_children.begin(); it != m_children.end(); it++) {
-    if ( (*it)->is_joint() ) {
-      (*it)->get_picked_joints( pickedJoints );
+    if ((*it)->is_joint()) {
+      (*it)->get_picked_joints(pickedJoints);
     }
   }
 }
@@ -333,7 +333,7 @@ void SceneNode::set_picked(bool picked) {
 }
 
 // Toggle the picked status of this node
-bool SceneNode::pick( int id )
+bool SceneNode::pick(int id)
 {
   // I AM THIS ID
   if (m_id == id) {
@@ -348,10 +348,10 @@ bool SceneNode::pick( int id )
     // Parent is a jointnode ?
     // Parent is not a jointnode ?
     SceneNode * node = m_parent;
-    while ( node != 0 ) {
+    while (node != 0) {
       if (node->is_joint()) {
         //std::cout << " -> Parent found! Parent is " << node->get_name() << std::endl;
-        node->toggle_picked( );
+        node->toggle_picked();
         return true;
       }
       node = node->get_parent();
@@ -363,7 +363,7 @@ bool SceneNode::pick( int id )
   // Not my id, check my children
   ChildList::iterator it;
   for (it = m_children.begin(); it != m_children.end(); it++) {
-    if ( (*it)->pick( id ) ) {
+    if ((*it)->pick(id)) {
       return true;
     }
   }
@@ -373,36 +373,36 @@ bool SceneNode::pick( int id )
   return false;
 }
 
-void SceneNode::applyAction( Matrix4x4* pTransform ) {
+void SceneNode::applyAction(Matrix4x4* pTransform) {
       m_trans = m_trans * *pTransform;
       m_dirty = true;
 }
 
-void SceneNode::rotatePicked( int degrees ) {
+void SceneNode::rotatePicked(int degrees) {
 
   if (is_joint() && m_bPicked) {
-    rotate( 'x', degrees );
+    rotate('x', degrees);
   }
 
   // Now check children
   ChildList::iterator it;
   for (it = m_children.begin(); it != m_children.end(); it++) {
-    (*it)->rotatePicked( degrees );
+    (*it)->rotatePicked(degrees);
   }
   
 }
 
-void SceneNode::rotateHead( int degrees ) {
+void SceneNode::rotateHead(int degrees) {
 
   if (is_joint() && m_bPicked && m_name == "head") {
-    rotate( 'y', degrees );
+    rotate('y', degrees);
     return;
   }
 
   // Now check children
   ChildList::iterator it;
   for (it = m_children.begin(); it != m_children.end(); it++) {
-    (*it)->rotateHead( degrees );
+    (*it)->rotateHead(degrees);
   }
   
 }
@@ -454,10 +454,10 @@ void SceneNode::rotate(char axis, double angle)
 
   double radAngle = -(angle / 180 * M_PI);
   // Add the classic cos and sin requirements
-  r[topRow][leftCol] = cos( radAngle );
-  r[bottomRow][leftCol] = sin( radAngle );
-  r[topRow][rightCol] = sin( radAngle ) * -1;
-  r[bottomRow][rightCol] = cos( radAngle );
+  r[topRow][leftCol] = cos(radAngle);
+  r[bottomRow][leftCol] = sin(radAngle);
+  r[topRow][rightCol] = sin(radAngle) * -1;
+  r[bottomRow][rightCol] = cos(radAngle);
 
   m_trans = m_trans * r;
   m_dirty = true;
@@ -511,10 +511,10 @@ JointNode::~JointNode()
 {
 }
 
-SceneNode* JointNode::clone( )
+SceneNode* JointNode::clone()
 {
 
-  SceneNode * pNode = new JointNode( *this );
+  SceneNode * pNode = new JointNode(*this);
   pNode->remove_children();
 
   // recursively call on my children
@@ -535,9 +535,9 @@ void JointNode::draw_gl() const
 
 }
 
-void JointNode::walk_gl( ) const
+void JointNode::walk_gl() const
 {
-  SceneNode::walk_gl( );
+  SceneNode::walk_gl();
 }
 
 bool JointNode::is_joint() const
@@ -560,44 +560,44 @@ void JointNode::set_joint_y(double min, double init, double max)
 }
 
 void JointNode::add_frame(AnnimationFrame * pFrame) {
-	m_KeyFrames.push_back( pFrame );
+    m_KeyFrames.push_back(pFrame);
 }
 
 void JointNode::freeze() {
-	FrameList::iterator it;
-	for (it = m_KeyFrames.begin(); it != m_KeyFrames.end(); it++) {
-		(*it)->m_nAngle = m_nAngle;
-	   (*it)->m_nRemainingFrames = 0;
-	 	(*it)->m_bLoopBack = false;
-	}
+    FrameList::iterator it;
+    for (it = m_KeyFrames.begin(); it != m_KeyFrames.end(); it++) {
+        (*it)->m_nAngle = m_nAngle;
+       (*it)->m_nRemainingFrames = 0;
+         (*it)->m_bLoopBack = false;
+    }
 
-	if (m_pDestFrame) {
-		m_pDestFrame->m_bLoopBack = false;
-		m_pDestFrame->m_nAngle = m_nAngle;
-		m_pDestFrame->m_nRemainingFrames = 0;
-	}
+    if (m_pDestFrame) {
+        m_pDestFrame->m_bLoopBack = false;
+        m_pDestFrame->m_nAngle = m_nAngle;
+        m_pDestFrame->m_nRemainingFrames = 0;
+    }
 
-	m_KeyFrames.clear();
+    m_KeyFrames.clear();
 }
 
 void JointNode::tick() {
 
-	// Call parent to call children
-	SceneNode::tick();
+    // Call parent to call children
+    SceneNode::tick();
 
   while (true) {  
     // If no frame, but we have frames get one
-  	if (!m_pDestFrame && m_KeyFrames.size() > 0) {
-	  	m_pDestFrame = m_KeyFrames.front();
-	  	m_KeyFrames.pop_front();
-	  }
+      if (!m_pDestFrame && m_KeyFrames.size() > 0) {
+          m_pDestFrame = m_KeyFrames.front();
+          m_KeyFrames.pop_front();
+      }
     // If no frame, quit
-  	else if (!m_pDestFrame) {
-	  	return;
-	  }
+      else if (!m_pDestFrame) {
+          return;
+      }
 
     // Make sure this frame has frames remaining.
-    if ( m_pDestFrame->m_nRemainingFrames == 0 ) {
+    if (m_pDestFrame->m_nRemainingFrames == 0) {
       delete m_pDestFrame;
       m_pDestFrame = 0;
     } else {
@@ -605,50 +605,50 @@ void JointNode::tick() {
     }
   }
 
-	if	(m_pDestFrame->m_nRemainingFrames > 0) {
-		// Prepare our next angle
-		if ((m_pDestFrame->m_nAngle - m_nAngle) > 185) {
-			m_pDestFrame->m_nAngle -= 360;
-		} else if ((m_pDestFrame->m_nAngle - m_nAngle) < -185) {
-			m_pDestFrame->m_nAngle += 360;
-		}
+    if    (m_pDestFrame->m_nRemainingFrames > 0) {
+        // Prepare our next angle
+        if ((m_pDestFrame->m_nAngle - m_nAngle) > 185) {
+            m_pDestFrame->m_nAngle -= 360;
+        } else if ((m_pDestFrame->m_nAngle - m_nAngle) < -185) {
+            m_pDestFrame->m_nAngle += 360;
+        }
 
-		double nDiffStep = (m_pDestFrame->m_nAngle - m_nAngle)
-					 / (double)m_pDestFrame->m_nRemainingFrames;
-		
-		rotate( m_axis, nDiffStep );
+        double nDiffStep = (m_pDestFrame->m_nAngle - m_nAngle)
+                     / (double)m_pDestFrame->m_nRemainingFrames;
+        
+        rotate(m_axis, nDiffStep);
 
-		// Add this to our current known angle;
-		m_nAngle += nDiffStep;
+        // Add this to our current known angle;
+        m_nAngle += nDiffStep;
 
-		// Avoid overwrapping
-		if (m_nAngle < 0) {
-			m_nAngle += 360;
-		} else if (m_nAngle > 360) {
-			m_nAngle -= 360;
-		}
+        // Avoid overwrapping
+        if (m_nAngle < 0) {
+            m_nAngle += 360;
+        } else if (m_nAngle > 360) {
+            m_nAngle -= 360;
+        }
 
-		m_pDestFrame->m_nRemainingFrames--;
+        m_pDestFrame->m_nRemainingFrames--;
 
-		if (m_pDestFrame->m_nRemainingFrames == 0) {
+        if (m_pDestFrame->m_nRemainingFrames == 0) {
 
-			// Either requeue or delete
-			if (m_pDestFrame->m_bLoopBack) {
-				m_pDestFrame->m_nRemainingFrames = m_pDestFrame->m_nFrames;
-				m_KeyFrames.push_back( m_pDestFrame );
-			} else {
-				delete m_pDestFrame;
-			}
+            // Either requeue or delete
+            if (m_pDestFrame->m_bLoopBack) {
+                m_pDestFrame->m_nRemainingFrames = m_pDestFrame->m_nFrames;
+                m_KeyFrames.push_back(m_pDestFrame);
+            } else {
+                delete m_pDestFrame;
+            }
 
-			m_pDestFrame = 0;
-		} 
+            m_pDestFrame = 0;
+        } 
 
-	}
+    }
 
 }
 
 const double& JointNode::get_angle() {
-	return m_nAngle;
+    return m_nAngle;
 }
 
 GeometryNode::GeometryNode(const std::string& name, Primitive* primitive)
@@ -672,12 +672,12 @@ GeometryNode::~GeometryNode()
   }*/
 }
 
-SceneNode* GeometryNode::clone( )
+SceneNode* GeometryNode::clone()
 {
-  GeometryNode * pNode = new GeometryNode( *this );
+  GeometryNode * pNode = new GeometryNode(*this);
   pNode->remove_children();
-  pNode->set_material( m_material );
-  pNode->set_primitive( m_primitive );
+  pNode->set_material(m_material);
+  pNode->set_primitive(m_primitive);
 
   // recursively call on my children
   ChildList::iterator it;
@@ -692,7 +692,7 @@ void GeometryNode::draw_gl() const
 {
 
   // Blend if we have a bump map
-  if ( false )  {
+  if (false)  {
     // Choose fifty fifty
     //glBlendFunc(GL_ONE, GL_ZERO);
 
@@ -703,29 +703,29 @@ void GeometryNode::draw_gl() const
     //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
 
     // Draw my primitive
-    m_primitive->walk_gl( );
+    m_primitive->walk_gl();
     
   }
 
   // Default blending
-  // glBlendFunc( GL_ONE, GL_ZERO );
+  // glBlendFunc(GL_ONE, GL_ZERO);
     
   // Set my texture
   m_material->apply_gl();
     
   // Draw my primitive
-  m_primitive->walk_gl( );
+  m_primitive->walk_gl();
 }
  
-void GeometryNode::set_shadow( bool b ) {
-  m_primitive->set_shadow( b );
+void GeometryNode::set_shadow(bool b) {
+  m_primitive->set_shadow(b);
 
-  SceneNode::set_shadow( b );
+  SceneNode::set_shadow(b);
 }
 
 void GeometryNode::colour(const Colour &d) {
 
   ((PhongMaterial*)m_material)->m_kd = d;
   
-  SceneNode::colour( d );
+  SceneNode::colour(d);
 }

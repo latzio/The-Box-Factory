@@ -51,11 +51,11 @@ public:
 
   double& operator[](size_t idx)
   {
-    return v_[ idx ];
+    return v_[idx];
   }
   double operator[](size_t idx) const
   {
-    return v_[ idx ];
+    return v_[idx];
   }
 
 private:
@@ -94,11 +94,11 @@ public:
 
   double& operator[](size_t idx)
   {
-    return v_[ idx ];
+    return v_[idx];
   }
   double operator[](size_t idx) const
   {
-    return v_[ idx ];
+    return v_[idx];
   }
 
 private:
@@ -137,11 +137,11 @@ public:
 
   double& operator[](size_t idx)
   {
-    return v_[ idx ];
+    return v_[idx];
   }
   double operator[](size_t idx) const
   {
-    return v_[ idx ];
+    return v_[idx];
   }
 
   double dot(const Vector3D& other) const
@@ -265,11 +265,11 @@ public:
 
   double& operator[](size_t idx)
   {
-    return v_[ idx ];
+    return v_[idx];
   }
   double operator[](size_t idx) const
   {
-    return v_[ idx ];
+    return v_[idx];
   }
 
 private:

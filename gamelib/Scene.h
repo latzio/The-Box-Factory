@@ -8,14 +8,14 @@
 #include "Material.h"
 
 class AnnimationFrame {
-	public:
-	AnnimationFrame() : m_nAngle(0), m_nFrames(0), 
-	m_nRemainingFrames(0), m_bLoopBack( false ) {}
+    public:
+    AnnimationFrame() : m_nAngle(0), m_nFrames(0), 
+    m_nRemainingFrames(0), m_bLoopBack(false) {}
 
-	double m_nAngle;
-	int m_nFrames;
-	int m_nRemainingFrames;
-	bool m_bLoopBack;
+    double m_nAngle;
+    int m_nFrames;
+    int m_nRemainingFrames;
+    bool m_bLoopBack;
 };
 
 class SceneNode {
@@ -60,7 +60,7 @@ public:
   void add_child(SceneNode* child)
   {
     m_children.push_back(child);
-    child->set_parent( this );
+    child->set_parent(this);
   }
 
   void remove_child(SceneNode* child)
@@ -76,30 +76,30 @@ public:
   void scale(const Vector3D& amount);
   void translate(const Vector3D& amount);
 
-  void rotatePicked( int degrees );
-  void rotateHead( int degrees );
+  void rotatePicked(int degrees);
+  void rotateHead(int degrees);
 
   void resetOrientation();
 
   // These are needed for undo
-  std::vector< int >* getPicked( std::vector< int >* pPicked );
-  void applyAction( Matrix4x4* pTransform );
+  std::vector< int >* getPicked(std::vector< int >* pPicked);
+  void applyAction(Matrix4x4* pTransform);
 
   // Returns true if and only if this node is a JointNode
   virtual bool is_joint() const;
 
   // Called to recursively pick a node with this id
-  bool pick( int id );
-  void toggle_picked( );
-  void set_picked( bool picked );
+  bool pick(int id);
+  void toggle_picked();
+  void set_picked(bool picked);
 
-  void get_picked_joints( std::list< SceneNode * > * pickedJoints );
+  void get_picked_joints(std::list< SceneNode * > * pickedJoints);
 
   int get_id() const;
   const std::string& get_name() const;
   SceneNode* get_parent() const;
-  SceneNode* find( const std::string& aName );
-  void find_all( std::vector<SceneNode*> &v, const std::string& name );
+  SceneNode* find(const std::string& aName);
+  void find_all(std::vector<SceneNode*> &v, const std::string& name);
 
   void undo();
   void redo();
@@ -108,15 +108,15 @@ public:
   static void setupDL();
 
   // render shadow volume
-  static void render_shadow_volume( Point3D cube[][4], Point3D& centre, Point3D& light );
+  static void render_shadow_volume(Point3D cube[][4], Point3D& centre, Point3D& light);
   
   static int DL_INDEX;
   enum DL_INDEX { DL_SPHERE, DL_PLANE, DL_CUBE };
 
   // Activate shadows for me and children
-  virtual void set_shadow( bool b );
+  virtual void set_shadow(bool b);
 
-  virtual void colour( const Colour &c );
+  virtual void colour(const Colour &c);
 
 protected:
 
@@ -159,7 +159,7 @@ public:
 
   virtual bool is_joint() const;
 
-  void set_axis( char a ) { m_axis = a; }
+  void set_axis(char a) { m_axis = a; }
   void set_joint_x(double min, double init, double max);
   void set_joint_y(double min, double init, double max);
 
@@ -181,7 +181,7 @@ protected:
   AnnimationFrame* m_pDestFrame;
 
   FrameList m_KeyFrames;
-	
+    
   JointRange m_joint_x, m_joint_y;
 };
 
@@ -216,9 +216,9 @@ public:
   }
 
   // Activate shadows for me and children
-  virtual void set_shadow( bool b );
+  virtual void set_shadow(bool b);
 
-  virtual void colour( const Colour &c );
+  virtual void colour(const Colour &c);
 
 protected:
   Material* m_material;

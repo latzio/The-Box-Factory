@@ -94,7 +94,7 @@ bool Image::savePng(const std::string& filename)
 
   /* Setup PNG I/O */
   png_init_io(png_ptr, fout);
-	 
+     
   /* Optionally setup a callback to indicate when a row has been
    * written. */  
 
@@ -175,7 +175,7 @@ bool Image::loadPng(const std::string& filename)
 
   png_structp png_ptr =
     png_create_read_struct(PNG_LIBPNG_VER_STRING,
-			   0, 0, 0);
+               0, 0, 0);
   if (!png_ptr) return false;
 
   png_infop info_ptr = png_create_info_struct(png_ptr);
@@ -247,16 +247,16 @@ bool Image::loadPng(const std::string& filename)
   for (int y = 0; y < m_height; y++) {
     for (int x = 0; x < m_width; x++) {
       for (int i = 0; i < m_elements; i++) {
-	png_byte *row = row_pointers[y];
-	int index = m_elements * (y * m_width + x) + i;
-	
+    png_byte *row = row_pointers[y];
+    int index = m_elements * (y * m_width + x) + i;
+    
         long element = 0;
         for (int j = bit_depth/8 - 1; j >= 0; j--) {
           element <<= 8;
           element += row[(x * m_elements + i) * bit_depth/8 + j];
         }
         
-	      m_data[index] = element / static_cast<double>((1 << bit_depth) - 1);
+          m_data[index] = element / static_cast<double>((1 << bit_depth) - 1);
         m_byteData[index] = (unsigned char)(m_data[index] * 255);
       }
     }
