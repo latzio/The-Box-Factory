@@ -1,15 +1,17 @@
 #ifndef SCENE_HPP
 #define SCENE_HPP
 
-#include <list>
-#include <vector>
 #include "Algebra.h"
 #include "Primitive.h"
 #include "Material.h"
+#include "Macro.h"
+
+#include <list>
+#include <vector>
 
 class AnnimationFrame {
     public:
-    AnnimationFrame() : m_nAngle(0), m_nFrames(0), 
+    AnnimationFrame() : m_nAngle(0), m_nFrames(0),
     m_nRemainingFrames(0), m_bLoopBack(false) {}
 
     double m_nAngle;
@@ -22,6 +24,9 @@ class SceneNode {
 public:
   SceneNode(const std::string& name);
   virtual ~SceneNode();
+
+  SceneNode(const SceneNode&) = default;
+  SceneNode& operator=(const SceneNode&) = default;
 
   // Return a complete copy of this scenenode
   virtual SceneNode* clone();
@@ -109,7 +114,7 @@ public:
 
   // render shadow volume
   static void render_shadow_volume(Point3D cube[][4], Point3D& centre, Point3D& light);
-  
+
   static int DL_INDEX;
   enum DL_INDEX { DL_SPHERE, DL_PLANE, DL_CUBE };
 
@@ -121,7 +126,7 @@ public:
 protected:
 
   static int SCENE_NODE_COUNTER;
-  
+
   // Useful for picking
   int m_id;
   std::string m_name;
@@ -151,6 +156,8 @@ public:
   JointNode(const std::string& name);
   virtual ~JointNode();
 
+  CopyDefault(JointNode)
+
   virtual void tick();
   virtual SceneNode* clone();
 
@@ -171,7 +178,7 @@ public:
     double min, init, max;
   };
 
-  
+
 protected:
 
   char m_axis;
@@ -181,7 +188,7 @@ protected:
   AnnimationFrame* m_pDestFrame;
 
   FrameList m_KeyFrames;
-    
+
   JointRange m_joint_x, m_joint_y;
 };
 
@@ -190,6 +197,8 @@ public:
   GeometryNode(const std::string& name,
                Primitive* primitive);
   virtual ~GeometryNode();
+
+  CopyDefault(GeometryNode)
 
   virtual void draw_gl() const;
   // Return a complete copy of this scenenode

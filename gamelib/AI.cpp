@@ -3,15 +3,16 @@
 
 #define MAX_MOB_SIZE 16
 
-AI::AI() 
+AI::AI()
   : m_pTarget(0)
+  , m_pSubscribers()
   , m_nProcessCount(15)
   , m_nProcessTicks(-1)
 {
   m_pSubscribers.reserve(MAX_MOB_SIZE);
 }
 
-AI::~AI() 
+AI::~AI()
 {
 }
 
@@ -22,7 +23,7 @@ void AI::tick() {
     }
 
   m_nProcessTicks = m_nProcessCount;
-        
+
   // If we're all dead or have no target
   if (m_pSubscribers.size() == 0 || !m_pTarget) {
     return;
@@ -52,7 +53,7 @@ void AI::tick() {
   }
 
   // Issue primary and secondary commands
-  for (SubscriberList::iterator it = m_pSubscribers.begin(); 
+  for (SubscriberList::iterator it = m_pSubscribers.begin();
        it != m_pSubscribers.end(); it++) {
     if ((*it)->isActive()) {
       (*it)->move(ePrimary , eSecondary);
@@ -62,7 +63,7 @@ void AI::tick() {
 }
 
 void AI::remove(AISubscriber * subscriber) {
-    for (SubscriberList::iterator it = m_pSubscribers.begin(); 
+    for (SubscriberList::iterator it = m_pSubscribers.begin();
        it != m_pSubscribers.end(); it++) {
     if ((*it) == subscriber) {
          m_pSubscribers.erase(it);
@@ -84,12 +85,12 @@ void AI::addSubscriber(AISubscriber * subscriber)
 
 AutoAI::AutoAI(Direction d)
   : AI()
-  , m_eDirection(d) 
+  , m_eDirection(d)
 {
   m_nProcessCount = 15;
 }
 
-AutoAI::~AutoAI() 
+AutoAI::~AutoAI()
 {
 }
 
@@ -103,11 +104,11 @@ void AutoAI::tick() {
   m_nProcessTicks = m_nProcessCount;
 
   // Issue primary and secondary commands
-  for (SubscriberList::iterator it = m_pSubscribers.begin(); 
+  for (SubscriberList::iterator it = m_pSubscribers.begin();
        it != m_pSubscribers.end(); it++) {
     if ((*it)->isActive()) {
       (*it)->move(m_eDirection , m_eDirection);
-      
+
     }
   }
 

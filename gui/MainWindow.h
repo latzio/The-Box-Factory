@@ -14,6 +14,9 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    MainWindow(const MainWindow&) = delete;
+    MainWindow& operator=(const MainWindow&) = delete;
+
 protected:
 
     void keyPressEvent(QKeyEvent* event);

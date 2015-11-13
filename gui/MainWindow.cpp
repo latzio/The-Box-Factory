@@ -5,16 +5,15 @@
 #include "QVBoxLayout"
 #include "QWidget"
 
-MainWindow::MainWindow(QWidget *parent) {
+MainWindow::MainWindow(QWidget *parent)
+    : _gameWidget(new GameWidget(this))
+{
     // Box Factory Plugin
     Box::Game::BoxFactory box;
 
     // Making a central Widget for our Window
     QWidget * centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
-
-    // Building our widgets
-    _gameWidget = new GameWidget(this);
 
     // Setting the content and disposition of our central Widget
     QVBoxLayout * layout = new QVBoxLayout();

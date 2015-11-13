@@ -1,13 +1,13 @@
 #include "Object.h"
 #include <algorithm>
 
-#define PLAYER_COOLDOWN 5 // 20 // Shotgun, return to 4 for uzi 
+#define PLAYER_COOLDOWN 5 // 20 // Shotgun, return to 4 for uzi
 #define ENEMY_COOLDOWN 60 // one per second
 
 #define BULLET_TTL 600 // Max ten seconds of life
 #define PARTICLE_TTL 240
 #define SPARK_TTL 15
-#define JOG_FRAME_LENGTH 16 
+#define JOG_FRAME_LENGTH 16
 
 #define DOOR_FRAME_LENGTH 10
 #define SHIELD_FRAME_LENGTH 15
@@ -15,15 +15,17 @@
 int Moveable::WATERMARK_LOW  = (RAND_MAX / 10) * 1;
 int Moveable::WATERMARK_HIGH = (RAND_MAX / 10) * 5;
 
-Moveable::Moveable() 
+Moveable::Moveable()
    : m_pElement(0)
-  , m_bDead(true) 
+   , m_pSubscriber(0)
+  , m_bDead(true)
 {
 }
 
 Moveable::Moveable(SceneNode* element, MoveableSubscriber* subscriber)
    : m_pElement(element)
   , m_pSubscriber(subscriber)
+  , m_bDead(true)
 {
 }
 
@@ -48,12 +50,14 @@ void Moveable::tick() {
 }
 
 void Moveable::walk_gl() {
-   
+
    m_pElement->walk_gl();
 }
 
 Shield::Shield(SceneNode* element, MoveableSubscriber* subscriber)
   : Moveable(element, subscriber)
+  , m_bMajor(false)
+  , m_nTTLMax(0)
   , m_nTTL(0)
 {
 
@@ -105,7 +109,7 @@ void Shield::tick() {
       dynamic_cast<NPC*>(m)->getCentre(pHit);
 
       m_pSubscriber->DamageEnemy((NPC*)(m), 10000, pHit);
-    } 
+    }
   }
 
   if (m_nTTL) {
@@ -130,7 +134,7 @@ Moveable* Shield::IsHit(const Point3D& p, double r) {
 
   double nRadius = r + 4; //std::max(r, m_pElement->get_radius());
   double nDifference = (p - pCentre).length();
-  
+
   if (nRadius > nDifference) {
     return this;
   }
@@ -140,7 +144,9 @@ Moveable* Shield::IsHit(const Point3D& p, double r) {
 
 
 Particle::Particle(SceneNode* element, MoveableSubscriber* subscriber)
-  : Moveable(element, subscriber) 
+  : Moveable(element, subscriber)
+  , m_nAngularVelocity(0)
+  , m_velocity()
   , m_nTTL(PARTICLE_TTL)
 {
 
@@ -167,7 +173,7 @@ void Particle::tick() {
 
   // Gravity affects different things differently
   addGravity();
-  
+
   m_pElement->translate(m_velocity);
 }
 
@@ -182,11 +188,11 @@ void Particle::addGravity() {
   } else {
     m_velocity[1] -= 0.5;
   }
-  
+
 }
 
 Spark::Spark(SceneNode* element, MoveableSubscriber* subscriber)
-  : Particle(element, subscriber) 
+  : Particle(element, subscriber)
 {
   double rRand = ((rand() - (RAND_MAX/2)) / (double)RAND_MAX);
   m_nAngularVelocity = (rRand * 22.5);
@@ -210,8 +216,9 @@ void Spark::tick() {
   Particle::tick();
 }
 
-Level::Level(SceneNode* element, MoveableSubscriber* subscriber) 
+Level::Level(SceneNode* element, MoveableSubscriber* subscriber)
   : Moveable(element, subscriber)
+  , m_Objs()
 {
   m_pElement->find_all(m_Objs, "box");
   m_pElement->find_all(m_Objs, "box_small");
@@ -248,7 +255,7 @@ Level::Level(SceneNode* element, MoveableSubscriber* subscriber)
     o = new Obstacle(Point3D(90, 5, i), 10);
     m_pSubscriber->CreateObstacle(o);
   }
-    
+
   // Load the door references
   m_pDoor[DOOR_FRONT] = static_cast<JointNode*>(m_pElement->find("door_front"));
   m_pDoor[DOOR_RIGHT] = static_cast<JointNode*>(m_pElement->find("door_right"));
@@ -297,9 +304,9 @@ void Level::tick() {
 }
 
 
-Obstacle::Obstacle(const Point3D &centre, double radius) 
+Obstacle::Obstacle(const Point3D &centre, double radius)
   : m_centre(centre)
-  , m_nRadius(radius) 
+  , m_nRadius(radius)
 { }
 
 Obstacle::~Obstacle() { }
@@ -319,15 +326,18 @@ Moveable* Obstacle::IsHit(const Point3D& p, double r) {
   if (bHit) {
     return this;
   }
-  
+
   return (Moveable*)0;
 }
-//////////////////////////////////////////////////////////////////////////////////// 
+////////////////////////////////////////////////////////////////////////////////////
 
-Bullet::Bullet(SceneNode* element, MoveableSubscriber* subscriber, NPC* source) 
+Bullet::Bullet(SceneNode* element, MoveableSubscriber* subscriber, NPC* source)
   : Moveable(element, subscriber)
+  , m_pDirectionNode(0)
+  , m_pTrajectoryNode(0)
   , m_eSource(source->getType())
   , m_nVelocity(1)
+  , m_nWobble(0)
   , m_nTTL(BULLET_TTL)
   , m_nPower(35)
 {
@@ -335,7 +345,7 @@ Bullet::Bullet(SceneNode* element, MoveableSubscriber* subscriber, NPC* source)
 
 }
 
-Bullet::~Bullet() { 
+Bullet::~Bullet() {
 }
 
 void Bullet::tick() {
@@ -352,7 +362,7 @@ void Bullet::tick() {
 
   // Set to true if this bullet is finished
   bool bDelete = false;
-  
+
   // Check for collision
   if (m) {
     // Have we hit a wall? Show sparks and die
@@ -363,21 +373,21 @@ void Bullet::tick() {
           if (m_eSource == Moveable::TYPE_PC) {
           m_pSubscriber->PlaySFX(MoveableSubscriber::SFX_CAROM);
       }
-    } 
+    }
     // Have we hit an enemy? If shot by player do damage
     else if ((m->getType() == Moveable::TYPE_NPC ||
-          m->getType() == Moveable::TYPE_NPC_PISTOL)  
+          m->getType() == Moveable::TYPE_NPC_PISTOL)
           && m_eSource == Moveable::TYPE_PC)  {
 
       m_pSubscriber->DamageEnemy((NPC*)(m), m_nPower, p);
       bDelete = true;
-    } 
+    }
     // Have we hit a player? If shot by an enemy kill player
-    else if (m->getType() == Moveable::TYPE_PC 
+    else if (m->getType() == Moveable::TYPE_PC
              && m_eSource == Moveable::TYPE_NPC_PISTOL)   {
       m_pSubscriber->DamageEnemy((NPC*)m, 1000, p);
       bDelete = true;
-    } // a shield? 
+    } // a shield?
     else if (m->getType() == Moveable::TYPE_SHIELD && m_eSource == Moveable::TYPE_NPC_PISTOL) {
       bDelete = true;
     }
@@ -399,19 +409,19 @@ void Bullet::walk_gl() {
   Moveable::walk_gl();
 }
 
-void Bullet::set_joint() { 
+void Bullet::set_joint() {
   m_pDirectionNode = static_cast<JointNode*>(m_pElement->find("cog")) ;
   m_pTrajectoryNode = static_cast<JointNode*>(m_pElement->find("travel")) ;
 }
 
-void Bullet::set_direction(double dDegrees) { 
+void Bullet::set_direction(double dDegrees) {
 
   m_nTTL = BULLET_TTL;
   if (m_pDirectionNode) {
      Matrix4x4 m;
     m_pTrajectoryNode->set_transform(m);
     m_pDirectionNode->set_transform(m);
-    m_pDirectionNode->rotate('y', dDegrees); 
+    m_pDirectionNode->rotate('y', dDegrees);
   }
 
 }
@@ -423,13 +433,13 @@ void Bullet::set_velocity(double v) {
 void Moveable::set_position(const Matrix4x4 m) {
   m_pElement->set_transform(m);
 }
- 
+
 void Moveable::set_position(const Vector3D& v) {
    Matrix4x4 m;
   m_pElement->set_transform(m);
   m_pElement->translate(v);
-} 
-    
+}
+
 NPC::NPC(SceneNode* element, MoveableSubscriber* subscriber)
   : Moveable(element, subscriber)
   , m_nCooldown(0)
@@ -475,7 +485,7 @@ NPC::NPC(SceneNode* element, MoveableSubscriber* subscriber)
   m_pAI = 0;
 
 }
-    
+
 NPC::~NPC() {
 
 }
@@ -522,10 +532,10 @@ bool NPC::move(AI::Direction ePrimary, AI::Direction eSecondary) {
       // Set proper direction to true
       bMove[ePrimary] = true;
       bMove[eSecondary] = true;
-   } else if (nRand > WATERMARK_LOW) { 
+   } else if (nRand > WATERMARK_LOW) {
       // Sometimes go diagonal
       bMove[ePrimary] = true;
-   } else { 
+   } else {
       // Lastly, go sideways
       // bMove[((ePrimary + nDiff) % 4)] = true;
       bMove[((ePrimary + nDiff) % 4)] = true;
@@ -544,7 +554,7 @@ void NPC::setMoving(Direction d, bool b) {
    bool bRequireUpdate = ! (m_eMoving[d] == b);
 
    m_eMoving[d] = b;
-   
+
    if (bWasMoving != isMoving()) {
       updateMovingAnimation();
    }
@@ -585,7 +595,7 @@ void NPC::tick() {
             // Move Me
             switch(eOut) {
                 case D:
-                    z = 1;   
+                    z = 1;
                     break;
                 case DR:
                     z = .7;
@@ -621,10 +631,10 @@ void NPC::tick() {
 
          // Move person
          m_pElement->translate(v);
-        
+
          // Allow child to override collision rules
          Moveable * m = getCollidingMoveable();
-         
+
          // Allow child to override collision action
      if ((m_pAI && !m_pAI->isAuto()) || !(isNPC())) {
            doCollisionAction(m, v);
@@ -641,7 +651,7 @@ void NPC::tick() {
           revertToAI();
        }
      }
-         
+
     // Update my animations
     m_pElement->tick();
 }
@@ -702,7 +712,7 @@ NPC::OutputDir NPC::getOutputDirection() {
          return (OutputDir) (2 * i);
       }
    }
-   
+
    return NO_MOVEMENT;
 }
 
@@ -760,15 +770,15 @@ void NPC::revertToAI() {
 
 }
 
-void NPC::updateMovingDirection(bool bCascade) { 
+void NPC::updateMovingDirection(bool bCascade) {
    AnnimationFrame * pFrame;
-   
+
    int d = isMoving() ? getOutputDirection() : getTargetDirection();
-   
+
    if (d == NO_MOVEMENT) {
       return;
    }
-      
+
    // Turn lower body to face the correct direction
    m_pJoints[JOINT_CENTRE]->freeze();
    pFrame = new AnnimationFrame();
@@ -784,15 +794,15 @@ void NPC::updateMovingDirection(bool bCascade) {
 
 }
 
-void NPC::updateAimingAnimation() { 
+void NPC::updateAimingAnimation() {
 
    AnnimationFrame * pFrame;
-      
+
    m_pJoints[JOINT_RIGHT_SHOULDER]->freeze();
    m_pJoints[JOINT_RIGHT_WRIST]->freeze();
    m_pJoints[JOINT_LEFT_SHOULDER]->freeze();
    m_pJoints[JOINT_LEFT_WRIST]->freeze();
-   
+
    if (isAiming()) {
 
       AnnimationFrame * pFrame = new AnnimationFrame();
@@ -824,7 +834,7 @@ void NPC::updateAimingAnimation() {
       m_pJoints[JOINT_LEFT_WRIST]->add_frame(pFrame);
 
   } else {
-     
+
       pFrame = new AnnimationFrame();
       pFrame->m_nAngle = 0;
       pFrame->m_nFrames = 5;
@@ -838,7 +848,7 @@ void NPC::updateAimingAnimation() {
       pFrame->m_nRemainingFrames = 5;
       pFrame->m_bLoopBack = false;
       m_pJoints[JOINT_RIGHT_WRIST]->add_frame(pFrame);
-        
+
       pFrame = new AnnimationFrame();
       pFrame->m_nAngle = 0;
       pFrame->m_nFrames = 5;
@@ -926,7 +936,7 @@ void NPC::updateMovingAnimation() {
       pFrame->m_nRemainingFrames = JOG_FRAME_LENGTH / 2;
       pFrame->m_bLoopBack = false;
 
-      m_pJoints[JOINT_RIGHT_KNEE]->add_frame(pFrame);      
+      m_pJoints[JOINT_RIGHT_KNEE]->add_frame(pFrame);
 
       // Right leg continuous motion
 
@@ -969,7 +979,7 @@ void NPC::updateMovingAnimation() {
       pFrame->m_bLoopBack = false;
 
       m_pJoints[JOINT_LEFT_HIP]->add_frame(pFrame);
-      
+
       pFrame = new AnnimationFrame();
       pFrame->m_nAngle = 0;
       pFrame->m_nFrames = 5;
@@ -985,7 +995,7 @@ void NPC::updateMovingAnimation() {
       pFrame->m_bLoopBack = false;
 
       m_pJoints[JOINT_RIGHT_HIP]->add_frame(pFrame);
-      
+
       pFrame = new AnnimationFrame();
       pFrame->m_nAngle = 0;
       pFrame->m_nFrames = 5;
@@ -1001,11 +1011,11 @@ void NPC::updateMovingAnimation() {
 const Point3D NPC::get_gun_nozzle() {
   Point3D p;
   m_pJoints[JOINT_RIGHT_WRIST]->get_centre(p);
-  
+
   return p;
 }
 
-PistolNPC::PistolNPC(SceneNode* element, MoveableSubscriber* subscriber) 
+PistolNPC::PistolNPC(SceneNode* element, MoveableSubscriber* subscriber)
   : NPC(element, subscriber)
   , m_nCooldown(ENEMY_COOLDOWN)
 {
@@ -1015,7 +1025,7 @@ PistolNPC::PistolNPC(SceneNode* element, MoveableSubscriber* subscriber)
 PistolNPC::~PistolNPC() { }
 
 void PistolNPC::doUniqueAction() {
-  
+
    // Cooldown gun
    if (m_nCooldown) {
      m_nCooldown--;
@@ -1039,7 +1049,7 @@ PC::PC(SceneNode* element, MoveableSubscriber* subscriber)
   m_nThrottle = 0.8;
 
   m_nHealth = 100;
-  
+
   // Set size of radius (smaller than enemies)
   m_pElement->set_radius(2);
 
@@ -1051,7 +1061,7 @@ PC::~PC() {
 }
 
 void PC::tick() {
-   
+
    // If moving
    NPC::tick();
 
@@ -1059,7 +1069,7 @@ void PC::tick() {
    if (m_nCooldown) {
      m_nCooldown--;
    }
-   
+
    // If moving
    if (isAiming() && !m_nCooldown) {
 
@@ -1120,9 +1130,9 @@ const Point3D PC::get_gun_nozzle() {
 void PC::walk_gl() {
 
    NPC::walk_gl();
-   
+
    //if (m_pShield) {
-   // 
+   //
     // m_pShield->walk_gl();
    //}
 }
@@ -1140,10 +1150,10 @@ Moveable* PC::IsHit(const Point3D& p, double r) {
 
 void PC::die() {
   m_nHealth = 100;
- 
+
   Point3D p;
   m_pElement->get_centre(p);
- 
+
   m_pElement->translate(Point3D(0,0,0) - p);
 
   // Set size of radius (smaller than enemies)

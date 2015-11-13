@@ -22,6 +22,7 @@ class Moveable {
         Moveable();
         Moveable(SceneNode* element, MoveableSubscriber* subscriber);
         virtual ~Moveable();
+        MoveCtor(Moveable)
 
     void set_position(const Matrix4x4 m);
     void set_position(const Vector3D& v);
@@ -39,9 +40,6 @@ class Moveable {
     virtual bool is_dead() { return m_bDead; }
     virtual void set_dead(bool b) { m_bDead = b; }
 
-    void set_id(int id) { m_nId = id; }
-    int get_id() { return m_nId; }
-
     // Where is this unit
     virtual void getCentre(Point3D& p);
 
@@ -57,14 +55,12 @@ class Moveable {
    SceneNode* getRoot() { return m_pElement; }
 
     protected:
-        
+
         SceneNode* m_pElement;
     MoveableSubscriber * m_pSubscriber;
-    Type m_eType;
 
     bool m_bDead;
 
-    int m_nId;
 };
 
 class Shield : public Moveable {
@@ -75,7 +71,7 @@ class Shield : public Moveable {
         // Step through my animation/movement
         // (Called by gamelogic)
         virtual void tick();
-    
+
     virtual Moveable* IsHit(const Point3D& p, double r);
 
     void reset();
@@ -85,14 +81,14 @@ class Shield : public Moveable {
 
     void setMajor(bool b) { m_bMajor = b; }
     bool isMajor() { return m_bMajor; }
-    
+
     virtual Type getType() { return TYPE_SHIELD; }
 
   private:
     bool m_bMajor;
     int m_nTTLMax;
     int m_nTTL;
-    
+
 
 };
 
@@ -105,10 +101,10 @@ class Particle : public Moveable {
 
     void set_velocity(const Vector3D& v) { m_velocity = v; }
     virtual void reset();
-    
+
     virtual Type getType() { return TYPE_PARTICLE; }
   protected:
-    
+
      virtual void addGravity();
 
     double m_nAngularVelocity;
@@ -134,6 +130,7 @@ class Level : public Moveable {
   public:
     Level(SceneNode* element, MoveableSubscriber* subscriber);
     virtual ~Level();
+    MoveCtor(Level)
 
     virtual Type getType() { return TYPE_LEVEL; }
 
@@ -150,7 +147,7 @@ class Level : public Moveable {
 
     typedef std::vector< SceneNode* > ObjList;
     ObjList m_Objs;
-    
+
     JointNode* m_pDoor[4];
     bool m_bDoorOpen[4];
 
@@ -161,7 +158,7 @@ class Obstacle : public Moveable {
   public:
     Obstacle(const Point3D &centre, double radius);
     virtual ~Obstacle();
-    
+
     // see if this moveable hits this object
     virtual void getCentre(Point3D &p) { p = m_centre; }
     virtual Moveable* IsHit(const Point3D& p, double r);
@@ -176,6 +173,7 @@ class Bullet : public Moveable {
   public:
     Bullet(SceneNode* element, MoveableSubscriber* subscriber, NPC* source);
     virtual ~Bullet();
+    MoveCtor(Bullet)
 
     // Use this with the constructor to create bullets from
     // copies of the static bullet
@@ -184,9 +182,9 @@ class Bullet : public Moveable {
 
     virtual void tick();
     virtual void walk_gl();
-    
+
     void set_joint();
-    void set_direction(double dDegrees); 
+    void set_direction(double dDegrees);
     void set_velocity(double v);
 
     virtual Type getType() { return TYPE_BULLET; }
@@ -197,7 +195,7 @@ class Bullet : public Moveable {
     JointNode* m_pDirectionNode;
     SceneNode* m_pTrajectoryNode;
     Type m_eSource;
-        
+
     //double m_direction;
 
     double m_nVelocity;
@@ -214,6 +212,7 @@ class NPC : public Moveable, public AISubscriber {
     NPC();
     NPC(SceneNode* element, MoveableSubscriber* subscriber);
     virtual ~NPC();
+    MoveCtor(NPC)
 
     virtual void tick();
     virtual void walk_gl();
@@ -256,7 +255,7 @@ class NPC : public Moveable, public AISubscriber {
      // Is player moving or shooting (at all)
      bool isMoving();
      bool isAiming();
-    
+
     // Give me the point from which bullets come out of this Moveable
     const virtual Point3D get_gun_nozzle() ;
 
@@ -276,7 +275,7 @@ class NPC : public Moveable, public AISubscriber {
     virtual bool isActive() {
       return !m_bDead;
     };
-    
+
     virtual Type getType() { return TYPE_NPC; }
 
     virtual void setCooldown(int cooldown) { m_nCooldownReset = cooldown; }
@@ -302,7 +301,7 @@ class NPC : public Moveable, public AISubscriber {
    int m_nHealth;
 
    int m_nCooldownReset;
-    
+
 
 };
 
@@ -326,13 +325,14 @@ class PC : public NPC {
         PC();
         PC(SceneNode* element, MoveableSubscriber* subscriber);
         virtual ~PC();
-        
+        MoveCtor(PC)
+
         virtual void tick();
         virtual void walk_gl();
 
     virtual bool isNPC() { return false; }
     const virtual Point3D get_gun_nozzle();
-    
+
     // see if this moveable hits this object
     virtual Moveable* IsHit(const Point3D& p, double r);
     virtual Type getType() { return TYPE_PC; }
@@ -359,6 +359,7 @@ class PC : public NPC {
 class MoveableSubscriber {
 
   public:
+  virtual ~MoveableSubscriber() { }
 
   // These are required for shooting
   virtual void CreateBullet(const Point3D& origin, double dDegrees, NPC* source) = 0;

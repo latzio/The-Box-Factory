@@ -25,7 +25,17 @@
 #define LIFE_CAP 10
 
 Game::Game(int nPlayers)
-    : m_nBulletCounter(0)
+    : m_pLevel(0)
+    , m_Objs()
+    , m_PCs()
+    , m_NPCs()
+    , m_Bullets()
+    , m_AIs()
+    , m_Particles()
+    , m_EnemyIndex()
+    , m_pDefaultBullet(0)
+    , m_pDefaultEnemy(0)
+    , m_nBulletCounter(0)
     , m_nEnemyCounter(0)
     , m_nKeyboardPlayer(0)
     , m_bRunning(true)
@@ -36,7 +46,7 @@ Game::Game(int nPlayers)
     , m_movements(0)
 {
     // Import the level
-    m_pLevel = new Level(import_lua("models/level.lua"), this);;
+    m_pLevel = new Level(import_lua("models/level.lua"), this);
     std::cout << "Creating " << nPlayers << " players." << std::endl;
 
     // Set up shield lua files
@@ -105,7 +115,6 @@ Game::Game(int nPlayers)
            p = new Spark(import_lua("models/chunk_sparks.lua"), this);
         }
 
-        p->set_id(i);
         p->set_dead(true);
         m_Particles.push_back(p);
     }
@@ -206,9 +215,8 @@ bool Game::tick() {
     }
 
     // Fire AI
-    for (AIList::iterator it = m_AIs.begin();
-        it != m_AIs.end(); it++) {
-        (*it)->tick();
+    for (auto& ai : m_AIs) {
+        ai->tick();
     }
 
     // Attempt to move players
@@ -529,7 +537,6 @@ AISubscriber * Game::CreateEnemy(int x, int z) {
     }
 
     npc->set_dead(false);
-    npc->set_id(m_NPCs.size());
 
     int xDiff = (int)(((double)rand() / (double)RAND_MAX - 0.5) * 40); //+ 70;
     int zDiff = (int)(((double)rand() / (double)RAND_MAX - 0.5) * 30); //+ 70;
@@ -715,7 +722,6 @@ void Game::PlaySFX(MoveableSubscriber::SFX id) {
 }
 
 void Game::CreateObstacle(Moveable* pObstacle) {
-    pObstacle->set_id(m_Objs.size());
     m_Objs.push_back(pObstacle);
     pObstacle->set_dead(false);
 }

@@ -15,6 +15,9 @@ public:
     GameWidget(QWidget * parent = 0);
     virtual ~GameWidget();
 
+    GameWidget(const GameWidget&) = delete;
+    GameWidget& operator=(const GameWidget&) = delete;
+
     enum GameKey { MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT,
                    SHOOT_UP, SHOOT_DOWN, SHOOT_LEFT, SHOOT_RIGHT };
     bool handleKeyEvent(GameKey key, bool pressed);

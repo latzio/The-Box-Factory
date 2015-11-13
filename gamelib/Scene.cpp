@@ -10,6 +10,10 @@ SceneNode::SceneNode(const std::string& name)
   : m_id(SCENE_NODE_COUNTER++)
   , m_name(name)
   , m_bPicked(false)
+  , m_trans()
+  , m_transTranspose()
+  , m_invtrans()
+  , m_children()
   , m_parent(0)
   , m_nRadius(0.0)
   , m_dirty(true)
@@ -25,7 +29,7 @@ SceneNode::~SceneNode()
         delete *it;
       }
   }
-  
+
 }
 
 SceneNode* SceneNode::clone()
@@ -38,7 +42,7 @@ SceneNode* SceneNode::clone()
   for (it = m_children.begin(); it != m_children.end(); it++) {
     pNode->add_child((*it)->clone());
   }
-  
+
   return pNode;
 }
 
@@ -52,8 +56,8 @@ void SceneNode::get_centre(Point3D &p) {
 
 }
 
-void SceneNode::render_shadow_volume(Point3D cube[][4], 
-                                      Point3D& centre, 
+void SceneNode::render_shadow_volume(Point3D cube[][4],
+                                      Point3D& centre,
                                       Point3D& light)
 {
         //int i;
@@ -79,7 +83,7 @@ void SceneNode::setupDL() {
   // DISPLAY LIST
   // create one display list
   SceneNode::DL_INDEX = glGenLists(DL_INDEX);
-  
+
   GLUquadric* gluq = gluNewQuadric();
 
   // compile the display list, for a sphere
@@ -93,7 +97,7 @@ void SceneNode::setupDL() {
 
   // compile the display list, for a plane
   glNewList(DL_INDEX + DL_PLANE, GL_COMPILE);
-  
+
     glBegin(GL_QUADS);
 
     glNormal3d(0.0, 1.0, 0.0);
@@ -127,7 +131,7 @@ void SceneNode::setupDL() {
   glVertex3d(HBOUND, HBOUND, HBOUND);
   glTexCoord2f(1,0);
   glVertex3d(LBOUND, HBOUND, HBOUND);
-  
+
   // Back
   glNormal3d(0, 0, -1);
   glTexCoord2f(0, 0);
@@ -138,7 +142,7 @@ void SceneNode::setupDL() {
   glVertex3d(HBOUND, HBOUND, LBOUND);
   glTexCoord2f(0, 1);
   glVertex3d(HBOUND, LBOUND, LBOUND);
-  
+
   // Left
   glNormal3d(-1, 0, 0);
   glTexCoord2f(0, 0);
@@ -171,7 +175,7 @@ void SceneNode::setupDL() {
   glVertex3d(HBOUND, LBOUND, HBOUND);
   glTexCoord2f(1, 0);
   glVertex3d(LBOUND, LBOUND, HBOUND);
-  
+
   // Top
   glNormal3d(0, 1, 0);
   glTexCoord2f(0, 0);
@@ -216,7 +220,7 @@ void SceneNode::set_shadow(bool b) {
 }
 
 void SceneNode::walk_gl() const
-{ 
+{
   // Apply my transformation
   glPushMatrix();
 
@@ -253,7 +257,7 @@ SceneNode* SceneNode::find(const std::string& aName) {
     if (aName == m_name) {
         return this;
     }
-    
+
   // Default assumption - walk_gl on my children
   ChildList::const_iterator it;
   for (it = m_children.begin(); it != m_children.end(); it++) {
@@ -268,7 +272,7 @@ SceneNode* SceneNode::find(const std::string& aName) {
 }
 
 void SceneNode::find_all(std::vector<SceneNode*> &v, const std::string &name) {
-  
+
   if (m_name == name) { // add me to vector
     v.push_back(this);
   }
@@ -281,7 +285,7 @@ void SceneNode::find_all(std::vector<SceneNode*> &v, const std::string &name) {
 
 }
 
-void SceneNode::draw_gl() const 
+void SceneNode::draw_gl() const
 {
 
 }
@@ -299,10 +303,10 @@ const std::string& SceneNode::get_name() const {
 }
 
 void SceneNode::toggle_picked() {
-  
+
   m_bPicked = !m_bPicked;
   // std::cout << "I am " << m_name << ". I am picked? " << m_bPicked << std::endl;
-   
+
   // Set my children to be picked
   ChildList::iterator it;
   for (it = m_children.begin(); it != m_children.end(); it++) {
@@ -356,7 +360,7 @@ bool SceneNode::pick(int id)
       }
       node = node->get_parent();
     }
-    
+
     return false;
   }
 
@@ -389,7 +393,7 @@ void SceneNode::rotatePicked(int degrees) {
   for (it = m_children.begin(); it != m_children.end(); it++) {
     (*it)->rotatePicked(degrees);
   }
-  
+
 }
 
 void SceneNode::rotateHead(int degrees) {
@@ -404,7 +408,7 @@ void SceneNode::rotateHead(int degrees) {
   for (it = m_children.begin(); it != m_children.end(); it++) {
     (*it)->rotateHead(degrees);
   }
-  
+
 }
 
 void SceneNode::resetOrientation() {
@@ -445,8 +449,8 @@ void SceneNode::rotate(char axis, double angle)
       bottomRow = 1;
       leftCol = 0;
       rightCol = 1;
-      break;   
-     
+      break;
+
      default:
       std::cerr << "Bad params!" << std::endl;
 
@@ -468,12 +472,12 @@ void SceneNode::scale(const Vector3D& amount)
   // std::cerr << "Stub: Scale " << m_name << " by " << amount << std::endl;
   // Fill me in
   Matrix4x4 s;
-  
+
   // Add the scale factors in to the main diagonal
   for(int i = 0; i < 3; i++) {
     s[i][i] = amount[i];
   }
-  
+
   m_trans = m_trans * s;
   m_dirty = true;
 }
@@ -502,8 +506,11 @@ bool SceneNode::is_joint() const
 JointNode::JointNode(const std::string& name)
   : SceneNode(name)
   , m_axis('x')
-  , m_nAngle(0) 
-  , m_pDestFrame(0) 
+  , m_nAngle(0)
+  , m_pDestFrame(0)
+  , m_KeyFrames()
+  , m_joint_x()
+  , m_joint_y()
 {
 }
 
@@ -522,7 +529,7 @@ SceneNode* JointNode::clone()
   for (it = m_children.begin(); it != m_children.end(); it++) {
     pNode->add_child((*it)->clone());
   }
-  
+
   return pNode;
 }
 
@@ -585,7 +592,7 @@ void JointNode::tick() {
     // Call parent to call children
     SceneNode::tick();
 
-  while (true) {  
+  while (true) {
     // If no frame, but we have frames get one
       if (!m_pDestFrame && m_KeyFrames.size() > 0) {
           m_pDestFrame = m_KeyFrames.front();
@@ -615,7 +622,7 @@ void JointNode::tick() {
 
         double nDiffStep = (m_pDestFrame->m_nAngle - m_nAngle)
                      / (double)m_pDestFrame->m_nRemainingFrames;
-        
+
         rotate(m_axis, nDiffStep);
 
         // Add this to our current known angle;
@@ -641,7 +648,7 @@ void JointNode::tick() {
             }
 
             m_pDestFrame = 0;
-        } 
+        }
 
     }
 
@@ -684,7 +691,7 @@ SceneNode* GeometryNode::clone()
   for (it = m_children.begin(); it != m_children.end(); it++) {
     pNode->add_child((*it)->clone());
   }
-  
+
   return pNode;
 }
 
@@ -698,25 +705,25 @@ void GeometryNode::draw_gl() const
 
     // Set my bumpmap
     m_map->apply_gl();
-    
+
     // Choose fifty fifty
     //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
 
     // Draw my primitive
     m_primitive->walk_gl();
-    
+
   }
 
   // Default blending
   // glBlendFunc(GL_ONE, GL_ZERO);
-    
+
   // Set my texture
   m_material->apply_gl();
-    
+
   // Draw my primitive
   m_primitive->walk_gl();
 }
- 
+
 void GeometryNode::set_shadow(bool b) {
   m_primitive->set_shadow(b);
 
@@ -726,6 +733,6 @@ void GeometryNode::set_shadow(bool b) {
 void GeometryNode::colour(const Colour &d) {
 
   ((PhongMaterial*)m_material)->m_kd = d;
-  
+
   SceneNode::colour(d);
 }

@@ -9,14 +9,15 @@
 
 // This class is to hold all the gamelogic for the BoxFactory Game
 // It will have references to the current level and objects within it
-// It will store the passable and impassable areas, as well as the 
+// It will store the passable and impassable areas, as well as the
 // current status of all activity.
-class Game : public MoveableSubscriber{ 
+class Game : public MoveableSubscriber {
 
   public:
     // Create a new game
     Game(int nPlayers);
     ~Game();
+    NoMoveOrCopy(Game)
 
     // Initiate the game and start timers
     void play();
@@ -26,17 +27,17 @@ class Game : public MoveableSubscriber{
     // and collisions will be detected. Returns false if all enemies
     // are defeated, or both players are out of lives, true otherwise
     bool tick();
-    
+
     // Draw this game
     void walk_gl();
 
     enum Action{ ACTION_MOVE_LEFT,  ACTION_STOP_MOVE_LEFT,
-                 ACTION_MOVE_UP,    ACTION_STOP_MOVE_UP, 
+                 ACTION_MOVE_UP,    ACTION_STOP_MOVE_UP,
                  ACTION_MOVE_RIGHT, ACTION_STOP_MOVE_RIGHT,
-                 ACTION_MOVE_DOWN,  ACTION_STOP_MOVE_DOWN, 
-                 ACTION_SHOOT_LEFT, ACTION_STOP_SHOOT_LEFT, 
+                 ACTION_MOVE_DOWN,  ACTION_STOP_MOVE_DOWN,
+                 ACTION_SHOOT_LEFT, ACTION_STOP_SHOOT_LEFT,
                  ACTION_SHOOT_RIGHT,ACTION_STOP_SHOOT_RIGHT,
-                 ACTION_SHOOT_UP,   ACTION_STOP_SHOOT_UP,  
+                 ACTION_SHOOT_UP,   ACTION_STOP_SHOOT_UP,
                  ACTION_SHOOT_DOWN, ACTION_STOP_SHOOT_DOWN,
                  ACTION_TOGGLE_PAUSE };
     // Input
@@ -59,8 +60,8 @@ class Game : public MoveableSubscriber{
     virtual Shield* RequestShield(MoveableSubscriber::ShieldType s);
 
     virtual void CreateParticles(ParticleSize eSize, int nQuantity, const Vector3D& v);
-    virtual void CreateObstacle(Moveable* pObstacle); 
-  
+    virtual void CreateObstacle(Moveable* pObstacle);
+
        virtual void PlaySFX(MoveableSubscriber::SFX id);
 
     virtual void pause() { m_bRunning = false; }
@@ -83,7 +84,7 @@ class Game : public MoveableSubscriber{
     typedef std::vector< NPC* > EnemyList;
     typedef std::vector< AI* > AIList;
     typedef std::vector< Particle* > ParticleList;
-       
+
     ObjList       m_Objs; // Not drawn at preset, just used by gamelogic
     PCList        m_PCs;
     EnemyList     m_NPCs;

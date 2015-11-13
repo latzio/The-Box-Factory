@@ -2,6 +2,8 @@
 #define __AI_H_
 
 #include "Algebra.h"
+#include "Macro.h"
+
 #include <vector>
 
 class AISubscriber;
@@ -15,6 +17,8 @@ class AI {
   public:
     AI();
     virtual ~AI();
+
+    NoMoveOrCopy(AI)
 
     // This method causes our AI to calculate the motions
     // for all of its subscribers and then instruct them
@@ -30,7 +34,7 @@ class AI {
 
       void remove(AISubscriber * subscriber);
 
-    // Add an enemy to our processing list, 
+    // Add an enemy to our processing list,
     void addTarget(AISubscriber * target) {
       m_pTarget = target;
     }
@@ -49,7 +53,7 @@ class AI {
   protected:
 
     AISubscriber * m_pTarget; // This is the object this AI pursues
-    typedef std::vector< AISubscriber* > SubscriberList; 
+    typedef std::vector< AISubscriber* > SubscriberList;
     SubscriberList m_pSubscribers; // These are the mob
 
 
@@ -61,15 +65,15 @@ class AI {
 
 class AutoAI : public AI {
 
-  public: 
+  public:
 
     AutoAI(Direction d);
     virtual ~AutoAI();
 
     virtual void tick();
     virtual bool isAuto() { return true; }
-   
-  protected: 
+
+  protected:
 
      Direction m_eDirection;
 };
@@ -77,6 +81,10 @@ class AutoAI : public AI {
 class AISubscriber {
 
   public:
+    AISubscriber() : m_pAI(0) { }
+    virtual ~AISubscriber() { }
+    NoMoveOrCopy(AISubscriber)
+
     // Where is this unit
     virtual void getCentre(Point3D& p) = 0;
 
