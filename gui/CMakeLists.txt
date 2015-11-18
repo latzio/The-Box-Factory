@@ -39,7 +39,7 @@ SET( PLAY_LIB
     ${PNG_LIBRARIES}
 )
 
-ADD_EXECUTABLE( out ${PLAY_SRC} )
-TARGET_LINK_LIBRARIES( out
+ADD_EXECUTABLE( qbf ${PLAY_SRC} )
+TARGET_LINK_LIBRARIES( qbf
                        ${LIBRARY_OUTPUT_PATH}/libboxfactory.a
                        ${PLAY_LIB})
