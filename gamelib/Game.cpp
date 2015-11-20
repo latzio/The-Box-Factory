@@ -1,6 +1,9 @@
 #include "Game.h"
+#include "Image.h"
 #include "Object.h"
 #include "SceneLua.h"
+#include "Textures.h"
+
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
@@ -382,12 +385,108 @@ void Game::handleJoystick(Joystick* joy, PC * pc){
 
 }
 */
+
+void Game::init_gl() {
+
+    glShadeModel(GL_SMOOTH);
+    glClearColor(0, 0, 0, 0);
+    glEnable(GL_DEPTH_TEST);
+
+    //logo = new QtLogo(this, 64);
+    //logo->setColor(qtGreen.dark());
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    //glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHT0);
+    //glEnable(GL_MULTISAMPLE);
+
+    //static GLfloat lightPosition[4] = { 0.5, 5.0, 7.0, 1.0 };
+    //glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+
+    // DISPLAY LIST
+    SceneNode::setupDL();
+
+    // IMAGE LOADER
+
+    // Texture mapping
+    std::cout << "Textures: " << TEXTURE_COUNT << std::endl;
+    glEnable(GL_TEXTURE_2D);
+
+    Image image;
+    for( int c = 1; c < TEXTURE_COUNT; c++ ) {
+
+        // Load into OpenGL
+        image.loadPng( Textures::texFolder + Textures::texPaths[ c ] );
+        std::cout << "Loading texture from: " << Textures::texFolder + Textures::texPaths[ c ] << std::endl;
+        glBindTexture(GL_TEXTURE_2D, Textures::TEX_NO_TEXTURE + c );
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, image.width(), image.height(),
+        0, (image.elements() == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, image.byteData());
+
+    }
+
+    // Set up lighting
+    glEnable ( GL_LIGHTING ) ;
+    glEnable ( GL_COLOR_MATERIAL ) ;
+
+    glEnable(GL_NORMALIZE);
+
+    // Light 0 // Ambient
+    GLfloat light0[] = { .42, .22, .08, 1 };
+    glLightfv( GL_LIGHT0, GL_AMBIENT, light0);
+    glEnable(GL_LIGHT0);
+}
+
+/*
+SOME GL ONE LIGHTING JUNK
+GLfloat light[] = { 0.9, 0.9, 0.7, 1 };
+//									{ 0.8, 0.8, 0.6, 1 },
+//									{ 0.8, 0.8, 0.6, 1 },
+//									{ 0.8, 0.8, 0.6, 1 } };
+
+GLfloat pos[][4]  =  { { -8, 10, -8, 1 },
+                          { 7, 10, -7, 1 },
+                          { -7, 10, 7, 1 },
+                          { 8, 10, 8, 1 }};
+
+GLfloat dir[] = {0, -1, 0};
+
+for (int i = 0; i < 4; i++) {
+ for (int j = 0; j < 2; j++) {
+    glLightfv( GL_LIGHT1 + i, GL_DIFFUSE, light);
+    glLightfv( GL_LIGHT1 + i, GL_POSITION, pos[i]);
+     glLightfv( GL_LIGHT1 + i, GL_SPOT_DIRECTION, dir);
+     glLightf ( GL_LIGHT1 + i, GL_SPOT_CUTOFF, 45.f);
+     //glLightf ( GL_LIGHT1 + i, GL_CONSTANT_ATTENUATION, 0.95);
+    glEnable(GL_LIGHT1 + i);
+ }
+}*/
+
 void Game::walk_gl() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (!m_pLevel)
         return;
 
+    // Set up for perspective drawing
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(40.0, 1.33, .1, 1000.0);
+
+    // change to model view for drawing
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
     m_frames++;
+
+    glTranslated( 0, 0, -40 );
+    glRotated( 70, 1, 0, 0 );
 
     // draw the level
     glPushMatrix();

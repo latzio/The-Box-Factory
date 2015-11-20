@@ -33,7 +33,7 @@ yjoint = {0,0,0}
 centre = gr.node('floor_centre', xjoint, yjoint)
 myroot:add_child( centre )
 
--- ROTATE THE SCENE 
+-- ROTATE THE SCENE
 -- centre:rotate('x', ROOM_TILT)
 -- centre:scale( ROOM_ZOOM, ROOM_ZOOM, ROOM_ZOOM)
 
@@ -182,7 +182,7 @@ wall_left:translate( 0, 1, 0 )
 wall_left:rotate( 'x', -90 )
 
 end
-    
+
 -- Left And Right Ceiling
 for i = (room_x + 1), 23, 2 do
     for j = -(room_z-1), (room_z-1), 2 do
@@ -207,7 +207,7 @@ end
 -- Top, Bottom, and corner Ceiling
 for i = -23, 23, 2 do
     for j = (room_z +1), 23, 2 do
-        
+
 		  -- Create the tiles
 		  ceiling1 = gr.plane('ceiling' .. i .. '-' .. j)
         centre:add_child( ceiling1 )
@@ -234,13 +234,13 @@ boxlayout = math.random(1, 4)
 if boxlayout == 1 then
 
 bigboxes = { {-14, 2, -10}, {-14, 2, -6}, {6, 2, 6}, {10, 2, 6} }
-littleboxes = { {-11, 1,-11, 0}, 
-          {-10.8, 3,-10.5, -14}, 
-          {-11, 1, -9, 0}, 
+littleboxes = { {-11, 1,-11, 0},
+          {-10.8, 3,-10.5, -14},
+          {-11, 1, -9, 0},
           {-9, 1, -11, 0},
-          {5, 1, 9,0}, 
-          {6, 3, 9,0}, 
-          {7, 1, 9,0}, 
+          {5, 1, 9,0},
+          {6, 3, 9,0},
+          {7, 1, 9,0},
           {9, 1, 9,0} }
 
 
@@ -253,18 +253,18 @@ littleboxes = { {3, 5, 3}, { -12, 1, 8}, {-10, 1, 8}, {-8, 1, 8} ,
 
 elseif boxlayout == 3 then
 
-bigboxes = { {-14, 2, -10}, 
-             {-10, 2, -10}, 
-             {-6, 2, -10}, 
-             {6, 2, -10}, 
-             {10, 2, -10}, 
+bigboxes = { {-14, 2, -10},
+             {-10, 2, -10},
+             {-6, 2, -10},
+             {6, 2, -10},
+             {10, 2, -10},
              {14, 2, -10} }
 
-littleboxes = { {-14, 5, -11}, 
-                {-12, 5, -11}, 
-                {-6, 5, -11}, 
-                {8, 5, -11}, 
-                {10, 5, -11}, 
+littleboxes = { {-14, 5, -11},
+                {-12, 5, -11},
+                {-6, 5, -11},
+                {8, 5, -11},
+                {10, 5, -11},
                 {12, 5, -11} }
 
 elseif boxlayout == 4 then

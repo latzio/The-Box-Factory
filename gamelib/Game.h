@@ -28,6 +28,8 @@ class Game : public MoveableSubscriber {
     // are defeated, or both players are out of lives, true otherwise
     bool tick();
 
+    // Must be called once before walk_gl to initialize everything GL.
+    void init_gl();
     // Draw this game
     void walk_gl();
 
