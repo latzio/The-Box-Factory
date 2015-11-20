@@ -120,10 +120,7 @@ static void setup_bf_opengl( int width, int height )
     // Set up the rendering context, define display lists etc.:
     std::cout << "Initialize GL called." << std::endl;
 
-    glEnable(GL_CULL_FACE);
     glViewport(0, 0, width, height);
-
-
 }
 
 int main( int argc, char* argv[] )

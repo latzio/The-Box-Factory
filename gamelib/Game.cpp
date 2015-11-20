@@ -525,11 +525,11 @@ void Game::walk_gl() {
                 (*it)->walk_gl();
             }
         }
-        glPopMatrix();
 
-    }
+    glPopMatrix();
+ }
 
-    void Game::CreateBullet(const Point3D& origin, double dDegrees, NPC* source) {
+void Game::CreateBullet(const Point3D& origin, double dDegrees, NPC* source) {
     int nQuantity = 1;
 
     if (m_Bullets.size() + nQuantity > BULLET_CAP) {
