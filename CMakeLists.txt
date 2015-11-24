@@ -16,8 +16,5 @@ INCLUDE_DIRECTORIES( ${PROJECT_BINARY_DIR}/gamelib )
 # Build gamelib first
 ADD_SUBDIRECTORY( gamelib )
 
-# GUI loads from the gamelib library
-ADD_SUBDIRECTORY( gui )
-
-# An SDL Port that doesn't require Qt.
+# An SDL Wrapper.
 ADD_SUBDIRECTORY( sdl )
