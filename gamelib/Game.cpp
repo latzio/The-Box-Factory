@@ -513,14 +513,12 @@ void Game::walk_gl() {
 
     //auto projection = camera(40, glm::vec2(0, 0));
 
-    glBindTexture(GL_TEXTURE_2D, 4);
 
     // draw the level
     glPushMatrix();
     m_pLevel->walk_gl();
     glPopMatrix();
 
-    glBindTexture(GL_TEXTURE_2D, 0);
     // DRAW PLAYERS
     // They require scaling down from the lua file
     glPushMatrix();

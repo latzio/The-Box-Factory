@@ -2,8 +2,8 @@
 #include "Scene.h"
 #include "Textures.h"
 
-Primitive::Primitive() 
-  : m_bShadow(0) 
+Primitive::Primitive()
+  : m_bShadow(0)
 { }
 
 Primitive::~Primitive()
@@ -18,7 +18,6 @@ Sphere::~Sphere()
 void Sphere::walk_gl() const
 {
   // draw the display list
-  glBindTexture(GL_TEXTURE_2D, Textures::TEX_NO_TEXTURE);
   glCallList(SceneNode::DL_INDEX + SceneNode::DL_SPHERE);
 }
 
@@ -41,7 +40,7 @@ void Cube::walk_gl() const
 
   if (m_bShadow) {
     std::cout << "Rendering shadow volume." << std::endl;
-    
+
 #define LBOUND -1
 #define HBOUND 1
 
@@ -51,13 +50,13 @@ void Cube::walk_gl() const
     cube[0][1] = Point3D(HBOUND, LBOUND, HBOUND);
     cube[0][2] = Point3D(HBOUND, HBOUND, HBOUND);
     cube[0][3] = Point3D(LBOUND, HBOUND, HBOUND);
-  
+
     // Back
     cube[1][0] = Point3D(LBOUND, LBOUND, LBOUND);
     cube[1][1] = Point3D(LBOUND, HBOUND, LBOUND);
     cube[1][2] = Point3D(HBOUND, HBOUND, LBOUND);
     cube[1][3] = Point3D(HBOUND, LBOUND, LBOUND);
-  
+
     // Left
     cube[2][0] = Point3D(LBOUND, LBOUND, HBOUND);
     cube[2][1] = Point3D(LBOUND, HBOUND, HBOUND);
@@ -75,7 +74,7 @@ void Cube::walk_gl() const
     cube[4][1] = Point3D(HBOUND, LBOUND, LBOUND);
     cube[4][2] = Point3D(HBOUND, LBOUND, HBOUND);
     cube[4][3] = Point3D(LBOUND, LBOUND, HBOUND);
-  
+
     // Top
     cube[5][0] = Point3D(LBOUND, HBOUND, LBOUND);
     cube[5][1] = Point3D(LBOUND, HBOUND, HBOUND);
