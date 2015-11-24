@@ -4,6 +4,11 @@
 #include "SceneLua.h"
 #include "Textures.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
+
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
@@ -430,6 +435,7 @@ void Game::init_gl() {
         0, (image.elements() == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, image.byteData());
 
     }
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     // Set up lighting
     glEnable ( GL_LIGHTING ) ;
@@ -467,6 +473,17 @@ for (int i = 0; i < 4; i++) {
     glEnable(GL_LIGHT1 + i);
  }
 }*/
+glm::mat4 camera(float Translate, glm::vec2 const & Rotate)
+{
+	glm::mat4 Projection;// = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
+	glm::mat4 View = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Translate));
+	View = glm::rotate(View, Rotate.y, glm::vec3(-1.0f, 0.0f, 0.0f));
+	View = glm::rotate(View, Rotate.x, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+	return Projection * View * Model;
+}
+
+
 
 void Game::walk_gl() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -477,7 +494,7 @@ void Game::walk_gl() {
     // Set up for perspective drawing
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(40.0, 1.33, .1, 1000.0);
+    gluPerspective(45.0, 1.33, .1, 1000.0);
 
     // change to model view for drawing
     glMatrixMode(GL_MODELVIEW);
@@ -485,14 +502,25 @@ void Game::walk_gl() {
 
     m_frames++;
 
-    glTranslated( 0, 0, -40 );
-    glRotated( 70, 1, 0, 0 );
+
+
+    auto mvp = camera(20, glm::vec2(0, -1.22));
+    glMultMatrixf(glm::value_ptr(mvp));
+
+    //glTranslated( 0, 0, -40 );
+    //glRotated( 70, 1, 0, 0 );
+
+
+    //auto projection = camera(40, glm::vec2(0, 0));
+
+    glBindTexture(GL_TEXTURE_2D, 4);
 
     // draw the level
     glPushMatrix();
     m_pLevel->walk_gl();
     glPopMatrix();
 
+    glBindTexture(GL_TEXTURE_2D, 0);
     // DRAW PLAYERS
     // They require scaling down from the lua file
     glPushMatrix();
@@ -731,7 +759,7 @@ void Game::CreateParticles(ParticleSize eSize, int nQuantity, const Vector3D& v)
 
 void Game::CreateMob() {
 
-    AI * ai;
+    AI * ai = 0;
     int x = 0;
     int z = 0;
 
@@ -756,6 +784,9 @@ void Game::CreateMob() {
 
     x += (int)(((double)rand() / (double)RAND_MAX -0.5) * 5);
     z += (int)(((double)rand() / (double)RAND_MAX -0.5) * 5);
+
+    if (!ai)
+        return;
 
     // Create AI to auto move
     for (int i = 0; i < MOB_SIZE; i++){
