@@ -18,6 +18,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <string.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -363,6 +364,11 @@ public:
   double *end() const
   {
     return begin() + 16;
+  }
+
+  bool isIdentity() const {
+    static const Matrix4x4 identity;
+    return !memcmp(this, &identity, sizeof(*this));
   }
 
 private:

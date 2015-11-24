@@ -222,23 +222,18 @@ void SceneNode::set_shadow(bool b) {
 void SceneNode::walk_gl() const
 {
   // Apply my transformation
-  glPushMatrix();
+  bool pushAndMult = !m_trans.isIdentity();
+
+  if (pushAndMult)
+      glPushMatrix();
 
   if (m_dirty) {
       m_transTranspose = m_trans.transpose();
       m_dirty = false;
   }
-  glMultMatrixd(m_transTranspose.begin());
 
-  /*
-  if (is_joint() && m_bPicked) {
-    //std::cout << m_name << " is a joint and is picked. " << std::endl;
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  } else if (is_joint()) {
-    //std::cout << m_name << " is a joint and is not picked. " << std::endl;
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  }
-  */
+  if (pushAndMult)
+      glMultMatrixd(m_transTranspose.begin());
 
   draw_gl();
 
@@ -248,7 +243,8 @@ void SceneNode::walk_gl() const
     (*it)->walk_gl();
   }
 
-  glPopMatrix();
+  if (pushAndMult)
+      glPopMatrix();
 }
 
 SceneNode* SceneNode::find(const std::string& aName) {
@@ -424,8 +420,8 @@ void SceneNode::rotate(char axis, double angle)
   // std::cerr << "Stub: Rotate " << m_name << " around " << axis << " by " << angle << std::endl;
   // Fill me in
   Matrix4x4 r;
-  size_t topRow, bottomRow;
-  size_t leftCol, rightCol;
+  size_t topRow = 0, bottomRow = 0;
+  size_t leftCol = 0, rightCol = 0;
 
   // Obtain the four locations for the trig functions
   switch (axis) {

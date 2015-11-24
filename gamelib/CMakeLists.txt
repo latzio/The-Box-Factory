@@ -1,11 +1,12 @@
 # FIXME Need openGL, GLUT, SDL, etc. Lots of shit.
+cmake_minimum_required(VERSION 3.0)
 
 FIND_PACKAGE(Lua51 REQUIRED)
 
 # General
 SET( GAMELIB_SRC
     AI.cpp
-    Algebra.cpp    
+    Algebra.cpp
     BoxFactory.cpp
     Game.cpp
     Image.cpp
@@ -16,9 +17,9 @@ SET( GAMELIB_SRC
     SceneLua.cpp
 #    SoundManager.cpp
 )
-         
+
 SET( GAMELIB_LIB
 )
-          
+
 ADD_LIBRARY( boxfactory ${GAMELIB_SRC} )
 TARGET_LINK_LIBRARIES( boxfactory ${GAMELIB_LIB} )
