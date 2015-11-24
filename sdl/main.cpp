@@ -6,7 +6,6 @@
  * Distributed under terms of the LGPL.
  */
 
-#include "Algebra.h"
 #include "Game.h"
 #include <SDL/SDL.h>
 #include <GL/gl.h>

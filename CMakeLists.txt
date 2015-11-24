@@ -18,3 +18,4 @@ ADD_SUBDIRECTORY( gamelib )
 
 # An SDL Wrapper.
 ADD_SUBDIRECTORY( sdl )
+ADD_SUBDIRECTORY( sdl2 )
