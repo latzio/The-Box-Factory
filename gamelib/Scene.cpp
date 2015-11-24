@@ -72,8 +72,8 @@ double SceneNode::get_radius() {
 
 // SPHERE STUFF
 #define SPHERE_RADIUS 1.0
-#define SPHERE_SLICES 12
-#define SPHERE_STACKS 8
+#define SPHERE_SLICES 20
+#define SPHERE_STACKS 20
 
 // CUBE STUFF
 #define LBOUND -1
