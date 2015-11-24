@@ -34,7 +34,7 @@ void PhongMaterial::apply_gl() const
   glMaterialf(GL_FRONT, GL_SHININESS, m_shininess);
 
   // Turn off texture
-  // glBindTexture(GL_TEXTURE_2D, 0);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 TextureMaterial::TextureMaterial(const Colour& kd, const Colour& ks,
@@ -51,5 +51,5 @@ TextureMaterial::~TextureMaterial()
 void TextureMaterial::apply_gl() const
 {
     PhongMaterial::apply_gl();
-    // glBindTexture(GL_TEXTURE_2D, m_nTextureIndex);
+    glBindTexture(GL_TEXTURE_2D, m_nTextureIndex);
 }

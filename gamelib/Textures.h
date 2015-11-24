@@ -26,7 +26,7 @@ namespace Textures {
     TEX_WALL1_MAP  = 16
   };
 
-  static std::string texFolder = "data/";
+  static std::string texFolder = "data/textures/";
   static std::string texPaths[] = {
     "",
     "wall_metal.png",
