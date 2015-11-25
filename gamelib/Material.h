@@ -3,7 +3,6 @@
 
 #include "Algebra.h"
 #include <GL/gl.h>
-#include <GL/glu.h>
 
 class Material {
 public:
@@ -39,7 +38,7 @@ class TextureMaterial : public PhongMaterial {
 public:
     TextureMaterial(const Colour& kd, const Colour& ks, double shininess, int nTextureIndex);
     virtual ~TextureMaterial();
-  
+
     virtual Type get_type() {return TEXTURE; }
 
     virtual void apply_gl() const;

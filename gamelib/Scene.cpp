@@ -1,5 +1,9 @@
 #include "Scene.h"
 #include <iostream>
+#include <functional>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 typedef std::list<SceneNode*> ChildList;
 
@@ -74,25 +78,91 @@ double SceneNode::get_radius() {
 #define SPHERE_RADIUS 1.0
 #define SPHERE_SLICES 20
 #define SPHERE_STACKS 20
+#define PI 3.141592653589
 
 // CUBE STUFF
 #define LBOUND -1
 #define HBOUND 1
+
+static void makeSphere(int slices, int stacks) {
+
+    for( int t = 0 ; t < stacks ; t++ ) // stacks are ELEVATION so they count theta
+    {
+      float theta1 = ( (float)(t)/stacks )*PI - (PI/2.0);
+      float theta2 = ( (float)(t+1)/stacks )*PI - (PI/2.0);
+
+      for( int p = 0 ; p < slices ; p++ ) // slices are ORANGE SLICES so the count azimuth
+      {
+        float phi1 = ( (float)(p)/slices )*2*PI ; // azimuth goes around 0 .. 2*PI
+        float phi2 = ( (float)(p+1)/slices )*2*PI ;
+
+        //phi2   phi1
+        // |      |
+        // 2------1 -- theta1
+        // |\ _   |
+        // |    \ |
+        // 3------4 -- theta2
+        //
+
+        auto vertex1 = glm::vec3(cos(theta1) * cos(phi1), cos(theta1) * sin(phi1), sin(theta1));
+        auto vertex2 = glm::vec3(cos(theta1) * cos(phi2), cos(theta1) * sin(phi2), sin(theta1));
+        auto vertex3 = glm::vec3(cos(theta2) * cos(phi2), cos(theta2) * sin(phi2), sin(theta2));
+        auto vertex4 = glm::vec3(cos(theta2) * cos(phi1), cos(theta2) * sin(phi1), sin(theta2));
+        //vertex2 = vertex on a sphere of radius r at spherical coords theta1, phi2
+        //vertex3 = vertex on a sphere of radius r at spherical coords theta2, phi2
+        //vertex4 = vertex on a sphere of radius r at spherical coords theta2, phi1
+
+        // facing out
+        if( t == 0 ) { // top cap
+          //mesh->addTri( vertex1, vertex3, vertex4 ) ; //t1p1, t2p2, t2p1
+          glNormal3fv(glm::value_ptr(vertex1));
+          glVertex3fv(glm::value_ptr(vertex1));
+          glNormal3fv(glm::value_ptr(vertex3));
+          glVertex3fv(glm::value_ptr(vertex3));
+          glNormal3fv(glm::value_ptr(vertex4));
+          glVertex3fv(glm::value_ptr(vertex4));
+        } else if( t + 1 == stacks ) {//end cap
+          glNormal3fv(glm::value_ptr(vertex3));
+          glVertex3fv(glm::value_ptr(vertex3));
+          glNormal3fv(glm::value_ptr(vertex1));
+          glVertex3fv(glm::value_ptr(vertex1));
+          glNormal3fv(glm::value_ptr(vertex2));
+          glVertex3fv(glm::value_ptr(vertex2));
+        } else
+        {
+          // body, facing OUT:
+          //mesh->addTri( vertex1, vertex2, vertex4 ) ;
+          //mesh->addTri( vertex2, vertex3, vertex4 ) ;
+          glNormal3fv(glm::value_ptr(vertex1));
+          glVertex3fv(glm::value_ptr(vertex1));
+          glNormal3fv(glm::value_ptr(vertex2));
+          glVertex3fv(glm::value_ptr(vertex2));
+          glNormal3fv(glm::value_ptr(vertex4));
+          glVertex3fv(glm::value_ptr(vertex4));
+          glNormal3fv(glm::value_ptr(vertex2));
+          glVertex3fv(glm::value_ptr(vertex2));
+          glNormal3fv(glm::value_ptr(vertex3));
+          glVertex3fv(glm::value_ptr(vertex3));
+          glNormal3fv(glm::value_ptr(vertex4));
+          glVertex3fv(glm::value_ptr(vertex4));
+        }
+      }
+    }
+}
 
 void SceneNode::setupDL() {
   // DISPLAY LIST
   // create one display list
   SceneNode::DL_INDEX = glGenLists(DL_INDEX);
 
-  GLUquadric* gluq = gluNewQuadric();
 
   // compile the display list, for a sphere
   glNewList(DL_INDEX + DL_SPHERE, GL_COMPILE);
     // Draw a simple sphere
-    gluSphere(gluq,
-                SPHERE_RADIUS,
-                SPHERE_SLICES,
-                SPHERE_STACKS);
+    glBegin(GL_TRIANGLES);
+    makeSphere(SPHERE_SLICES, SPHERE_STACKS);
+    glEnd();
+
   glEndList();
 
   // compile the display list, for a plane

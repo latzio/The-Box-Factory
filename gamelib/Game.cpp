@@ -446,10 +446,7 @@ void Game::init_gl() {
     GLfloat light0[] = { .42, .22, .08, 1 };
     glLightfv( GL_LIGHT0, GL_AMBIENT, light0);
     glEnable(GL_LIGHT0);
-}
 
-/*
-SOME GL ONE LIGHTING JUNK
 GLfloat light[] = { 0.9, 0.9, 0.7, 1 };
 //									{ 0.8, 0.8, 0.6, 1 },
 //									{ 0.8, 0.8, 0.6, 1 },
@@ -471,7 +468,8 @@ for (int i = 0; i < 4; i++) {
      //glLightf ( GL_LIGHT1 + i, GL_CONSTANT_ATTENUATION, 0.95);
     glEnable(GL_LIGHT1 + i);
  }
-}*/
+}
+}
 glm::mat4 camera(float Translate, glm::vec2 const & Rotate)
 {
 	glm::mat4 Projection;// = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
@@ -482,8 +480,6 @@ glm::mat4 camera(float Translate, glm::vec2 const & Rotate)
 	return Projection * View * Model;
 }
 
-
-
 void Game::walk_gl() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -493,7 +489,8 @@ void Game::walk_gl() {
     // Set up for perspective drawing
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0, 1.33, .1, 1000.0);
+    auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
+    glMultMatrixf(glm::value_ptr(perspectiveProjection));
 
     // change to model view for drawing
     glMatrixMode(GL_MODELVIEW);

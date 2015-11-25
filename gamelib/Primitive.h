@@ -3,7 +3,6 @@
 
 #include "Algebra.h"
 #include <GL/gl.h>
-#include <GL/glu.h>
 
 class Primitive {
 public:
