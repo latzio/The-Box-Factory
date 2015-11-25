@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+using namespace glm;
+
 typedef std::list<SceneNode*> ChildList;
 
 int SceneNode::SCENE_NODE_COUNTER = 0;
@@ -84,69 +86,40 @@ double SceneNode::get_radius() {
 #define LBOUND -1
 #define HBOUND 1
 
-static void makeSphere(int slices, int stacks) {
+static void makeSphere(int slices, int stacks, std::function<void(const vec3& position, const vec3& normal, const vec2& texcoord)> handleVertex)
+{
+    for( int t = 0 ; t < stacks ; t++ ) {
+        float theta1 = ( (float)(t)/stacks )*PI - (PI/2.0);
+        float theta2 = ( (float)(t+1)/stacks )*PI - (PI/2.0);
 
-    for( int t = 0 ; t < stacks ; t++ ) // stacks are ELEVATION so they count theta
-    {
-      float theta1 = ( (float)(t)/stacks )*PI - (PI/2.0);
-      float theta2 = ( (float)(t+1)/stacks )*PI - (PI/2.0);
+        for( int p = 0 ; p < slices ; p++ ) {
+            float phi1 = ( (float)(p)/slices )*2*PI ;
+            float phi2 = ( (float)(p+1)/slices )*2*PI ;
 
-      for( int p = 0 ; p < slices ; p++ ) // slices are ORANGE SLICES so the count azimuth
-      {
-        float phi1 = ( (float)(p)/slices )*2*PI ; // azimuth goes around 0 .. 2*PI
-        float phi2 = ( (float)(p+1)/slices )*2*PI ;
+            auto vertex1 = glm::vec3(cos(theta1) * cos(phi1), cos(theta1) * sin(phi1), sin(theta1));
+            auto vertex2 = glm::vec3(cos(theta1) * cos(phi2), cos(theta1) * sin(phi2), sin(theta1));
+            auto vertex3 = glm::vec3(cos(theta2) * cos(phi2), cos(theta2) * sin(phi2), sin(theta2));
+            auto vertex4 = glm::vec3(cos(theta2) * cos(phi1), cos(theta2) * sin(phi1), sin(theta2));
+            auto tex = glm::vec2();
 
-        //phi2   phi1
-        // |      |
-        // 2------1 -- theta1
-        // |\ _   |
-        // |    \ |
-        // 3------4 -- theta2
-        //
-
-        auto vertex1 = glm::vec3(cos(theta1) * cos(phi1), cos(theta1) * sin(phi1), sin(theta1));
-        auto vertex2 = glm::vec3(cos(theta1) * cos(phi2), cos(theta1) * sin(phi2), sin(theta1));
-        auto vertex3 = glm::vec3(cos(theta2) * cos(phi2), cos(theta2) * sin(phi2), sin(theta2));
-        auto vertex4 = glm::vec3(cos(theta2) * cos(phi1), cos(theta2) * sin(phi1), sin(theta2));
-        //vertex2 = vertex on a sphere of radius r at spherical coords theta1, phi2
-        //vertex3 = vertex on a sphere of radius r at spherical coords theta2, phi2
-        //vertex4 = vertex on a sphere of radius r at spherical coords theta2, phi1
-
-        // facing out
-        if( t == 0 ) { // top cap
-          //mesh->addTri( vertex1, vertex3, vertex4 ) ; //t1p1, t2p2, t2p1
-          glNormal3fv(glm::value_ptr(vertex1));
-          glVertex3fv(glm::value_ptr(vertex1));
-          glNormal3fv(glm::value_ptr(vertex3));
-          glVertex3fv(glm::value_ptr(vertex3));
-          glNormal3fv(glm::value_ptr(vertex4));
-          glVertex3fv(glm::value_ptr(vertex4));
-        } else if( t + 1 == stacks ) {//end cap
-          glNormal3fv(glm::value_ptr(vertex3));
-          glVertex3fv(glm::value_ptr(vertex3));
-          glNormal3fv(glm::value_ptr(vertex1));
-          glVertex3fv(glm::value_ptr(vertex1));
-          glNormal3fv(glm::value_ptr(vertex2));
-          glVertex3fv(glm::value_ptr(vertex2));
-        } else
-        {
-          // body, facing OUT:
-          //mesh->addTri( vertex1, vertex2, vertex4 ) ;
-          //mesh->addTri( vertex2, vertex3, vertex4 ) ;
-          glNormal3fv(glm::value_ptr(vertex1));
-          glVertex3fv(glm::value_ptr(vertex1));
-          glNormal3fv(glm::value_ptr(vertex2));
-          glVertex3fv(glm::value_ptr(vertex2));
-          glNormal3fv(glm::value_ptr(vertex4));
-          glVertex3fv(glm::value_ptr(vertex4));
-          glNormal3fv(glm::value_ptr(vertex2));
-          glVertex3fv(glm::value_ptr(vertex2));
-          glNormal3fv(glm::value_ptr(vertex3));
-          glVertex3fv(glm::value_ptr(vertex3));
-          glNormal3fv(glm::value_ptr(vertex4));
-          glVertex3fv(glm::value_ptr(vertex4));
+            // facing out
+            if( t == 0 ) {
+                handleVertex(vertex1, vertex1, tex);
+                handleVertex(vertex3, vertex3, tex);
+                handleVertex(vertex4, vertex4, tex);
+            } else if( t + 1 == stacks ) {
+                handleVertex(vertex3, vertex3, tex);
+                handleVertex(vertex1, vertex1, tex);
+                handleVertex(vertex2, vertex2, tex);
+            } else {
+                handleVertex(vertex1, vertex1, tex);
+                handleVertex(vertex2, vertex2, tex);
+                handleVertex(vertex4, vertex4, tex);
+                handleVertex(vertex2, vertex2, tex);
+                handleVertex(vertex3, vertex3, tex);
+                handleVertex(vertex4, vertex4, tex);
+            }
         }
-      }
     }
 }
 
@@ -160,7 +133,12 @@ void SceneNode::setupDL() {
   glNewList(DL_INDEX + DL_SPHERE, GL_COMPILE);
     // Draw a simple sphere
     glBegin(GL_TRIANGLES);
-    makeSphere(SPHERE_SLICES, SPHERE_STACKS);
+    auto vertexToGL = [](const vec3& position, const vec3& normal, const vec2& texcoord) {
+        glTexCoord2fv(value_ptr(texcoord));
+        glNormal3fv(value_ptr(normal));
+        glVertex3fv(value_ptr(position));
+    };
+    makeSphere(SPHERE_SLICES, SPHERE_STACKS, vertexToGL);
     glEnd();
 
   glEndList();
