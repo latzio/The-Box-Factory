@@ -12,19 +12,19 @@
 
 #include <iostream>
 
-static void quit_tutorial( int code )
+static void quit_tutorial(int code)
 {
     /*
      * Quit SDL so we can release the fullscreen
      * mode and restore the previous video settings,
      * etc.
      */
-    SDL_Quit( );
+    SDL_Quit();
 
     /* Exit program. */
-    exit( code );
+    exit(code);
 }
-static void handle_key_press( SDL_Keysym* keysym, bool pressed, Game* bf )
+static void handle_key_press(SDL_Keysym* keysym, bool pressed, Game* bf)
 {
     Game::Action action = Game::ACTION_MOVE_LEFT;
 
@@ -36,10 +36,10 @@ static void handle_key_press( SDL_Keysym* keysym, bool pressed, Game* bf )
      * Handle the arrow keys and have that change the
      * viewing position/angle.
      */
-    switch( (int)keysym->sym ) {
+    switch ((int)keysym->sym) {
     case SDLK_ESCAPE:
         if (pressed)
-        quit_tutorial( 0 );
+            quit_tutorial(0);
         break;
     case SDLK_SPACE:
         break;
@@ -74,15 +74,15 @@ static void handle_key_press( SDL_Keysym* keysym, bool pressed, Game* bf )
 
     bf->input(action, 0);
 }
-static void process_events( Game* bf )
+static void process_events(Game* bf)
 {
     /* Our SDL event placeholder. */
     SDL_Event event;
 
     /* Grab all the events off the queue. */
-    while( SDL_PollEvent( &event ) ) {
+    while (SDL_PollEvent(&event)) {
 
-        switch( event.type ) {
+        switch (event.type) {
         case SDL_KEYDOWN:
         case SDL_KEYUP:
             /* Handle key presses. */
@@ -90,7 +90,7 @@ static void process_events( Game* bf )
             break;
         case SDL_QUIT:
             /* Handle quit requests (like Ctrl-c). */
-            quit_tutorial( 0 );
+            quit_tutorial(0);
             break;
         }
 
@@ -98,7 +98,8 @@ static void process_events( Game* bf )
 
 }
 
-int main(int argc, char* argv[]){
+int main(int argc, char* argv[])
+{
 
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window* displayWindow;
@@ -108,7 +109,7 @@ int main(int argc, char* argv[]){
     SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
     /*TODO: Check that we have OpenGL */
     if ((displayRendererInfo.flags & SDL_RENDERER_ACCELERATED) == 0 ||
-        (displayRendererInfo.flags & SDL_RENDERER_TARGETTEXTURE) == 0) {
+            (displayRendererInfo.flags & SDL_RENDERER_TARGETTEXTURE) == 0) {
         /*TODO: Handle this. We have no render surface and not accelerated. */
     }
 
@@ -129,9 +130,9 @@ int main(int argc, char* argv[]){
      * Now we want to begin our normal app process--
      * an event loop with a lot of redrawing.
      */
-    while( 1 ) {
+    while (1) {
         /* Process incoming events. */
-        process_events( &bf );
+        process_events(&bf);
         bf.tick();
         /* Draw the screen. */
         //draw_screen( &bf );
@@ -139,14 +140,14 @@ int main(int argc, char* argv[]){
 
         SDL_RenderPresent(displayRenderer);
     }
-  // The window is open: enter program loop (see SDL_PollEvent)
-  SDL_Delay(3000);  // Wait for 3000 milliseconds, for example
+    // The window is open: enter program loop (see SDL_PollEvent)
+    SDL_Delay(3000);  // Wait for 3000 milliseconds, for example
 
-  // Close and destroy the window
-  //SDL_DestroyWindow(window);
+    // Close and destroy the window
+    //SDL_DestroyWindow(window);
 
-  // Clean up SDL2 and exit the program
-  SDL_Quit();
-  return 0;
+    // Clean up SDL2 and exit the program
+    SDL_Quit();
+    return 0;
 
 }

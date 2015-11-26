@@ -1,16 +1,16 @@
- /* ***************************************************************
- *
- * File : SoundManager.h
- *
- * Author : Tiberiu Popa
- *          J. Alexander Clarke
- * Date   : June 18th, 2002
- *
- * Modified:
- *
- * Purpose: Header file for the sound manager
- *
- * ****************************************************************/
+/* ***************************************************************
+*
+* File : SoundManager.h
+*
+* Author : Tiberiu Popa
+*          J. Alexander Clarke
+* Date   : June 18th, 2002
+*
+* Modified:
+*
+* Purpose: Header file for the sound manager
+*
+* ****************************************************************/
 #ifndef _SOUND_MANAGER__H
 #define _SOUND_MANAGER__H
 #pragma interface
@@ -26,7 +26,7 @@
 
 // wrapper calss around SDL and SDL_mixer libraries
 class SoundManager {
-  public:
+public:
     SoundManager();
     ~SoundManager();
 
@@ -42,7 +42,7 @@ class SoundManager {
 
     // manipulating music clips
     // should have only one music clip
-    
+
     int LoadMusic(const std::string& file);
 
     int PlayMusic(int);
@@ -51,7 +51,7 @@ class SoundManager {
     int ResumeMusic(int);
     int VolumeMusic(int);
 
-  private:
+private:
 
     // internal data
 
@@ -65,7 +65,7 @@ class SoundManager {
     // number of sound clips loaded
     int nSounds;
     int nMusics;
-    
+
     int ResetSound(int snd);
     int ResetMusic(int snd);
 };

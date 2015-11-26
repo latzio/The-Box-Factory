@@ -10,7 +10,7 @@ BoxFactory::~BoxFactory()
 {
 }
 
-std::string BoxFactory::getTitle() 
+std::string BoxFactory::getTitle()
 {
     return "Hello Box Fans!";
 }

@@ -6,7 +6,7 @@
 
 namespace Textures {
 
-  enum Texture{
+enum Texture {
     TEX_NO_TEXTURE = 0,
     TEX_WALL1           = 1, // Grim Metal Wall
     TEX_WALL2      = 2, // Red Metal Wall
@@ -24,10 +24,10 @@ namespace Textures {
     TEX_BOX3       = 14,
     TEX_BOX4       = 15,
     TEX_WALL1_MAP  = 16
-  };
+};
 
-  static std::string texFolder = "data/textures/";
-  static std::string texPaths[] = {
+static std::string texFolder = "data/textures/";
+static std::string texPaths[] = {
     "",
     "wall_metal.png",
     "wall_metal2.png",
@@ -45,7 +45,7 @@ namespace Textures {
     "box_metal3.png",
     "box_wood.png",
     "wall_metal_map.png"
-  };
-  }
+};
+}
 
 #endif

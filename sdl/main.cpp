@@ -17,20 +17,20 @@ static int width = 1024;
 static int height = 768;
 static GLboolean should_rotate = GL_TRUE;
 
-static void quit_tutorial( int code )
+static void quit_tutorial(int code)
 {
     /*
      * Quit SDL so we can release the fullscreen
      * mode and restore the previous video settings,
      * etc.
      */
-    SDL_Quit( );
+    SDL_Quit();
 
     /* Exit program. */
-    exit( code );
+    exit(code);
 }
 
-static void handle_key_press( SDL_keysym* keysym, bool pressed, Game* bf )
+static void handle_key_press(SDL_keysym* keysym, bool pressed, Game* bf)
 {
     Game::Action action = Game::ACTION_MOVE_LEFT;
 
@@ -42,10 +42,10 @@ static void handle_key_press( SDL_keysym* keysym, bool pressed, Game* bf )
      * Handle the arrow keys and have that change the
      * viewing position/angle.
      */
-    switch( (int)keysym->sym ) {
+    switch ((int)keysym->sym) {
     case SDLK_ESCAPE:
         if (pressed)
-        quit_tutorial( 0 );
+            quit_tutorial(0);
         break;
     case SDLK_SPACE:
         should_rotate = !should_rotate;
@@ -82,15 +82,15 @@ static void handle_key_press( SDL_keysym* keysym, bool pressed, Game* bf )
     bf->input(action, 0);
 }
 
-static void process_events( Game* bf )
+static void process_events(Game* bf)
 {
     /* Our SDL event placeholder. */
     SDL_Event event;
 
     /* Grab all the events off the queue. */
-    while( SDL_PollEvent( &event ) ) {
+    while (SDL_PollEvent(&event)) {
 
-        switch( event.type ) {
+        switch (event.type) {
         case SDL_KEYDOWN:
         case SDL_KEYUP:
             /* Handle key presses. */
@@ -98,7 +98,7 @@ static void process_events( Game* bf )
             break;
         case SDL_QUIT:
             /* Handle quit requests (like Ctrl-c). */
-            quit_tutorial( 0 );
+            quit_tutorial(0);
             break;
         }
 
@@ -106,14 +106,14 @@ static void process_events( Game* bf )
 
 }
 
-static void draw_screen( Game* bf )
+static void draw_screen(Game* bf)
 {
     bf->walk_gl();
 
-    SDL_GL_SwapBuffers( );
+    SDL_GL_SwapBuffers();
 }
 
-static void setup_bf_opengl( int width, int height )
+static void setup_bf_opengl(int width, int height)
 {
     // Set up the rendering context, define display lists etc.:
     std::cout << "Initialize GL called." << std::endl;
@@ -121,7 +121,7 @@ static void setup_bf_opengl( int width, int height )
     glViewport(0, 0, width, height);
 }
 
-int main( int argc, char* argv[] )
+int main(int argc, char* argv[])
 {
     /* Information about the current video settings. */
     const SDL_VideoInfo* info = NULL;
@@ -132,21 +132,21 @@ int main( int argc, char* argv[] )
     int flags = 0;
 
     /* First, initialize SDL's video subsystem. */
-    if( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         /* Failed, exit. */
-        fprintf( stderr, "Video initialization failed: %s\n",
-             SDL_GetError( ) );
-        quit_tutorial( 1 );
+        fprintf(stderr, "Video initialization failed: %s\n",
+                SDL_GetError());
+        quit_tutorial(1);
     }
 
     /* Let's get some video information. */
-    info = SDL_GetVideoInfo( );
+    info = SDL_GetVideoInfo();
 
-    if( !info ) {
+    if (!info) {
         /* This should probably never happen. */
-        fprintf( stderr, "Video query failed: %s\n",
-             SDL_GetError( ) );
-        quit_tutorial( 1 );
+        fprintf(stderr, "Video query failed: %s\n",
+                SDL_GetError());
+        quit_tutorial(1);
     }
 
     bpp = info->vfmt->BitsPerPixel;
@@ -167,11 +167,11 @@ int main( int argc, char* argv[] )
      * not affect the GL attribute state, only
      * the standard 2D blitting setup.
      */
-    SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );
-    SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 8 );
-    SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 8 );
-    SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
-    SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     /*
      * We want to request that SDL provide us
@@ -183,15 +183,15 @@ int main( int argc, char* argv[] )
     /*
      * Set the video mode
      */
-    if( SDL_SetVideoMode( width, height, bpp, flags ) == 0 ) {
+    if (SDL_SetVideoMode(width, height, bpp, flags) == 0) {
         /*
          * This could happen for a variety of reasons,
          * including DISPLAY not being set, the specified
          * resolution not being available, etc.
          */
-        fprintf( stderr, "Video mode set failed: %s\n",
-             SDL_GetError( ) );
-        quit_tutorial( 1 );
+        fprintf(stderr, "Video mode set failed: %s\n",
+                SDL_GetError());
+        quit_tutorial(1);
     }
 
     // Create one player game now.
@@ -202,7 +202,7 @@ int main( int argc, char* argv[] )
      * double-buffered window for use with OpenGL.
      */
     //setup_opengl( width, height );
-    setup_bf_opengl( width, height );
+    setup_bf_opengl(width, height);
     bf.init_gl();
 
     bf.play();
@@ -211,12 +211,12 @@ int main( int argc, char* argv[] )
      * Now we want to begin our normal app process--
      * an event loop with a lot of redrawing.
      */
-    while( 1 ) {
+    while (1) {
         /* Process incoming events. */
-        process_events( &bf );
+        process_events(&bf);
         bf.tick();
         /* Draw the screen. */
-        draw_screen( &bf );
+        draw_screen(&bf);
     }
 
     /*

@@ -120,7 +120,7 @@ Game::Game(int nPlayers)
         } else if (i < BIGGER_PARTICLES) {
             p = new Particle(import_lua("models/chunk_bigger.lua"), this);
         } else if (i < SPARKS_PARTICLES) {
-           p = new Spark(import_lua("models/chunk_sparks.lua"), this);
+            p = new Spark(import_lua("models/chunk_sparks.lua"), this);
         }
 
         p->set_dead(true);
@@ -163,11 +163,13 @@ Game::Game(int nPlayers)
     */
 }
 
-Game::~Game() {
+Game::~Game()
+{
 
 }
 
-void Game::play() {
+void Game::play()
+{
     //int music = SM.LoadMusic("data/WOM.XM");
     /*
     int music = SM.LoadMusic("data/UNREAL.S3M");
@@ -203,7 +205,8 @@ void Game::play() {
 // All characters in motion will move, all bullets will move,
 // and collisions will be detected. Returns false if all enemies
 // are defeated, or both players are out of lives, true otherwise
-bool Game::tick() {
+bool Game::tick()
+{
 
     // Check joystick
     /*
@@ -244,7 +247,7 @@ bool Game::tick() {
 
     // Attempt to move particles
     for (ParticleList::iterator it = m_Particles.begin();
-        it != m_Particles.end(); it++) {
+            it != m_Particles.end(); it++) {
 
         if (!(*it)->is_dead()) {
             (*it)->tick();
@@ -273,7 +276,8 @@ bool Game::tick() {
     return m_nLives;
 }
 
-void Game::input(Action action, int nPlayer) {
+void Game::input(Action action, int nPlayer)
+{
 
     if ((unsigned int)nPlayer > m_PCs.size()) {
         return;
@@ -285,7 +289,7 @@ void Game::input(Action action, int nPlayer) {
         return;
     }
 
-    switch(action) {
+    switch (action) {
 
     // Positive movement and aiming
     case ACTION_MOVE_LEFT:
@@ -391,7 +395,8 @@ void Game::handleJoystick(Joystick* joy, PC * pc){
 }
 */
 
-void Game::init_gl() {
+void Game::init_gl()
+{
 
     glShadeModel(GL_SMOOTH);
     glClearColor(0, 0, 0, 0);
@@ -419,68 +424,70 @@ void Game::init_gl() {
     glEnable(GL_TEXTURE_2D);
 
     Image image;
-    for( int c = 1; c < TEXTURE_COUNT; c++ ) {
+    for (int c = 1; c < TEXTURE_COUNT; c++) {
 
         // Load into OpenGL
-        image.loadPng( Textures::texFolder + Textures::texPaths[ c ] );
+        image.loadPng(Textures::texFolder + Textures::texPaths[ c ]);
         std::cout << "Loading texture from: " << Textures::texFolder + Textures::texPaths[ c ] << std::endl;
-        glBindTexture(GL_TEXTURE_2D, Textures::TEX_NO_TEXTURE + c );
+        glBindTexture(GL_TEXTURE_2D, Textures::TEX_NO_TEXTURE + c);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, image.width(), image.height(),
-        0, (image.elements() == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, image.byteData());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width(), image.height(),
+                     0, (image.elements() == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, image.byteData());
 
     }
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Set up lighting
-    glEnable ( GL_LIGHTING ) ;
-    glEnable ( GL_COLOR_MATERIAL ) ;
+    glEnable(GL_LIGHTING) ;
+    glEnable(GL_COLOR_MATERIAL) ;
 
     glEnable(GL_NORMALIZE);
 
     // Light 0 // Ambient
     GLfloat light0[] = { .42, .22, .08, 1 };
-    glLightfv( GL_LIGHT0, GL_AMBIENT, light0);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light0);
     glEnable(GL_LIGHT0);
 
-GLfloat light[] = { 0.9, 0.9, 0.7, 1 };
-//									{ 0.8, 0.8, 0.6, 1 },
-//									{ 0.8, 0.8, 0.6, 1 },
-//									{ 0.8, 0.8, 0.6, 1 } };
+    GLfloat light[] = { 0.9, 0.9, 0.7, 1 };
+//                                  { 0.8, 0.8, 0.6, 1 },
+//                                  { 0.8, 0.8, 0.6, 1 },
+//                                  { 0.8, 0.8, 0.6, 1 } };
 
-GLfloat pos[][4]  =  { { -8, 10, -8, 1 },
-                          { 7, 10, -7, 1 },
-                          { -7, 10, 7, 1 },
-                          { 8, 10, 8, 1 }};
+    GLfloat pos[][4]  =  { { -8, 10, -8, 1 },
+        { 7, 10, -7, 1 },
+        { -7, 10, 7, 1 },
+        { 8, 10, 8, 1 }
+    };
 
-GLfloat dir[] = {0, -1, 0};
+    GLfloat dir[] = {0, -1, 0};
 
-for (int i = 0; i < 4; i++) {
- for (int j = 0; j < 2; j++) {
-    glLightfv( GL_LIGHT1 + i, GL_DIFFUSE, light);
-    glLightfv( GL_LIGHT1 + i, GL_POSITION, pos[i]);
-     glLightfv( GL_LIGHT1 + i, GL_SPOT_DIRECTION, dir);
-     glLightf ( GL_LIGHT1 + i, GL_SPOT_CUTOFF, 45.f);
-     //glLightf ( GL_LIGHT1 + i, GL_CONSTANT_ATTENUATION, 0.95);
-    glEnable(GL_LIGHT1 + i);
- }
-}
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 2; j++) {
+            glLightfv(GL_LIGHT1 + i, GL_DIFFUSE, light);
+            glLightfv(GL_LIGHT1 + i, GL_POSITION, pos[i]);
+            glLightfv(GL_LIGHT1 + i, GL_SPOT_DIRECTION, dir);
+            glLightf(GL_LIGHT1 + i, GL_SPOT_CUTOFF, 45.f);
+            //glLightf ( GL_LIGHT1 + i, GL_CONSTANT_ATTENUATION, 0.95);
+            glEnable(GL_LIGHT1 + i);
+        }
+    }
 }
 glm::mat4 camera(float Translate, glm::vec2 const & Rotate)
 {
-	glm::mat4 Projection;// = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
-	glm::mat4 View = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Translate));
-	View = glm::rotate(View, Rotate.y, glm::vec3(-1.0f, 0.0f, 0.0f));
-	View = glm::rotate(View, Rotate.x, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
-	return Projection * View * Model;
+    glm::mat4 Projection;// = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
+    glm::mat4 View = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Translate));
+    View = glm::rotate(View, Rotate.y, glm::vec3(-1.0f, 0.0f, 0.0f));
+    View = glm::rotate(View, Rotate.x, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+    return Projection * View * Model;
 }
 
-void Game::walk_gl() {
+void Game::walk_gl()
+{
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (!m_pLevel)
@@ -522,13 +529,13 @@ void Game::walk_gl() {
     glTranslated(0, 7, 0);
 
     for (PCList::iterator it = m_PCs.begin();
-        it != m_PCs.end(); it++) {
+            it != m_PCs.end(); it++) {
         (*it)->walk_gl();
     }
 
     // Draw the enemies
     for (EnemyList::iterator it = m_NPCs.begin();
-        it != m_NPCs.end(); it++) {
+            it != m_NPCs.end(); it++) {
         (*it)->walk_gl();
     }
 
@@ -536,22 +543,23 @@ void Game::walk_gl() {
 
     // Draw all projectiles
     for (BulletList::iterator it = m_Bullets.begin();
-        it != m_Bullets.end(); it++) {
+            it != m_Bullets.end(); it++) {
         (*it)->walk_gl();
     }
 
     // Attempt to draw particles
     for (ParticleList::iterator it = m_Particles.begin();
-        it != m_Particles.end(); it++) {
-            if (!(*it)->is_dead()) {
-                (*it)->walk_gl();
-            }
+            it != m_Particles.end(); it++) {
+        if (!(*it)->is_dead()) {
+            (*it)->walk_gl();
         }
+    }
 
     glPopMatrix();
- }
+}
 
-void Game::CreateBullet(const Point3D& origin, double dDegrees, NPC* source) {
+void Game::CreateBullet(const Point3D& origin, double dDegrees, NPC* source)
+{
     int nQuantity = 1;
 
     if (m_Bullets.size() + nQuantity > BULLET_CAP) {
@@ -581,10 +589,11 @@ void Game::CreateBullet(const Point3D& origin, double dDegrees, NPC* source) {
     }
 }
 
-void Game::DeleteBullet(Bullet * pBullet) {
+void Game::DeleteBullet(Bullet * pBullet)
+{
     // Find and delete bullet
     for (BulletList::iterator it = m_Bullets.begin();
-    it != m_Bullets.end(); it++) {
+            it != m_Bullets.end(); it++) {
 
         if (*it == pBullet) {
             delete *it;
@@ -597,7 +606,8 @@ void Game::DeleteBullet(Bullet * pBullet) {
 #define LEVEL_MAX_X 80
 #define LEVEL_MAX_Z 60
 
-Moveable* Game::DetectCollision(Point3D p, double r, Moveable* pExcluded) {
+Moveable* Game::DetectCollision(Point3D p, double r, Moveable* pExcluded)
+{
     Moveable* m = 0;
 
     // Check for collision with box
@@ -629,7 +639,8 @@ Moveable* Game::DetectCollision(Point3D p, double r, Moveable* pExcluded) {
     return m;
 }
 
-AISubscriber * Game::CreateEnemy(int x, int z) {
+AISubscriber * Game::CreateEnemy(int x, int z)
+{
     //  NPC * npc = new NPC();
     int nRand = rand() / (RAND_MAX / 40);
     NPC * npc;
@@ -666,7 +677,8 @@ AISubscriber * Game::CreateEnemy(int x, int z) {
 
 }
 
-void Game::DamageEnemy(NPC * pNPC, int nDamage, const Point3D& p3d) {
+void Game::DamageEnemy(NPC * pNPC, int nDamage, const Point3D& p3d)
+{
     Vector3D v = p3d - Point3D(0,0,0);
     CreateParticles(SIZE_LITTLE, 2, v);
     CreateParticles(SIZE_SPARKS, 3, v);
@@ -690,7 +702,7 @@ void Game::DamageEnemy(NPC * pNPC, int nDamage, const Point3D& p3d) {
             }
 
             for (EnemyList::iterator it = m_NPCs.begin();
-            it != m_NPCs.end(); it++) {
+                    it != m_NPCs.end(); it++) {
                 if (*it == pNPC) {
                     m_NPCs.erase(it);
                     break;
@@ -721,16 +733,17 @@ void Game::DamageEnemy(NPC * pNPC, int nDamage, const Point3D& p3d) {
             PC * pc = (PC*)npc;
             pc->die();
             // SM.PlaySound(m_nSFX[SFX_HUMAN_DEATH]);
-       }
+        }
     }
 }
 
-void Game::CreateParticles(ParticleSize eSize, int nQuantity, const Vector3D& v) {
+void Game::CreateParticles(ParticleSize eSize, int nQuantity, const Vector3D& v)
+{
 
     for (int i = 0; i < nQuantity; i++) {
         Particle * p = m_Particles[m_nParticleIndex[eSize]];
 
-        switch(eSize) {
+        switch (eSize) {
         case SIZE_LITTLE:
             m_nParticleIndex[eSize] = (m_nParticleIndex[eSize] + 1) % LITTLE_PARTICLES;
             break;
@@ -751,7 +764,8 @@ void Game::CreateParticles(ParticleSize eSize, int nQuantity, const Vector3D& v)
     }
 }
 
-void Game::CreateMob() {
+void Game::CreateMob()
+{
 
     AI * ai = 0;
     int x = 0;
@@ -783,7 +797,7 @@ void Game::CreateMob() {
         return;
 
     // Create AI to auto move
-    for (int i = 0; i < MOB_SIZE; i++){
+    for (int i = 0; i < MOB_SIZE; i++) {
         ai->addSubscriber(CreateEnemy(x, z));
     }
 
@@ -792,7 +806,8 @@ void Game::CreateMob() {
 
 }
 
-void Game::CreateAI(NPC * npc) {
+void Game::CreateAI(NPC * npc)
+{
 
     AI * ai = new AI();
     ai->addSubscriber(npc);
@@ -803,10 +818,11 @@ void Game::CreateAI(NPC * npc) {
 
 }
 
-void Game::DeleteAI(AI * ai) {
+void Game::DeleteAI(AI * ai)
+{
 
     for (AIList::iterator it = m_AIs.begin();
-        it != m_AIs.end(); it++) {
+            it != m_AIs.end(); it++) {
         if (*it == ai) {
             delete *it;
             m_AIs.erase(it);
@@ -815,9 +831,10 @@ void Game::DeleteAI(AI * ai) {
     }
 }
 
-void Game::PlaySFX(MoveableSubscriber::SFX id) {
+void Game::PlaySFX(MoveableSubscriber::SFX id)
+{
 
-    switch(id) {
+    switch (id) {
     case MoveableSubscriber::SFX_BULLET:
     case MoveableSubscriber::SFX_BLAST:
     case MoveableSubscriber::SFX_BOMB:
@@ -841,15 +858,17 @@ void Game::PlaySFX(MoveableSubscriber::SFX id) {
     }
 }
 
-void Game::CreateObstacle(Moveable* pObstacle) {
+void Game::CreateObstacle(Moveable* pObstacle)
+{
     m_Objs.push_back(pObstacle);
     pObstacle->set_dead(false);
 }
 
-Shield* Game::RequestShield(MoveableSubscriber::ShieldType s) {
+Shield* Game::RequestShield(MoveableSubscriber::ShieldType s)
+{
 
     Shield * shield = 0;
-    switch(s) {
+    switch (s) {
     case MoveableSubscriber::MAJOR:
         shield = new Shield(m_pShield[0]->clone(), this);
         shield->setTTL(240);
@@ -866,7 +885,8 @@ Shield* Game::RequestShield(MoveableSubscriber::ShieldType s) {
 
 }
 
-void Game::dumpStats() {
+void Game::dumpStats()
+{
 
     std::cout << "Game Stats:" << std::endl;
     std::cout << "-------------------------------------------:" << std::endl;
@@ -876,7 +896,8 @@ void Game::dumpStats() {
 
 }
 
-void Game::clearStats() {
+void Game::clearStats()
+{
     m_frames = 0;
     m_movements = 0;
 }

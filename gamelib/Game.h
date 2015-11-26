@@ -13,7 +13,7 @@
 // current status of all activity.
 class Game : public MoveableSubscriber {
 
-  public:
+public:
     // Create a new game
     Game(int nPlayers);
     ~Game();
@@ -33,15 +33,16 @@ class Game : public MoveableSubscriber {
     // Draw this game
     void walk_gl();
 
-    enum Action{ ACTION_MOVE_LEFT,  ACTION_STOP_MOVE_LEFT,
-                 ACTION_MOVE_UP,    ACTION_STOP_MOVE_UP,
-                 ACTION_MOVE_RIGHT, ACTION_STOP_MOVE_RIGHT,
-                 ACTION_MOVE_DOWN,  ACTION_STOP_MOVE_DOWN,
-                 ACTION_SHOOT_LEFT, ACTION_STOP_SHOOT_LEFT,
-                 ACTION_SHOOT_RIGHT,ACTION_STOP_SHOOT_RIGHT,
-                 ACTION_SHOOT_UP,   ACTION_STOP_SHOOT_UP,
-                 ACTION_SHOOT_DOWN, ACTION_STOP_SHOOT_DOWN,
-                 ACTION_TOGGLE_PAUSE };
+    enum Action { ACTION_MOVE_LEFT,  ACTION_STOP_MOVE_LEFT,
+                  ACTION_MOVE_UP,    ACTION_STOP_MOVE_UP,
+                  ACTION_MOVE_RIGHT, ACTION_STOP_MOVE_RIGHT,
+                  ACTION_MOVE_DOWN,  ACTION_STOP_MOVE_DOWN,
+                  ACTION_SHOOT_LEFT, ACTION_STOP_SHOOT_LEFT,
+                  ACTION_SHOOT_RIGHT,ACTION_STOP_SHOOT_RIGHT,
+                  ACTION_SHOOT_UP,   ACTION_STOP_SHOOT_UP,
+                  ACTION_SHOOT_DOWN, ACTION_STOP_SHOOT_DOWN,
+                  ACTION_TOGGLE_PAUSE
+                };
     // Input
     void input(Action action, int nPlayer);
 
@@ -64,17 +65,26 @@ class Game : public MoveableSubscriber {
     virtual void CreateParticles(ParticleSize eSize, int nQuantity, const Vector3D& v);
     virtual void CreateObstacle(Moveable* pObstacle);
 
-       virtual void PlaySFX(MoveableSubscriber::SFX id);
+    virtual void PlaySFX(MoveableSubscriber::SFX id);
 
-    virtual void pause() { m_bRunning = false; }
-    virtual void unpause() { m_bRunning = true; }
-    virtual void togglePause() { m_bRunning = !m_bRunning; }
+    virtual void pause()
+    {
+        m_bRunning = false;
+    }
+    virtual void unpause()
+    {
+        m_bRunning = true;
+    }
+    virtual void togglePause()
+    {
+        m_bRunning = !m_bRunning;
+    }
 
 
     void dumpStats();
     void clearStats();
 
-  protected:
+protected:
 
     // This is the level we are playing
     Level* m_pLevel;
@@ -106,44 +116,46 @@ class Game : public MoveableSubscriber {
     int m_nParticleIndex[4];
 
     // Sound effects
-    enum SFX{ SFX_BULLET, SFX_BLAST, SFX_BOMB,
-     SFX_CAROM0, SFX_CAROM1, SFX_CAROM2, SFX_CAROM3, SFX_CAROM4,
-     SFX_CAROM5, SFX_CAROM6, SFX_CAROM7, SFX_CAROM8, SFX_CAROM9,
-     SFX_CAROM10, SFX_CAROM11, SFX_CAROM12, SFX_CAROM13, SFX_HIT0 = 17,
-     SFX_HIT1 = 18, SFX_HUMAN_DEATH, SFX_ROBOT_DEATH };
+    enum SFX { SFX_BULLET, SFX_BLAST, SFX_BOMB,
+               SFX_CAROM0, SFX_CAROM1, SFX_CAROM2, SFX_CAROM3, SFX_CAROM4,
+               SFX_CAROM5, SFX_CAROM6, SFX_CAROM7, SFX_CAROM8, SFX_CAROM9,
+               SFX_CAROM10, SFX_CAROM11, SFX_CAROM12, SFX_CAROM13, SFX_HIT0 = 17,
+               SFX_HIT1 = 18, SFX_HUMAN_DEATH, SFX_ROBOT_DEATH
+             };
 
-      int m_nSFX[22];
+    int m_nSFX[22];
 
     // Copies of stuff that will be re-used
-    enum MODELS{ MODEL_ENEMY_SWORD, MODEL_ENEMY_SWORD_BOSS, MODEL_ENEMY_SWORD_FAST,
-                 MODEL_ENEMY_PISTOL, MODEL_ENEMY_PISTOL_BOSS,
-                 MODEL_BULLET, MODEL_ENEMY_BULLET };
+    enum MODELS { MODEL_ENEMY_SWORD, MODEL_ENEMY_SWORD_BOSS, MODEL_ENEMY_SWORD_FAST,
+                  MODEL_ENEMY_PISTOL, MODEL_ENEMY_PISTOL_BOSS,
+                  MODEL_BULLET, MODEL_ENEMY_BULLET
+                };
     SceneNode* m_pModels[7];
 
-     int m_nKeyboardPlayer;
-     int m_nJoystickPlayer[2];
+    int m_nKeyboardPlayer;
+    int m_nJoystickPlayer[2];
 
-     // JOYSTICK!
-     // Joystick * m_pJoystick[2];
-     // void handleJoystick(Joystick* joy, PC * pc);
+    // JOYSTICK!
+    // Joystick * m_pJoystick[2];
+    // void handleJoystick(Joystick* joy, PC * pc);
 
-   // SHIELDS!
-   SceneNode* m_pShield[2];
+    // SHIELDS!
+    SceneNode* m_pShield[2];
 
-   // Pause
-   bool m_bRunning;
+    // Pause
+    bool m_bRunning;
 
-   // Total number of players
-   int m_nPlayers;
+    // Total number of players
+    int m_nPlayers;
 
-   // Total number of lives
-   int m_nLives;
+    // Total number of lives
+    int m_nLives;
 
-   int m_nScore;
+    int m_nScore;
 
-   // Stat tracking
-   int m_frames;
-   int m_movements;
+    // Stat tracking
+    int m_frames;
+    int m_movements;
 
 
 };

@@ -14,7 +14,7 @@ class AISubscriber;
 // enemies that we release. Once they are all dead, the AI will destroy itself
 class AI {
 
-  public:
+public:
     AI();
     virtual ~AI();
 
@@ -27,60 +27,69 @@ class AI {
     virtual void tick();
 
     // Directions used in logic
-    enum Direction{ DOWN, RIGHT, UP, LEFT };
+    enum Direction { DOWN, RIGHT, UP, LEFT };
     // Add an enemy to our processing list, the first one added
     // is our leader, naturally
     void addSubscriber(AISubscriber * subscriber);
 
-      void remove(AISubscriber * subscriber);
+    void remove(AISubscriber * subscriber);
 
     // Add an enemy to our processing list,
-    void addTarget(AISubscriber * target) {
-      m_pTarget = target;
+    void addTarget(AISubscriber * target)
+    {
+        m_pTarget = target;
     }
 
     // As long as we still have somebody
-    bool isActive() {
-      return (m_pSubscribers.size() > 0);
+    bool isActive()
+    {
+        return (m_pSubscribers.size() > 0);
     }
 
-     void setTicks(int tickTotal) {
-         m_nProcessCount = tickTotal;
-     }
+    void setTicks(int tickTotal)
+    {
+        m_nProcessCount = tickTotal;
+    }
 
-    virtual bool isAuto() { return false; }
+    virtual bool isAuto()
+    {
+        return false;
+    }
 
-  protected:
+protected:
 
     AISubscriber * m_pTarget; // This is the object this AI pursues
     typedef std::vector< AISubscriber* > SubscriberList;
     SubscriberList m_pSubscribers; // These are the mob
 
 
-     int m_nProcessCount;
-     int m_nProcessTicks;
+    int m_nProcessCount;
+    int m_nProcessTicks;
 
 
 };
 
 class AutoAI : public AI {
 
-  public:
+public:
 
     AutoAI(Direction d);
     virtual ~AutoAI();
 
     virtual void tick();
-    virtual bool isAuto() { return true; }
+    virtual bool isAuto()
+    {
+        return true;
+    }
 
-  protected:
+protected:
 
-     Direction m_eDirection;
+    Direction m_eDirection;
 };
 
 class AISubscriber {
 
-  public:
+public:
     AISubscriber() : m_pAI(0) { }
     virtual ~AISubscriber() { }
     NoMoveOrCopy(AISubscriber)
@@ -97,11 +106,17 @@ class AISubscriber {
     // Revert to general purpose ai
     virtual void revertToAI() = 0;
 
-      void setAI(AI* ai) { m_pAI = ai; }
-    AI* getAI() { return m_pAI; }
+    void setAI(AI* ai)
+    {
+        m_pAI = ai;
+    }
+    AI* getAI()
+    {
+        return m_pAI;
+    }
 
-  protected:
-       AI* m_pAI;
+protected:
+    AI* m_pAI;
 
 };
 

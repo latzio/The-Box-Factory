@@ -19,7 +19,8 @@
 
 SoundManager SM;
 
-SoundManager::SoundManager(){
+SoundManager::SoundManager()
+{
 
     nSounds = 0;
     nMusics = 0;
@@ -29,25 +30,27 @@ SoundManager::SoundManager(){
 
     /* sound setup */
     int audio_rate = 22050;
-    Uint16 audio_format = AUDIO_S16; 
+    Uint16 audio_format = AUDIO_S16;
     int audio_channels = 2;
     int audio_buffers = 256;
 
-    // open the audio stream 
-    if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers)) {
-         printf("Unable to open audio!\n");
-         exit(1);
-       }
+    // open the audio stream
+    if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers)) {
+        printf("Unable to open audio!\n");
+        exit(1);
+    }
 }
 
-SoundManager::~SoundManager(){
+SoundManager::~SoundManager()
+{
 }
 
 
 /* *************** Manipulate Sound Chunks *******************/
 
-int SoundManager::ResetSound(int snd){
-    if(snd<0 || snd>=nSounds) return -1;
+int SoundManager::ResetSound(int snd)
+{
+    if (snd<0 || snd>=nSounds) return -1;
 
     Mix_HaltChannel(channel[snd]);
     channel[snd] = -1;
@@ -55,8 +58,9 @@ int SoundManager::ResetSound(int snd){
     return 0;
 }
 
-int SoundManager::LoadSound(const std::string& file){
- 
+int SoundManager::LoadSound(const std::string& file)
+{
+
     chunks[nSounds] = Mix_LoadWAV(file.c_str());
     Mix_VolumeChunk(chunks[nSounds], 48);
 
@@ -67,26 +71,30 @@ int SoundManager::LoadSound(const std::string& file){
 
 }
 
-int SoundManager::PlaySound(int snd){
-    if(snd<0 && snd>=nSounds) return -1;
+int SoundManager::PlaySound(int snd)
+{
+    if (snd<0 && snd>=nSounds) return -1;
     channel[snd] = Mix_PlayChannel(-1, chunks[snd], 0 /*-1*/);
     return 0;
 }
 
-int SoundManager::StopSound(int snd){
-    if(snd<0 && snd>=nSounds) return -1;
+int SoundManager::StopSound(int snd)
+{
+    if (snd<0 && snd>=nSounds) return -1;
     ResetSound(snd);
     return 0;
 }
 
-int SoundManager::PauseSound(int snd){
-    if(snd<0 && snd>=nSounds) return -1;
+int SoundManager::PauseSound(int snd)
+{
+    if (snd<0 && snd>=nSounds) return -1;
     Mix_Pause(channel[snd]);
     return 0;
 }
 
-int SoundManager::ResumeSound(int snd){
-    if(snd<0 && snd>=nSounds) return -1;
+int SoundManager::ResumeSound(int snd)
+{
+    if (snd<0 && snd>=nSounds) return -1;
     Mix_Resume(channel[snd]);
     return 0;
 }
@@ -94,49 +102,56 @@ int SoundManager::ResumeSound(int snd){
 
 /* *************** Manipulate Music *******************/
 
-int SoundManager::ResetMusic(int snd){
-    if(snd<0 || snd>=nMusics) return -1;
+int SoundManager::ResetMusic(int snd)
+{
+    if (snd<0 || snd>=nMusics) return -1;
 
     Mix_HaltMusic();
 
     return 0;
 }
 
-int SoundManager::LoadMusic(const std::string& file){
- 
+int SoundManager::LoadMusic(const std::string& file)
+{
+
     music[nMusics] = Mix_LoadMUS(file.c_str());
- 
+
     nMusics+=1;
     return nMusics - 1;
 
 }
 
-int SoundManager::PlayMusic(int snd){
-    if(snd<0 && snd>=nMusics) return -1;
+int SoundManager::PlayMusic(int snd)
+{
+    if (snd<0 && snd>=nMusics) return -1;
     Mix_PlayMusic(music[snd], 1 /*-1*/);
     return 0;
 }
 
-int SoundManager::StopMusic(int snd){
-    if(snd<0 && snd>=nMusics) return -1;
+int SoundManager::StopMusic(int snd)
+{
+    if (snd<0 && snd>=nMusics) return -1;
     ResetMusic(snd);
     return 0;
 }
 
-int SoundManager::PauseMusic(int snd){
-    if(snd<0 && snd>=nMusics) return -1;
+int SoundManager::PauseMusic(int snd)
+{
+    if (snd<0 && snd>=nMusics) return -1;
     Mix_PauseMusic();
     return 0;
 }
 
-int SoundManager::ResumeMusic(int snd){
-    if(snd<0 && snd>=nMusics) return -1;
+int SoundManager::ResumeMusic(int snd)
+{
+    if (snd<0 && snd>=nMusics) return -1;
     Mix_ResumeMusic();
     return 0;
 }
 
-int SoundManager::VolumeMusic(int snd) {
-    if(snd<0) return -1;
+int SoundManager::VolumeMusic(int snd)
+{
+    if (snd<0) return -1;
     Mix_VolumeMusic(snd);
     return 0;
 }

@@ -7,13 +7,13 @@ namespace Box {
 namespace Game {
 
 class BoxFactory {
-    public:
+public:
     BoxFactory();
     ~BoxFactory();
 
     std::string getTitle();
 
-    private:
+private:
 };
 
 } // Game

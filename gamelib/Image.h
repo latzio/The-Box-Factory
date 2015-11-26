@@ -11,45 +11,45 @@
  */
 class Image {
 public:
-  Image(); ///< Construct an empty image
-  Image(int width, int height, int depth); ///< Construct a black
-                                             ///image at the given width/height/depth
-  Image(const Image& other); ///< Copy an image
+    Image(); ///< Construct an empty image
+    Image(int width, int height, int depth); ///< Construct a black
+    ///image at the given width/height/depth
+    Image(const Image& other); ///< Copy an image
 
-  ~Image();
+    ~Image();
 
-  Image& operator=(const Image& other); ///< Copy the data from
-                                            ///one image to another
+    Image& operator=(const Image& other); ///< Copy the data from
+    ///one image to another
 
-  int width() const; ///< Determine the width of the image
-  int height() const; ///< Determine the height of the image
-  int elements() const; ///< Determine the depth (doubles per pixel) of
-                        ///the image
+    int width() const; ///< Determine the width of the image
+    int height() const; ///< Determine the height of the image
+    int elements() const; ///< Determine the depth (doubles per pixel) of
+    ///the image
 
-  double operator()(int x, int y, int i) const; ///< Retrieve a
-                                               ///particular component
-                                               ///from the image.
-  double& operator()(int x, int y, int i);  ///< Retrieve a
-                                               ///particular component
-                                               ///from the image.
+    double operator()(int x, int y, int i) const; ///< Retrieve a
+    ///particular component
+    ///from the image.
+    double& operator()(int x, int y, int i);  ///< Retrieve a
+    ///particular component
+    ///from the image.
 
 
-  bool loadPng(const std::string& filename); ///< Load a PNG file into
-                                             /// this image.
+    bool loadPng(const std::string& filename); ///< Load a PNG file into
+    /// this image.
 
-  bool savePng(const std::string& filename); ///< Save this image into
-                                             ///  the given PNG file
-  
-  const double* data() const;
-  double* data();
-  const unsigned char* byteData() const;
-  unsigned char* byteData();
-  
+    bool savePng(const std::string& filename); ///< Save this image into
+    ///  the given PNG file
+
+    const double* data() const;
+    double* data();
+    const unsigned char* byteData() const;
+    unsigned char* byteData();
+
 private:
-  int m_width, m_height;
-  int m_elements;
-  double* m_data;
-  unsigned char* m_byteData;
+    int m_width, m_height;
+    int m_elements;
+    double* m_data;
+    unsigned char* m_byteData;
 };
 
 #endif
