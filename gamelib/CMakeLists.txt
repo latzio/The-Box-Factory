@@ -1,9 +1,8 @@
-# FIXME Need openGL, GLUT, SDL, etc. Lots of shit.
+# While gamelib does depend on OpenGL and Lua51, we only build it
+# into a static library. It's up to the app wrappers to link those in.
+
 cmake_minimum_required(VERSION 3.0)
 
-FIND_PACKAGE(Lua51 REQUIRED)
-
-# General
 SET( GAMELIB_SRC
     AI.cpp
     Algebra.cpp
