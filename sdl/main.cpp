@@ -194,6 +194,8 @@ int main(int argc, char* argv[])
         quit_tutorial(1);
     }
 
+    std::cout << "Initialzing " << argv[0] << ". GL Ver: " << glGetString(GL_VERSION) << ", GLSL Ver: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+
     // Create one player game now.
     Game bf(1);
 

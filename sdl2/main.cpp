@@ -105,6 +105,18 @@ int main(int argc, char* argv[])
     SDL_Window* displayWindow;
     SDL_Renderer* displayRenderer;
     SDL_RendererInfo displayRendererInfo;
+
+    /* Request opengl 3.2 context.
+     * SDL doesn't have the ability to choose which profile at this time of writing,
+     * but it should default to the core profile */
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
+    /* Turn on double buffering with a 24bit Z buffer.
+     * You may need to change this to 16 or 32 for your system */
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
     SDL_CreateWindowAndRenderer(800, 600, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
     SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
     /*TODO: Check that we have OpenGL */
@@ -114,6 +126,8 @@ int main(int argc, char* argv[])
     }
 
     SDL_GL_SetSwapInterval(1);
+
+    std::cout << "Initialzing " << argv[0] << ". GL Ver: " << glGetString(GL_VERSION) << ", GLSL Ver: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
     //Display_InitGL();
     //Display_SetViewport(800, 600);

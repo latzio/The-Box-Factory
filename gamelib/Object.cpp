@@ -59,6 +59,12 @@ void Moveable::walk_gl()
     m_pElement->walk_gl();
 }
 
+void Moveable::walk_gl2(const glm::mat4x4& mat)
+{
+
+    m_pElement->walk_gl2(mat);
+}
+
 Shield::Shield(SceneNode* element, MoveableSubscriber* subscriber)
     : Moveable(element, subscriber)
     , m_bMajor(false)

@@ -9,6 +9,8 @@
 
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 
+#include <GLES3/gl3.h>
+
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
@@ -395,27 +397,131 @@ void Game::handleJoystick(Joystick* joy, PC * pc){
 }
 */
 
+const char vsTexture[] =
+    ""
+    "   uniform mat4 u_projection;                                        \n"
+    "                                                                     \n"
+    "   attribute vec3 a_position;                                        \n"
+    "   attribute vec3 a_normal;                                          \n"
+    "   attribute vec2 a_tex;                                             \n"
+    "                                                                     \n"
+    "   varying vec3 v_normal;                                            \n"
+    "   varying vec2 v_tex;                                               \n"
+    "                                                                     \n"
+    "   void main()                                                       \n"
+    "   {                                                                 \n"
+    "      gl_Position = u_projection * vec4(a_position, 1.0);            \n"
+    "      vec4 normal = u_projection * vec4(a_normal, 0.0);              \n"
+    "      v_normal = normal.xyz;                                         \n"
+    "      v_tex = a_tex;                                                 \n"
+    "   }                                                                 \n"
+    "";
+
+
+const char fsTexture[] =
+    ""
+    "   varying vec3 v_normal;                                            \n"
+    "   varying vec2 v_tex;                                               \n"
+    "                                                                     \n"
+    "   void main()                                                       \n"
+    "   {                                                                 \n"
+    "      gl_FragColor = vec4(1.0, 1.0, 1.0, 0.1);\n"
+    "   }                                                                 \n"
+    "";
+
+void
+print_info_log(
+    GLuint  name      // handle to the
+)
+{
+    constexpr int maxLen = 2024;
+    int len = 0;
+    char buffer[maxLen];
+
+    if (glIsProgram(name)) {
+        glGetProgramInfoLog(name , 2014 , &len , buffer);
+        std::cout << "Program " << name << " Info: " <<  buffer << std::endl;
+    } else {
+        glGetShaderInfoLog(name , 2014 , &len , buffer);
+        if (len > 0) {
+            std::cout << "Shader Info: " <<  buffer << std::endl;
+
+            GLint success;
+            glGetShaderiv(name, GL_COMPILE_STATUS, &success);
+            if (success != GL_TRUE)   exit(1);
+        }
+    }
+}
+
+GLuint
+load_shader(
+    const char  *shader_source,
+    GLenum       type
+)
+{
+    GLuint  shader = glCreateShader(type);
+
+    glShaderSource(shader , 1 , &shader_source , NULL);
+    glCompileShader(shader);
+
+    print_info_log(shader);
+
+    return shader;
+}
+
+int u_projection;
+int a_position;
+int a_normal;
+int a_tex;
+
 void Game::init_gl()
 {
-
-    glShadeModel(GL_SMOOTH);
     glClearColor(0, 0, 0, 0);
     glEnable(GL_DEPTH_TEST);
 
-    //logo = new QtLogo(this, 64);
-    //logo->setColor(qtGreen.dark());
-
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    //glEnable(GL_LIGHTING);
-    //glEnable(GL_LIGHT0);
-    //glEnable(GL_MULTISAMPLE);
 
-    //static GLfloat lightPosition[4] = { 0.5, 5.0, 7.0, 1.0 };
-    //glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // DISPLAY LIST
     SceneNode::setupDL();
+
+    // Compile Programs
+    ///////  the openGL part  ///////////////////////////////////////////////////////////////
+
+    GLuint vertexShader   = load_shader(vsTexture , GL_VERTEX_SHADER);         // load vertex shader
+    GLuint fragmentShader = load_shader(fsTexture , GL_FRAGMENT_SHADER);     // load fragment shader
+
+    GLuint shaderProgram  = glCreateProgram();                  // create program object
+    glAttachShader(shaderProgram, vertexShader);                // and attach both...
+    glAttachShader(shaderProgram, fragmentShader);              // ... shaders to it
+
+    glLinkProgram(shaderProgram);       // link the program
+    print_info_log(shaderProgram);
+
+    int linkStatus = 0;
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &linkStatus);
+    if (linkStatus == GL_FALSE)
+        std::cerr << "Failed to link." << std::endl;
+
+
+    //// now get the locations (kind of handle) of the shaders variables
+    u_projection =  glGetUniformLocation(shaderProgram , "u_projection");
+    a_position =    glGetAttribLocation(shaderProgram , "a_position");
+    a_normal =      glGetAttribLocation(shaderProgram , "a_normal");
+    a_tex =         glGetAttribLocation(shaderProgram , "a_tex");
+
+    if (a_position < 0  ||  u_projection < 0  ||  a_normal < 0  || a_tex < 0) {
+        std::cerr << a_tex << std::endl;
+        std::cerr << a_normal << std::endl;
+        std::cerr << a_position << std::endl;
+        std::cerr << u_projection << std::endl;
+        std::cerr << "Unable to get uniform location" << std::endl;
+    }
+
+    glUseProgram(shaderProgram);        // and select it for usage
 
     // IMAGE LOADER
 
@@ -493,22 +599,19 @@ void Game::walk_gl()
     if (!m_pLevel)
         return;
 
-    // Set up for perspective drawing
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
-    glMultMatrixf(glm::value_ptr(perspectiveProjection));
+    glEnableVertexAttribArray(a_position);
 
-    // change to model view for drawing
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
+    auto modelview = camera(20, glm::vec2(0, -1.22));
+    auto mvp = perspectiveProjection * modelview;
+
+    glUniformMatrix4fv(u_projection, 1, GL_FALSE, glm::value_ptr(mvp));
 
     m_frames++;
 
 
 
-    auto mvp = camera(20, glm::vec2(0, -1.22));
-    glMultMatrixf(glm::value_ptr(mvp));
+    //glMultMatrixf(glm::value_ptr(mvp));
 
     //glTranslated( 0, 0, -40 );
     //glRotated( 70, 1, 0, 0 );
@@ -518,25 +621,27 @@ void Game::walk_gl()
 
 
     // draw the level
-    glPushMatrix();
-    m_pLevel->walk_gl();
-    glPopMatrix();
+    m_pLevel->walk_gl2(mvp);
 
     // DRAW PLAYERS
     // They require scaling down from the lua file
-    glPushMatrix();
-    glScaled(.2, .2, .2);
-    glTranslated(0, 7, 0);
+    //glScaled(.2, .2, .2);
+    auto scaleDown = glm::scale(glm::mat4x4(), glm::vec3(.2f, .2f, .2f));
+    auto translateUp = glm::translate(glm::mat4x4(), glm::vec3(0.0f, 7.0f, 0.0f));
+
+    mvp = mvp * scaleDown * translateUp;
+    glUniformMatrix4fv(u_projection, 1, GL_FALSE, glm::value_ptr(mvp));
+    //glTranslated(0, 7, 0);
 
     for (PCList::iterator it = m_PCs.begin();
             it != m_PCs.end(); it++) {
-        (*it)->walk_gl();
+        (*it)->walk_gl2(mvp);
     }
 
     // Draw the enemies
     for (EnemyList::iterator it = m_NPCs.begin();
             it != m_NPCs.end(); it++) {
-        (*it)->walk_gl();
+        (*it)->walk_gl2(mvp);
     }
 
     // END DRAW PLAYERS AND ENEMIES
@@ -544,18 +649,17 @@ void Game::walk_gl()
     // Draw all projectiles
     for (BulletList::iterator it = m_Bullets.begin();
             it != m_Bullets.end(); it++) {
-        (*it)->walk_gl();
+        (*it)->walk_gl2(mvp);
     }
 
     // Attempt to draw particles
     for (ParticleList::iterator it = m_Particles.begin();
             it != m_Particles.end(); it++) {
         if (!(*it)->is_dead()) {
-            (*it)->walk_gl();
+            (*it)->walk_gl2(mvp);
         }
     }
 
-    glPopMatrix();
 }
 
 void Game::CreateBullet(const Point3D& origin, double dDegrees, NPC* source)

@@ -6,6 +6,9 @@
 #include "Material.h"
 #include "Macro.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <list>
 #include <vector>
 
@@ -33,6 +36,7 @@ public:
 
     virtual void tick();
     virtual void walk_gl() const;
+    virtual void walk_gl2(const glm::mat4x4&) const;
     virtual void draw_gl() const;
 
     const Matrix4x4& get_transform() const

@@ -1,9 +1,10 @@
-# QT4 Handling
+# Libs to link binary using gamelib
 cmake_minimum_required(VERSION 3.0)
 
 FIND_PACKAGE(OpenGL REQUIRED)
 FIND_PACKAGE(PNG REQUIRED)
 FIND_PACKAGE(SDL2 REQUIRED)
+FIND_PACKAGE(Lua51 REQUIRED)
 
 # General
 SET(BF_SDL2_SRC

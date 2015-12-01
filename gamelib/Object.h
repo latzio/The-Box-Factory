@@ -6,6 +6,8 @@
 #include "SceneLua.h"
 #include "AI.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <string>
 
 // This is the base class for all moving objects
@@ -33,6 +35,7 @@ public:
     // draw me to gl buffers
     // (Called by renderer)
     virtual void walk_gl();
+    virtual void walk_gl2(const glm::mat4x4&);
 
     // see if this moveable hits this object
     virtual Moveable* IsHit(const Point3D& p, double r);

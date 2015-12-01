@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <GLES3/gl3.h>
+
 using namespace glm;
 
 typedef std::list<SceneNode*> ChildList;
@@ -299,6 +301,39 @@ void SceneNode::walk_gl() const
 
     if (pushAndMult)
         glPopMatrix();
+}
+
+void SceneNode::walk_gl2(const glm::mat4x4& mat) const
+{
+    // Apply my transformation
+    bool pushAndMult = !m_trans.isIdentity();
+
+    if (m_dirty) {
+        m_transTranspose = m_trans.transpose();
+        m_dirty = false;
+    }
+
+    glm::mat4x4 next(mat);
+    if (pushAndMult) {
+        glm::mat4x4 transpose;
+        for (int i = 0; i < 16; ++i)
+            transpose[i / 4][i % 4] = static_cast<float>(m_transTranspose.begin()[i]);
+
+        next = next * transpose;
+        glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(next));
+    }
+
+    draw_gl();
+
+    // Default assumption - walk_gl on my children
+    ChildList::const_iterator it;
+    for (it = m_children.begin(); it != m_children.end(); it++) {
+        (*it)->walk_gl2(next);
+    }
+
+    if (pushAndMult) {
+        glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(mat));
+    }
 }
 
 SceneNode* SceneNode::find(const std::string& aName)
