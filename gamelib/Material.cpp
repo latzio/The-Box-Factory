@@ -1,5 +1,7 @@
 #include "Material.h"
 
+#include <GLES3/gl3.h>
+
 Material::~Material()
 {
 }
@@ -16,7 +18,8 @@ PhongMaterial::~PhongMaterial()
 void PhongMaterial::apply_gl() const
 {
     // Set colorglNormal
-    // glColor3d(m_kd.R(), m_kd.G(), m_kd.B(), 1.0);
+    // glColor3d(
+    /*
     glColor3f(m_kd.R(), m_kd.G(), m_kd.B());
 
     // Polygon mode
@@ -35,6 +38,8 @@ void PhongMaterial::apply_gl() const
 
     // Turn off texture
     glBindTexture(GL_TEXTURE_2D, 0);
+    */
+    glUniform4f(0, m_kd.R(), m_kd.G(), m_kd.B(), 1.0);
 }
 
 TextureMaterial::TextureMaterial(const Colour& kd, const Colour& ks,

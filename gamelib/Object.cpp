@@ -76,7 +76,7 @@ Shield::Shield(SceneNode* element, MoveableSubscriber* subscriber)
     pCog->set_axis('y');
     pCog->freeze();
 
-    AnnimationFrame * pFrame;
+    AnnimationFrame* pFrame;
 
     pFrame = new AnnimationFrame();
     pFrame->m_nFrames = SHIELD_FRAME_LENGTH;
@@ -109,7 +109,7 @@ void Shield::tick()
     Point3D p;
     m_pElement->get_centre(p);
 
-    Moveable * m = m_pSubscriber->DetectCollision(p, 5);
+    Moveable* m = m_pSubscriber->DetectCollision(p, 5);
 
     // Check for collision
     if (m) {
@@ -173,8 +173,8 @@ Particle::~Particle() { }
 void Particle::reset()
 {
 
-    double xRand = ((rand() - (RAND_MAX/2)) / (double)RAND_MAX);
-    double zRand = ((rand() - (RAND_MAX/2)) / (double)RAND_MAX);
+    double xRand = ((rand() - (RAND_MAX / 2)) / (double)RAND_MAX);
+    double zRand = ((rand() - (RAND_MAX / 2)) / (double)RAND_MAX);
 
     m_velocity = Vector3D(xRand, 4, zRand);
 
@@ -212,7 +212,7 @@ void Particle::addGravity()
 Spark::Spark(SceneNode* element, MoveableSubscriber* subscriber)
     : Particle(element, subscriber)
 {
-    double rRand = ((rand() - (RAND_MAX/2)) / (double)RAND_MAX);
+    double rRand = ((rand() - (RAND_MAX / 2)) / (double)RAND_MAX);
     m_nAngularVelocity = (rRand * 22.5);
 }
 
@@ -224,7 +224,7 @@ void Spark::reset()
 {
     Particle::reset();
 
-    double yRand = ((rand() - (RAND_MAX/2)) / (double)RAND_MAX);
+    double yRand = ((rand() - (RAND_MAX / 2)) / (double)RAND_MAX);
     m_velocity[1] = yRand * 3;
     m_nTTL = SPARK_TTL;
 }
@@ -242,7 +242,7 @@ Level::Level(SceneNode* element, MoveableSubscriber* subscriber)
 {
     m_pElement->find_all(m_Objs, "box");
     m_pElement->find_all(m_Objs, "box_small");
-    Obstacle * o;
+    Obstacle* o;
 
     for (ObjList::iterator it = m_Objs.begin(); it != m_Objs.end(); it++) {
         Point3D p;
@@ -294,7 +294,7 @@ Level::~Level() { }
 
 AnnimationFrame* Level::createDoorFrame(int nAngle)
 {
-    AnnimationFrame * pFrame = new AnnimationFrame();
+    AnnimationFrame* pFrame = new AnnimationFrame();
     pFrame->m_nFrames = DOOR_FRAME_LENGTH;
     pFrame->m_nRemainingFrames = DOOR_FRAME_LENGTH;
     pFrame->m_bLoopBack = false;
@@ -327,7 +327,7 @@ void Level::tick()
 }
 
 
-Obstacle::Obstacle(const Point3D &centre, double radius)
+Obstacle::Obstacle(const Point3D& centre, double radius)
     : m_centre(centre)
     , m_nRadius(radius)
 { }
@@ -365,7 +365,7 @@ Bullet::Bullet(SceneNode* element, MoveableSubscriber* subscriber, NPC* source)
     , m_nTTL(BULLET_TTL)
     , m_nPower(35)
 {
-    m_nWobble = ((rand() / (double)RAND_MAX) -0.5) * 0.5 * m_nVelocity;
+    m_nWobble = ((rand() / (double)RAND_MAX) - 0.5) * 0.5 * m_nVelocity;
 
 }
 
@@ -384,7 +384,7 @@ void Bullet::tick()
     Point3D p;
     m_pTrajectoryNode->get_centre(p);
 
-    Moveable * m = m_pSubscriber->DetectCollision(p, 0.1);
+    Moveable* m = m_pSubscriber->DetectCollision(p, 0.1);
 
     // Set to true if this bullet is finished
     bool bDelete = false;
@@ -393,7 +393,7 @@ void Bullet::tick()
     if (m) {
         // Have we hit a wall? Show sparks and die
         if (m->getType() == Moveable::TYPE_OBSTACLE) {
-            m_pSubscriber->CreateParticles(MoveableSubscriber::SIZE_SPARKS, 4, pNow - Point3D(0,0,0));
+            m_pSubscriber->CreateParticles(MoveableSubscriber::SIZE_SPARKS, 4, pNow - Point3D(0, 0, 0));
             bDelete = true;
 
             if (m_eSource == Moveable::TYPE_PC) {
@@ -675,7 +675,7 @@ void NPC::tick()
     m_pElement->translate(v);
 
     // Allow child to override collision rules
-    Moveable * m = getCollidingMoveable();
+    Moveable* m = getCollidingMoveable();
 
     // Allow child to override collision action
     if ((m_pAI && !m_pAI->isAuto()) || !(isNPC())) {
@@ -698,7 +698,7 @@ void NPC::tick()
     m_pElement->tick();
 }
 
-Moveable * NPC::getCollidingMoveable()
+Moveable* NPC::getCollidingMoveable()
 {
     Point3D p;
     m_pElement->get_centre(p);
@@ -706,7 +706,7 @@ Moveable * NPC::getCollidingMoveable()
     return m_pSubscriber->DetectCollision(p, m_pElement->get_radius(), this);
 }
 
-void NPC::doCollisionAction(Moveable * m, const Vector3D& v)
+void NPC::doCollisionAction(Moveable* m, const Vector3D& v)
 {
     if (!m) {
         if (v[0] == 0)
@@ -745,7 +745,7 @@ NPC::OutputDir NPC::getOutputDirection()
 
     // Check diagonals
     for (int i = 0; i < 4; i++) {
-        if (m_eMoving[i] && m_eMoving[(i+1) % 4]) {
+        if (m_eMoving[i] && m_eMoving[(i + 1) % 4]) {
             return (OutputDir)((2 * i) + 1);
         }
     }
@@ -765,7 +765,7 @@ NPC::OutputDir NPC::getTargetDirection()
 
     // Check diagonals
     for (int i = 0; i < 4; i++) {
-        if (m_eAiming[i] && m_eAiming[(i+1) % 4]) {
+        if (m_eAiming[i] && m_eAiming[(i + 1) % 4]) {
             return (OutputDir)((2 * i) + 1);
         }
     }
@@ -798,7 +798,7 @@ void NPC::updateAimingDirection(bool bCascade)
     // Turn upper body to face the correct direction
     m_pJoints[JOINT_UPPER_CENTRE]->freeze();
 
-    AnnimationFrame * pFrame = new AnnimationFrame();
+    AnnimationFrame* pFrame = new AnnimationFrame();
     pFrame->m_nFrames = 5;
     pFrame->m_nRemainingFrames = 5;
     pFrame->m_bLoopBack = false;
@@ -820,7 +820,7 @@ void NPC::revertToAI()
 
 void NPC::updateMovingDirection(bool bCascade)
 {
-    AnnimationFrame * pFrame;
+    AnnimationFrame* pFrame;
 
     int d = isMoving() ? getOutputDirection() : getTargetDirection();
 
@@ -846,7 +846,7 @@ void NPC::updateMovingDirection(bool bCascade)
 void NPC::updateAimingAnimation()
 {
 
-    AnnimationFrame * pFrame;
+    AnnimationFrame* pFrame;
 
     m_pJoints[JOINT_RIGHT_SHOULDER]->freeze();
     m_pJoints[JOINT_RIGHT_WRIST]->freeze();
@@ -855,7 +855,7 @@ void NPC::updateAimingAnimation()
 
     if (isAiming()) {
 
-        AnnimationFrame * pFrame = new AnnimationFrame();
+        AnnimationFrame* pFrame = new AnnimationFrame();
         pFrame->m_nAngle = 70;
         pFrame->m_nFrames = 5;
         pFrame->m_nRemainingFrames = 5;
@@ -919,7 +919,7 @@ void NPC::updateAimingAnimation()
 void NPC::updateMovingAnimation()
 {
 
-    AnnimationFrame * pFrame;
+    AnnimationFrame* pFrame;
     m_pJoints[JOINT_LEFT_HIP]->freeze();
     m_pJoints[JOINT_LEFT_KNEE]->freeze();
     m_pJoints[JOINT_RIGHT_HIP]->freeze();
@@ -1154,7 +1154,7 @@ void PC::tick()
     }
 }
 
-Moveable * PC::getCollidingMoveable()
+Moveable* PC::getCollidingMoveable()
 {
     Point3D p;
     m_pElement->get_centre(p);
@@ -1162,7 +1162,7 @@ Moveable * PC::getCollidingMoveable()
     return m_pSubscriber->DetectCollision(p, m_pElement->get_radius(), this);
 }
 
-void PC::doCollisionAction(Moveable * m, const Vector3D& v)
+void PC::doCollisionAction(Moveable* m, const Vector3D& v)
 {
 
     NPC::doCollisionAction(m, v);
@@ -1199,7 +1199,7 @@ void PC::walk_gl()
 Moveable* PC::IsHit(const Point3D& p, double r)
 {
 
-    Moveable * m = 0;
+    Moveable* m = 0;
     if (m_pShield) {
         m = m_pShield->IsHit(p, r);
     }
@@ -1215,7 +1215,7 @@ void PC::die()
     Point3D p;
     m_pElement->get_centre(p);
 
-    m_pElement->translate(Point3D(0,0,0) - p);
+    m_pElement->translate(Point3D(0, 0, 0) - p);
 
     // Set size of radius (smaller than enemies)
     m_pElement->set_radius(2);

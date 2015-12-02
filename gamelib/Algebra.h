@@ -144,12 +144,12 @@ public:
 
     double dot(const Vector3D& other) const
     {
-        return v_[0]*other.v_[0] + v_[1]*other.v_[1] + v_[2]*other.v_[2];
+        return v_[0] * other.v_[0] + v_[1] * other.v_[1] + v_[2] * other.v_[2];
     }
 
     double length2() const
     {
-        return v_[0]*v_[0] + v_[1]*v_[1] + v_[2]*v_[2];
+        return v_[0] * v_[0] + v_[1] * v_[1] + v_[2] * v_[2];
     }
     double length() const
     {
@@ -161,9 +161,9 @@ public:
     Vector3D cross(const Vector3D& other) const
     {
         return Vector3D(
-                   v_[1]*other[2] - v_[2]*other[1],
-                   v_[2]*other[0] - v_[0]*other[2],
-                   v_[0]*other[1] - v_[1]*other[0]);
+                   v_[1] * other[2] - v_[2] * other[1],
+                   v_[2] * other[0] - v_[0] * other[2],
+                   v_[0] * other[1] - v_[1] * other[0]);
     }
 
 private:
@@ -172,27 +172,27 @@ private:
 
 inline Vector3D operator *(double s, const Vector3D& v)
 {
-    return Vector3D(s*v[0], s*v[1], s*v[2]);
+    return Vector3D(s * v[0], s * v[1], s * v[2]);
 }
 
 inline Vector3D operator +(const Vector3D& a, const Vector3D& b)
 {
-    return Vector3D(a[0]+b[0], a[1]+b[1], a[2]+b[2]);
+    return Vector3D(a[0] + b[0], a[1] + b[1], a[2] + b[2]);
 }
 
 inline Point3D operator +(const Point3D& a, const Vector3D& b)
 {
-    return Point3D(a[0]+b[0], a[1]+b[1], a[2]+b[2]);
+    return Point3D(a[0] + b[0], a[1] + b[1], a[2] + b[2]);
 }
 
 inline Vector3D operator -(const Point3D& a, const Point3D& b)
 {
-    return Vector3D(a[0]-b[0], a[1]-b[1], a[2]-b[2]);
+    return Vector3D(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 }
 
 inline Vector3D operator -(const Vector3D& a, const Vector3D& b)
 {
-    return Vector3D(a[0]-b[0], a[1]-b[1], a[2]-b[2]);
+    return Vector3D(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 }
 
 inline Vector3D operator -(const Vector3D& a)
@@ -202,7 +202,7 @@ inline Vector3D operator -(const Vector3D& a)
 
 inline Point3D operator -(const Point3D& a, const Vector3D& b)
 {
-    return Point3D(a[0]-b[0], a[1]-b[1], a[2]-b[2]);
+    return Point3D(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 }
 
 inline Vector3D cross(const Vector3D& a, const Vector3D& b)
@@ -278,7 +278,7 @@ public:
     Matrix4x4()
     {
         // Construct an identity matrix
-        std::fill(v_, v_+16, 0.0);
+        std::fill(v_, v_ + 16, 0.0);
         v_[0] = 1.0;
         v_[5] = 1.0;
         v_[10] = 1.0;
@@ -286,7 +286,7 @@ public:
     }
     Matrix4x4(const Matrix4x4& other)
     {
-        std::copy(other.v_, other.v_+16, v_);
+        std::copy(other.v_, other.v_ + 16, v_);
     }
     Matrix4x4(const Vector4D row1, const Vector4D row2, const Vector4D row3,
               const Vector4D row4)
@@ -311,36 +311,36 @@ public:
         v_[14] = row4[2];
         v_[15] = row4[3];
     }
-    Matrix4x4(double *vals)
+    Matrix4x4(double* vals)
     {
         std::copy(vals, vals + 16, (double*)v_);
     }
 
     Matrix4x4& operator=(const Matrix4x4& other)
     {
-        std::copy(other.v_, other.v_+16, v_);
+        std::copy(other.v_, other.v_ + 16, v_);
         return *this;
     }
 
     Vector4D getRow(size_t row) const
     {
-        return Vector4D(v_[4*row], v_[4*row+1], v_[4*row+2], v_[4*row+3]);
+        return Vector4D(v_[4 * row], v_[4 * row + 1], v_[4 * row + 2], v_[4 * row + 3]);
     }
-    double *getRow(size_t row)
+    double* getRow(size_t row)
     {
-        return (double*)v_ + 4*row;
+        return (double*)v_ + 4 * row;
     }
 
     Vector4D getColumn(size_t col) const
     {
-        return Vector4D(v_[col], v_[4+col], v_[8+col], v_[12+col]);
+        return Vector4D(v_[col], v_[4 + col], v_[8 + col], v_[12 + col]);
     }
 
     Vector4D operator[](size_t row) const
     {
         return getRow(row);
     }
-    double *operator[](size_t row)
+    double* operator[](size_t row)
     {
         return getRow(row);
     }
@@ -352,11 +352,11 @@ public:
     }
     Matrix4x4 invert() const;
 
-    double *begin() const
+    double* begin() const
     {
         return (double*)v_;
     }
-    double *end() const
+    double* end() const
     {
         return begin() + 16;
     }
@@ -475,17 +475,17 @@ private:
 
 inline Colour operator *(float s, const Colour& a)
 {
-    return Colour(s*a.R(), s*a.G(), s*a.B());
+    return Colour(s * a.R(), s * a.G(), s * a.B());
 }
 
 inline Colour operator *(const Colour& a, const Colour& b)
 {
-    return Colour(a.R()*b.R(), a.G()*b.G(), a.B()*b.B());
+    return Colour(a.R() * b.R(), a.G() * b.G(), a.B() * b.B());
 }
 
 inline Colour operator +(const Colour& a, const Colour& b)
 {
-    return Colour(a.R()+b.R(), a.G()+b.G(), a.B()+b.B());
+    return Colour(a.R() + b.R(), a.G() + b.G(), a.B() + b.B());
 }
 
 inline std::ostream& operator <<(std::ostream& os, const Colour& c)

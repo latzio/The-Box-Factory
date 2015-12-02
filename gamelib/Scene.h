@@ -54,7 +54,7 @@ public:
     }
     double get_radius();
 
-    void get_centre(Point3D &p);
+    void get_centre(Point3D& p);
 
     //const virtual Matrix4x4& get_
 
@@ -114,13 +114,13 @@ public:
     void toggle_picked();
     void set_picked(bool picked);
 
-    void get_picked_joints(std::list< SceneNode * > * pickedJoints);
+    void get_picked_joints(std::list< SceneNode* >* pickedJoints);
 
     int get_id() const;
     const std::string& get_name() const;
     SceneNode* get_parent() const;
     SceneNode* find(const std::string& aName);
-    void find_all(std::vector<SceneNode*> &v, const std::string& name);
+    void find_all(std::vector<SceneNode*>& v, const std::string& name);
 
     void undo();
     void redo();
@@ -137,7 +137,7 @@ public:
     // Activate shadows for me and children
     virtual void set_shadow(bool b);
 
-    virtual void colour(const Colour &c);
+    virtual void colour(const Colour& c);
 
 protected:
 
@@ -190,7 +190,7 @@ public:
     void set_joint_y(double min, double init, double max);
 
     void freeze();
-    void add_frame(AnnimationFrame * pFrame);
+    void add_frame(AnnimationFrame* pFrame);
     const double& get_angle();
 
     struct JointRange {
@@ -247,7 +247,7 @@ public:
     // Activate shadows for me and children
     virtual void set_shadow(bool b);
 
-    virtual void colour(const Colour &c);
+    virtual void colour(const Colour& c);
 
 protected:
     Material* m_material;

@@ -50,7 +50,7 @@ SoundManager::~SoundManager()
 
 int SoundManager::ResetSound(int snd)
 {
-    if (snd<0 || snd>=nSounds) return -1;
+    if (snd < 0 || snd >= nSounds) return -1;
 
     Mix_HaltChannel(channel[snd]);
     channel[snd] = -1;
@@ -66,35 +66,35 @@ int SoundManager::LoadSound(const std::string& file)
 
     channel[nSounds] = -1;
 
-    nSounds+=1;
+    nSounds += 1;
     return nSounds - 1;
 
 }
 
 int SoundManager::PlaySound(int snd)
 {
-    if (snd<0 && snd>=nSounds) return -1;
+    if (snd < 0 && snd >= nSounds) return -1;
     channel[snd] = Mix_PlayChannel(-1, chunks[snd], 0 /*-1*/);
     return 0;
 }
 
 int SoundManager::StopSound(int snd)
 {
-    if (snd<0 && snd>=nSounds) return -1;
+    if (snd < 0 && snd >= nSounds) return -1;
     ResetSound(snd);
     return 0;
 }
 
 int SoundManager::PauseSound(int snd)
 {
-    if (snd<0 && snd>=nSounds) return -1;
+    if (snd < 0 && snd >= nSounds) return -1;
     Mix_Pause(channel[snd]);
     return 0;
 }
 
 int SoundManager::ResumeSound(int snd)
 {
-    if (snd<0 && snd>=nSounds) return -1;
+    if (snd < 0 && snd >= nSounds) return -1;
     Mix_Resume(channel[snd]);
     return 0;
 }
@@ -104,7 +104,7 @@ int SoundManager::ResumeSound(int snd)
 
 int SoundManager::ResetMusic(int snd)
 {
-    if (snd<0 || snd>=nMusics) return -1;
+    if (snd < 0 || snd >= nMusics) return -1;
 
     Mix_HaltMusic();
 
@@ -116,42 +116,42 @@ int SoundManager::LoadMusic(const std::string& file)
 
     music[nMusics] = Mix_LoadMUS(file.c_str());
 
-    nMusics+=1;
+    nMusics += 1;
     return nMusics - 1;
 
 }
 
 int SoundManager::PlayMusic(int snd)
 {
-    if (snd<0 && snd>=nMusics) return -1;
+    if (snd < 0 && snd >= nMusics) return -1;
     Mix_PlayMusic(music[snd], 1 /*-1*/);
     return 0;
 }
 
 int SoundManager::StopMusic(int snd)
 {
-    if (snd<0 && snd>=nMusics) return -1;
+    if (snd < 0 && snd >= nMusics) return -1;
     ResetMusic(snd);
     return 0;
 }
 
 int SoundManager::PauseMusic(int snd)
 {
-    if (snd<0 && snd>=nMusics) return -1;
+    if (snd < 0 && snd >= nMusics) return -1;
     Mix_PauseMusic();
     return 0;
 }
 
 int SoundManager::ResumeMusic(int snd)
 {
-    if (snd<0 && snd>=nMusics) return -1;
+    if (snd < 0 && snd >= nMusics) return -1;
     Mix_ResumeMusic();
     return 0;
 }
 
 int SoundManager::VolumeMusic(int snd)
 {
-    if (snd<0) return -1;
+    if (snd < 0) return -1;
     Mix_VolumeMusic(snd);
     return 0;
 }

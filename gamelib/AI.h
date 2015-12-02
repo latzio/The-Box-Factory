@@ -30,12 +30,12 @@ public:
     enum Direction { DOWN, RIGHT, UP, LEFT };
     // Add an enemy to our processing list, the first one added
     // is our leader, naturally
-    void addSubscriber(AISubscriber * subscriber);
+    void addSubscriber(AISubscriber* subscriber);
 
-    void remove(AISubscriber * subscriber);
+    void remove(AISubscriber* subscriber);
 
     // Add an enemy to our processing list,
-    void addTarget(AISubscriber * target)
+    void addTarget(AISubscriber* target)
     {
         m_pTarget = target;
     }
@@ -58,7 +58,7 @@ public:
 
 protected:
 
-    AISubscriber * m_pTarget; // This is the object this AI pursues
+    AISubscriber* m_pTarget;  // This is the object this AI pursues
     typedef std::vector< AISubscriber* > SubscriberList;
     SubscriberList m_pSubscribers; // These are the mob
 

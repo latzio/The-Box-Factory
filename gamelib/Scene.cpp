@@ -42,7 +42,7 @@ SceneNode::~SceneNode()
 
 SceneNode* SceneNode::clone()
 {
-    SceneNode * pNode = new SceneNode(*this);
+    SceneNode* pNode = new SceneNode(*this);
     pNode->remove_children();
 
     // recursively call on my children
@@ -54,7 +54,7 @@ SceneNode* SceneNode::clone()
     return pNode;
 }
 
-void SceneNode::get_centre(Point3D &p)
+void SceneNode::get_centre(Point3D& p)
 {
 
     p = m_trans * p;
@@ -84,7 +84,6 @@ double SceneNode::get_radius()
 #define SPHERE_RADIUS 1.0
 #define SPHERE_SLICES 20
 #define SPHERE_STACKS 20
-#define PI 3.141592653589
 
 // CUBE STUFF
 #define LBOUND -1
@@ -92,36 +91,42 @@ double SceneNode::get_radius()
 
 static void makeSphere(int slices, int stacks, std::function<void(const vec3& position, const vec3& normal, const vec2& texcoord)> handleVertex)
 {
-    for (int t = 0 ; t < stacks ; t++) {
-        float theta1 = ((float)(t)/stacks)*PI - (PI/2.0);
-        float theta2 = ((float)(t+1)/stacks)*PI - (PI/2.0);
+    for (float t = 0 ; t < stacks ; t++) {
+        float theta1 = (t / stacks) * pi<float>() - half_pi<float>();
+        float theta2 = ((t + 1) / stacks) * pi<float>() - half_pi<float>();
 
-        for (int p = 0 ; p < slices ; p++) {
-            float phi1 = ((float)(p)/slices)*2*PI ;
-            float phi2 = ((float)(p+1)/slices)*2*PI ;
+        for (float p = 0 ; p < slices ; p++) {
+            float phi1 = (p / slices) * 2 * pi<float>() ;
+            float phi2 = ((p + 1) / slices) * 2 * pi<float>() ;
 
-            auto vertex1 = glm::vec3(cos(theta1) * cos(phi1), cos(theta1) * sin(phi1), sin(theta1));
-            auto vertex2 = glm::vec3(cos(theta1) * cos(phi2), cos(theta1) * sin(phi2), sin(theta1));
-            auto vertex3 = glm::vec3(cos(theta2) * cos(phi2), cos(theta2) * sin(phi2), sin(theta2));
-            auto vertex4 = glm::vec3(cos(theta2) * cos(phi1), cos(theta2) * sin(phi1), sin(theta2));
-            auto tex = glm::vec2();
+            auto vertex1 = vec3(cos(theta1) * cos(phi1), cos(theta1) * sin(phi1), sin(theta1));
+            auto tex1 = vec2(t / stacks, p / slices);
+
+            auto vertex2 = vec3(cos(theta1) * cos(phi2), cos(theta1) * sin(phi2), sin(theta1));
+            auto tex2 = vec2(t / stacks, (p + 1) / slices);
+
+            auto vertex3 = vec3(cos(theta2) * cos(phi2), cos(theta2) * sin(phi2), sin(theta2));
+            auto tex3 = vec2((t + 1) / stacks, p / slices);
+
+            auto vertex4 = vec3(cos(theta2) * cos(phi1), cos(theta2) * sin(phi1), sin(theta2));
+            auto tex4 = vec2((t + 1) / stacks, (p + 1) / slices);
 
             // facing out
             if (t == 0) {
-                handleVertex(vertex1, vertex1, tex);
-                handleVertex(vertex3, vertex3, tex);
-                handleVertex(vertex4, vertex4, tex);
+                handleVertex(vertex1, vertex1, tex1);
+                handleVertex(vertex3, vertex3, tex3);
+                handleVertex(vertex4, vertex4, tex4);
             } else if (t + 1 == stacks) {
-                handleVertex(vertex3, vertex3, tex);
-                handleVertex(vertex1, vertex1, tex);
-                handleVertex(vertex2, vertex2, tex);
+                handleVertex(vertex3, vertex3, tex3);
+                handleVertex(vertex1, vertex1, tex1);
+                handleVertex(vertex2, vertex2, tex4);
             } else {
-                handleVertex(vertex1, vertex1, tex);
-                handleVertex(vertex2, vertex2, tex);
-                handleVertex(vertex4, vertex4, tex);
-                handleVertex(vertex2, vertex2, tex);
-                handleVertex(vertex3, vertex3, tex);
-                handleVertex(vertex4, vertex4, tex);
+                handleVertex(vertex1, vertex1, tex1);
+                handleVertex(vertex2, vertex2, tex2);
+                handleVertex(vertex4, vertex4, tex4);
+                handleVertex(vertex2, vertex2, tex2);
+                handleVertex(vertex3, vertex3, tex3);
+                handleVertex(vertex4, vertex4, tex4);
             }
         }
     }
@@ -138,7 +143,7 @@ void SceneNode::setupDL()
     glNewList(DL_INDEX + DL_SPHERE, GL_COMPILE);
     // Draw a simple sphere
     glBegin(GL_TRIANGLES);
-    auto vertexToGL = [](const vec3& position, const vec3& normal, const vec2& texcoord) {
+    auto vertexToGL = [](const vec3 & position, const vec3 & normal, const vec2 & texcoord) {
         glTexCoord2fv(value_ptr(texcoord));
         glNormal3fv(value_ptr(normal));
         glVertex3fv(value_ptr(position));
@@ -176,13 +181,13 @@ void SceneNode::setupDL()
 
     // Front
     glNormal3d(0, 0, 1);
-    glTexCoord2f(0,0);
+    glTexCoord2f(0, 0);
     glVertex3d(LBOUND, LBOUND, HBOUND);
-    glTexCoord2f(0,1);
+    glTexCoord2f(0, 1);
     glVertex3d(HBOUND, LBOUND, HBOUND);
-    glTexCoord2f(1,1);
+    glTexCoord2f(1, 1);
     glVertex3d(HBOUND, HBOUND, HBOUND);
-    glTexCoord2f(1,0);
+    glTexCoord2f(1, 0);
     glVertex3d(LBOUND, HBOUND, HBOUND);
 
     // Back
@@ -257,7 +262,7 @@ void SceneNode::tick()
     }
 }
 
-void SceneNode::colour(const Colour &c)
+void SceneNode::colour(const Colour& c)
 {
     // recursively call on my children
     ChildList::iterator it;
@@ -303,7 +308,7 @@ void SceneNode::walk_gl() const
         glPopMatrix();
 }
 
-void SceneNode::walk_gl2(const glm::mat4x4& mat) const
+void SceneNode::walk_gl2(const mat4x4& mat) const
 {
     // Apply my transformation
     bool pushAndMult = !m_trans.isIdentity();
@@ -313,14 +318,14 @@ void SceneNode::walk_gl2(const glm::mat4x4& mat) const
         m_dirty = false;
     }
 
-    glm::mat4x4 next(mat);
+    mat4x4 next(mat);
     if (pushAndMult) {
-        glm::mat4x4 transpose;
+        mat4x4 transpose;
         for (int i = 0; i < 16; ++i)
             transpose[i / 4][i % 4] = static_cast<float>(m_transTranspose.begin()[i]);
 
         next = next * transpose;
-        glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(next));
+        glUniformMatrix4fv(1, 1, GL_FALSE, value_ptr(next));
     }
 
     draw_gl();
@@ -332,7 +337,7 @@ void SceneNode::walk_gl2(const glm::mat4x4& mat) const
     }
 
     if (pushAndMult) {
-        glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(mat));
+        glUniformMatrix4fv(1, 1, GL_FALSE, value_ptr(mat));
     }
 }
 
@@ -357,7 +362,7 @@ SceneNode* SceneNode::find(const std::string& aName)
     return node;
 }
 
-void SceneNode::find_all(std::vector<SceneNode*> &v, const std::string &name)
+void SceneNode::find_all(std::vector<SceneNode*>& v, const std::string& name)
 {
 
     if (m_name == name) { // add me to vector
@@ -408,7 +413,7 @@ void SceneNode::toggle_picked()
 
 }
 
-void SceneNode::get_picked_joints(std::list< SceneNode * > * pickedJoints)
+void SceneNode::get_picked_joints(std::list< SceneNode* >* pickedJoints)
 {
 
     if (is_joint() && m_bPicked) {
@@ -444,7 +449,7 @@ bool SceneNode::pick(int id)
 
         // Parent is a jointnode ?
         // Parent is not a jointnode ?
-        SceneNode * node = m_parent;
+        SceneNode* node = m_parent;
         while (node != 0) {
             if (node->is_joint()) {
                 //std::cout << " -> Parent found! Parent is " << node->get_name() << std::endl;
@@ -618,7 +623,7 @@ JointNode::~JointNode()
 SceneNode* JointNode::clone()
 {
 
-    SceneNode * pNode = new JointNode(*this);
+    SceneNode* pNode = new JointNode(*this);
     pNode->remove_children();
 
     // recursively call on my children
@@ -663,7 +668,7 @@ void JointNode::set_joint_y(double min, double init, double max)
     m_joint_y.max = max;
 }
 
-void JointNode::add_frame(AnnimationFrame * pFrame)
+void JointNode::add_frame(AnnimationFrame* pFrame)
 {
     m_KeyFrames.push_back(pFrame);
 }
@@ -782,7 +787,7 @@ GeometryNode::~GeometryNode()
 
 SceneNode* GeometryNode::clone()
 {
-    GeometryNode * pNode = new GeometryNode(*this);
+    GeometryNode* pNode = new GeometryNode(*this);
     pNode->remove_children();
     pNode->set_material(m_material);
     pNode->set_primitive(m_primitive);
@@ -832,7 +837,7 @@ void GeometryNode::set_shadow(bool b)
     SceneNode::set_shadow(b);
 }
 
-void GeometryNode::colour(const Colour &d)
+void GeometryNode::colour(const Colour& d)
 {
 
     ((PhongMaterial*)m_material)->m_kd = d;

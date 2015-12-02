@@ -73,7 +73,7 @@ public:
 protected:
 
     SceneNode* m_pElement;
-    MoveableSubscriber * m_pSubscriber;
+    MoveableSubscriber* m_pSubscriber;
 
     bool m_bDead;
 
@@ -196,11 +196,11 @@ protected:
 
 class Obstacle : public Moveable {
 public:
-    Obstacle(const Point3D &centre, double radius);
+    Obstacle(const Point3D& centre, double radius);
     virtual ~Obstacle();
 
     // see if this moveable hits this object
-    virtual void getCentre(Point3D &p)
+    virtual void getCentre(Point3D& p)
     {
         p = m_centre;
     }
@@ -223,7 +223,7 @@ public:
 
     // Use this with the constructor to create bullets from
     // copies of the static bullet
-    static Bullet* CreateBullet(MoveableSubscriber * subscriber,
+    static Bullet* CreateBullet(MoveableSubscriber* subscriber,
                                 Moveable* source);
 
     virtual void tick();
@@ -350,7 +350,7 @@ public:
 protected:
 
     virtual Moveable* getCollidingMoveable();
-    virtual void doCollisionAction(Moveable * m, const Vector3D& v);
+    virtual void doCollisionAction(Moveable* m, const Vector3D& v);
     virtual void doUniqueAction() { };
 
     // THE NEW WAY
@@ -374,7 +374,7 @@ protected:
 class PistolNPC : public NPC {
 public:
 
-    PistolNPC(SceneNode* element, MoveableSubscriber * subscriber);
+    PistolNPC(SceneNode* element, MoveableSubscriber* subscriber);
     virtual ~PistolNPC();
 
     virtual Type getType()
@@ -425,7 +425,7 @@ public:
 
 protected:
     virtual Moveable* getCollidingMoveable();
-    virtual void doCollisionAction(Moveable * m, const Vector3D& v);
+    virtual void doCollisionAction(Moveable* m, const Vector3D& v);
 
 private:
 
@@ -444,8 +444,8 @@ public:
 
     // These are required for shooting
     virtual void CreateBullet(const Point3D& origin, double dDegrees, NPC* source) = 0;
-    virtual void DeleteBullet(Bullet * pBullet) = 0;
-    virtual void CreateAI(NPC * npc) = 0;
+    virtual void DeleteBullet(Bullet* pBullet) = 0;
+    virtual void CreateAI(NPC* npc) = 0;
 
     enum ShieldType { MAJOR, MINOR };
     virtual Shield* RequestShield(ShieldType s) = 0;

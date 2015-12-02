@@ -31,7 +31,7 @@ void AI::tick()
     }
 
     // Select our leader, first man on scene (who's still alive!)
-    AISubscriber * pLeader = m_pSubscribers[0];
+    AISubscriber* pLeader = m_pSubscribers[0];
 
     // Get source and destination
     Point3D s, d;
@@ -63,7 +63,7 @@ void AI::tick()
 
 }
 
-void AI::remove(AISubscriber * subscriber)
+void AI::remove(AISubscriber* subscriber)
 {
     for (SubscriberList::iterator it = m_pSubscribers.begin();
             it != m_pSubscribers.end(); it++) {
@@ -74,9 +74,9 @@ void AI::remove(AISubscriber * subscriber)
     }
 }
 
-void AI::addSubscriber(AISubscriber * subscriber)
+void AI::addSubscriber(AISubscriber* subscriber)
 {
-    AI * pFormerAI = subscriber->getAI();
+    AI* pFormerAI = subscriber->getAI();
     if (pFormerAI) {
         pFormerAI->remove(subscriber);
     }

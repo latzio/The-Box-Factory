@@ -420,12 +420,15 @@ const char vsTexture[] =
 
 const char fsTexture[] =
     ""
+    "   uniform vec4 u_color;                                             \n"
+    "   uniform sampler2D u_texture;                                      \n"
+    "                                                                     \n"
     "   varying vec3 v_normal;                                            \n"
     "   varying vec2 v_tex;                                               \n"
     "                                                                     \n"
     "   void main()                                                       \n"
     "   {                                                                 \n"
-    "      gl_FragColor = vec4(1.0, 1.0, 1.0, 0.1);\n"
+    "      gl_FragColor = u_color;                                        \n"
     "   }                                                                 \n"
     "";
 
@@ -455,7 +458,7 @@ print_info_log(
 
 GLuint
 load_shader(
-    const char  *shader_source,
+    const char*  shader_source,
     GLenum       type
 )
 {
@@ -470,6 +473,8 @@ load_shader(
 }
 
 int u_projection;
+int u_color;
+int u_texture;
 int a_position;
 int a_normal;
 int a_tex;
@@ -508,20 +513,24 @@ void Game::init_gl()
 
 
     //// now get the locations (kind of handle) of the shaders variables
-    u_projection =  glGetUniformLocation(shaderProgram , "u_projection");
-    a_position =    glGetAttribLocation(shaderProgram , "a_position");
-    a_normal =      glGetAttribLocation(shaderProgram , "a_normal");
-    a_tex =         glGetAttribLocation(shaderProgram , "a_tex");
+    u_projection = glGetUniformLocation(shaderProgram , "u_projection");
+    u_texture = glGetUniformLocation(shaderProgram , "u_texture");
+    u_color = glGetUniformLocation(shaderProgram , "u_color");
+    a_position = glGetAttribLocation(shaderProgram , "a_position");
+    a_normal = glGetAttribLocation(shaderProgram , "a_normal");
+    a_tex = glGetAttribLocation(shaderProgram , "a_tex");
 
-    if (a_position < 0  ||  u_projection < 0  ||  a_normal < 0  || a_tex < 0) {
-        std::cerr << a_tex << std::endl;
-        std::cerr << a_normal << std::endl;
-        std::cerr << a_position << std::endl;
-        std::cerr << u_projection << std::endl;
-        std::cerr << "Unable to get uniform location" << std::endl;
-    }
+    std::cerr << "a_tex " << a_tex << std::endl;
+    std::cerr << "a_normal " << a_normal << std::endl;
+    std::cerr << "a_pos " << a_position << std::endl;
+    std::cerr << "u_proj " << u_projection << std::endl;
+    std::cerr << "u_color " << u_color << std::endl;
+    std::cerr << "u_tex " << u_texture << std::endl;
 
     glUseProgram(shaderProgram);        // and select it for usage
+
+    glActiveTexture(GL_TEXTURE0);
+    glUniform1i(u_texture, 0);
 
     // IMAGE LOADER
 
@@ -546,6 +555,7 @@ void Game::init_gl()
 
     }
     glBindTexture(GL_TEXTURE_2D, 0);
+#if 0
 
     // Set up lighting
     glEnable(GL_LIGHTING) ;
@@ -581,8 +591,9 @@ void Game::init_gl()
             glEnable(GL_LIGHT1 + i);
         }
     }
+#endif
 }
-glm::mat4 camera(float Translate, glm::vec2 const & Rotate)
+glm::mat4 camera(float Translate, glm::vec2 const& Rotate)
 {
     glm::mat4 Projection;// = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
     glm::mat4 View = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Translate));
@@ -600,6 +611,7 @@ void Game::walk_gl()
         return;
 
     glEnableVertexAttribArray(a_position);
+    glEnableVertexAttribArray(a_tex);
 
     auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
     auto modelview = camera(20, glm::vec2(0, -1.22));
@@ -683,17 +695,17 @@ void Game::CreateBullet(const Point3D& origin, double dDegrees, NPC* source)
 
         b->set_joint();
         b->set_direction(dDegrees);
-        b->set_position(origin - Point3D(0,0,0));
+        b->set_position(origin - Point3D(0, 0, 0));
         b->set_dead(false);
 
         m_Bullets.push_back(b);
 
         // Muzzle flash
-        CreateParticles(SIZE_SPARKS, 1, origin - Point3D(0,0,0));
+        CreateParticles(SIZE_SPARKS, 1, origin - Point3D(0, 0, 0));
     }
 }
 
-void Game::DeleteBullet(Bullet * pBullet)
+void Game::DeleteBullet(Bullet* pBullet)
 {
     // Find and delete bullet
     for (BulletList::iterator it = m_Bullets.begin();
@@ -743,11 +755,11 @@ Moveable* Game::DetectCollision(Point3D p, double r, Moveable* pExcluded)
     return m;
 }
 
-AISubscriber * Game::CreateEnemy(int x, int z)
+AISubscriber* Game::CreateEnemy(int x, int z)
 {
     //  NPC * npc = new NPC();
     int nRand = rand() / (RAND_MAX / 40);
-    NPC * npc;
+    NPC* npc;
 
     if (nRand <= 12) {
         npc = new PistolNPC((m_pModels[MODEL_ENEMY_PISTOL])->clone(), this);
@@ -781,13 +793,13 @@ AISubscriber * Game::CreateEnemy(int x, int z)
 
 }
 
-void Game::DamageEnemy(NPC * pNPC, int nDamage, const Point3D& p3d)
+void Game::DamageEnemy(NPC* pNPC, int nDamage, const Point3D& p3d)
 {
-    Vector3D v = p3d - Point3D(0,0,0);
+    Vector3D v = p3d - Point3D(0, 0, 0);
     CreateParticles(SIZE_LITTLE, 2, v);
     CreateParticles(SIZE_SPARKS, 3, v);
 
-    NPC * npc = pNPC;
+    NPC* npc = pNPC;
 
     if (npc->damage(nDamage)) {
 
@@ -834,7 +846,7 @@ void Game::DamageEnemy(NPC * pNPC, int nDamage, const Point3D& p3d)
         } else {
             // The player was killed
             std::cout << "Player killed. " << --m_nLives << " remaining." << std::endl;
-            PC * pc = (PC*)npc;
+            PC* pc = (PC*)npc;
             pc->die();
             // SM.PlaySound(m_nSFX[SFX_HUMAN_DEATH]);
         }
@@ -845,20 +857,20 @@ void Game::CreateParticles(ParticleSize eSize, int nQuantity, const Vector3D& v)
 {
 
     for (int i = 0; i < nQuantity; i++) {
-        Particle * p = m_Particles[m_nParticleIndex[eSize]];
+        Particle* p = m_Particles[m_nParticleIndex[eSize]];
 
         switch (eSize) {
         case SIZE_LITTLE:
             m_nParticleIndex[eSize] = (m_nParticleIndex[eSize] + 1) % LITTLE_PARTICLES;
             break;
         case SIZE_MEDIUM:
-            m_nParticleIndex[eSize] = (m_nParticleIndex[eSize] + 1 < MEDIUM_PARTICLES) ?  m_nParticleIndex[eSize] + 1: LITTLE_PARTICLES;
+            m_nParticleIndex[eSize] = (m_nParticleIndex[eSize] + 1 < MEDIUM_PARTICLES) ?  m_nParticleIndex[eSize] + 1 : LITTLE_PARTICLES;
             break;
         case SIZE_BIGGER:
-            m_nParticleIndex[eSize] = (m_nParticleIndex[eSize] + 1 < BIGGER_PARTICLES) ?  m_nParticleIndex[eSize] + 1: MEDIUM_PARTICLES;
+            m_nParticleIndex[eSize] = (m_nParticleIndex[eSize] + 1 < BIGGER_PARTICLES) ?  m_nParticleIndex[eSize] + 1 : MEDIUM_PARTICLES;
             break;
         case SIZE_SPARKS:
-            m_nParticleIndex[eSize] = (m_nParticleIndex[eSize] + 1 < PARTICLES) ?  m_nParticleIndex[eSize] + 1: BIGGER_PARTICLES;
+            m_nParticleIndex[eSize] = (m_nParticleIndex[eSize] + 1 < PARTICLES) ?  m_nParticleIndex[eSize] + 1 : BIGGER_PARTICLES;
             break;
         }
 
@@ -871,7 +883,7 @@ void Game::CreateParticles(ParticleSize eSize, int nQuantity, const Vector3D& v)
 void Game::CreateMob()
 {
 
-    AI * ai = 0;
+    AI* ai = 0;
     int x = 0;
     int z = 0;
 
@@ -894,8 +906,8 @@ void Game::CreateMob()
         break;
     }
 
-    x += (int)(((double)rand() / (double)RAND_MAX -0.5) * 5);
-    z += (int)(((double)rand() / (double)RAND_MAX -0.5) * 5);
+    x += (int)(((double)rand() / (double)RAND_MAX - 0.5) * 5);
+    z += (int)(((double)rand() / (double)RAND_MAX - 0.5) * 5);
 
     if (!ai)
         return;
@@ -910,10 +922,10 @@ void Game::CreateMob()
 
 }
 
-void Game::CreateAI(NPC * npc)
+void Game::CreateAI(NPC* npc)
 {
 
-    AI * ai = new AI();
+    AI* ai = new AI();
     ai->addSubscriber(npc);
 
     ai->addTarget(m_PCs[rand() / (RAND_MAX / m_PCs.size())]);
@@ -922,7 +934,7 @@ void Game::CreateAI(NPC * npc)
 
 }
 
-void Game::DeleteAI(AI * ai)
+void Game::DeleteAI(AI* ai)
 {
 
     for (AIList::iterator it = m_AIs.begin();
@@ -971,7 +983,7 @@ void Game::CreateObstacle(Moveable* pObstacle)
 Shield* Game::RequestShield(MoveableSubscriber::ShieldType s)
 {
 
-    Shield * shield = 0;
+    Shield* shield = 0;
     switch (s) {
     case MoveableSubscriber::MAJOR:
         shield = new Shield(m_pShield[0]->clone(), this);

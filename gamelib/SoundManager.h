@@ -56,8 +56,8 @@ private:
     // internal data
 
     // sound clips
-    Mix_Chunk * chunks[MAX_SOUNDS];
-    Mix_Music *music[MAX_MUSIC];
+    Mix_Chunk* chunks[MAX_SOUNDS];
+    Mix_Music* music[MAX_MUSIC];
 
     // sound channels for active sounds
     int channel[MAX_SOUNDS];

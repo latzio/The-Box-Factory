@@ -38,7 +38,7 @@ public:
                   ACTION_MOVE_RIGHT, ACTION_STOP_MOVE_RIGHT,
                   ACTION_MOVE_DOWN,  ACTION_STOP_MOVE_DOWN,
                   ACTION_SHOOT_LEFT, ACTION_STOP_SHOOT_LEFT,
-                  ACTION_SHOOT_RIGHT,ACTION_STOP_SHOOT_RIGHT,
+                  ACTION_SHOOT_RIGHT, ACTION_STOP_SHOOT_RIGHT,
                   ACTION_SHOOT_UP,   ACTION_STOP_SHOOT_UP,
                   ACTION_SHOOT_DOWN, ACTION_STOP_SHOOT_DOWN,
                   ACTION_TOGGLE_PAUSE
@@ -47,7 +47,7 @@ public:
     void input(Action action, int nPlayer);
 
     // Create Enemies
-    virtual AISubscriber * CreateEnemy(int x, int z);
+    virtual AISubscriber* CreateEnemy(int x, int z);
     virtual void DamageEnemy(NPC* pNPC, int nDamage, const Point3D& p3d);
 
     // Subscribe to game events
@@ -57,8 +57,8 @@ public:
     virtual Moveable* DetectCollision(Point3D p, double r, Moveable* pExcluded);
 
     virtual void CreateMob();
-    virtual void CreateAI(NPC * npc);
-    virtual void DeleteAI(AI * ai);
+    virtual void CreateAI(NPC* npc);
+    virtual void DeleteAI(AI* ai);
 
     virtual Shield* RequestShield(MoveableSubscriber::ShieldType s);
 

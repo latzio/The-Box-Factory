@@ -26,13 +26,13 @@ double Vector3D::normalize()
             if (1.0 + x > 1.0) {
                 y = y / x;
                 z = z / x;
-                denom = 1.0 / (x * sqrt(1.0 + y*y + z*z));
+                denom = 1.0 / (x * sqrt(1.0 + y * y + z * z));
             }
         } else { /* z > x > y */
             if (1.0 + z > 1.0) {
                 y = y / z;
                 x = x / z;
-                denom = 1.0 / (z * sqrt(1.0 + y*y + x*x));
+                denom = 1.0 / (z * sqrt(1.0 + y * y + x * x));
             }
         }
     } else {
@@ -40,13 +40,13 @@ double Vector3D::normalize()
             if (1.0 + y > 1.0) {
                 z = z / y;
                 x = x / y;
-                denom = 1.0 / (y * sqrt(1.0 + z*z + x*x));
+                denom = 1.0 / (y * sqrt(1.0 + z * z + x * x));
             }
         } else { /* x < y < z */
             if (1.0 + z > 1.0) {
                 y = y / z;
                 x = x / z;
-                denom = 1.0 / (z * sqrt(1.0 + y*y + x*x));
+                denom = 1.0 / (z * sqrt(1.0 + y * y + x * x));
             }
         }
     }
