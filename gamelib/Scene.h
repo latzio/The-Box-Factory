@@ -46,9 +46,9 @@ public:
 
     void get_centre(Point3D& p);
 
-    void set_transform(const Matrix4x4& m)
+    void resetTransform()
     {
-        m_trans = m;
+        resetOrientation();
     }
 
     void set_parent(SceneNode* parent)
@@ -85,7 +85,6 @@ public:
 
     // These are needed for undo
     std::vector< int >* getPicked(std::vector< int >* pPicked);
-    void applyAction(Matrix4x4* pTransform);
 
     // Returns true if and only if this node is a JointNode
     virtual bool is_joint() const;
@@ -130,8 +129,7 @@ protected:
     bool m_bPicked;
 
     // Transformations
-    Matrix4x4 m_trans;
-    mutable Matrix4x4 m_transTranspose;
+    glm::mat4 m_trans;
 
     // Hierarchy
     typedef std::list<SceneNode*> ChildList;
@@ -141,9 +139,6 @@ protected:
 
     // Collisions
     double m_nRadius;
-
-    // Optimization
-    mutable bool m_dirty;
 
 };
 

@@ -26,8 +26,8 @@ public:
     virtual ~Moveable();
     MoveCtor(Moveable)
 
-    void set_position(const Matrix4x4 m);
-    void set_position(const Vector3D& v);
+    //void set_position(const Matrix4x4&);
+    void set_position(const Vector3D&);
     // Step through my animation/movement
     // (Called by gamelogic)
     virtual void tick();

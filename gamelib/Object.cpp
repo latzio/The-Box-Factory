@@ -436,9 +436,8 @@ void Bullet::set_direction(double dDegrees)
 
     m_nTTL = BULLET_TTL;
     if (m_pDirectionNode) {
-        Matrix4x4 m;
-        m_pTrajectoryNode->set_transform(m);
-        m_pDirectionNode->set_transform(m);
+        m_pTrajectoryNode->resetTransform();
+        m_pDirectionNode->resetTransform();
         m_pDirectionNode->rotate('y', dDegrees);
     }
 
@@ -449,15 +448,9 @@ void Bullet::set_velocity(double v)
     m_nVelocity = v;
 }
 
-void Moveable::set_position(const Matrix4x4 m)
-{
-    m_pElement->set_transform(m);
-}
-
 void Moveable::set_position(const Vector3D& v)
 {
-    Matrix4x4 m;
-    m_pElement->set_transform(m);
+    m_pElement->resetTransform();
     m_pElement->translate(v);
 }
 

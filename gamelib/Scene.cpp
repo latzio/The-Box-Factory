@@ -4,6 +4,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 
 #include <GLES3/gl3.h>
 
@@ -18,12 +19,10 @@ SceneNode::SceneNode(const std::string& name)
     : m_id(SCENE_NODE_COUNTER++)
     , m_name(name)
     , m_bPicked(false)
-    , m_trans()
-    , m_transTranspose()
+    , m_trans(1.0f)
     , m_children()
     , m_parent(0)
     , m_nRadius(0.0)
-    , m_dirty(true)
 {
 }
 
@@ -55,13 +54,16 @@ SceneNode* SceneNode::clone()
 
 void SceneNode::get_centre(Point3D& p)
 {
+    vec4 v(p[0], p[1], p[2], 1.0f);
+    v = m_trans * v;
 
-    p = m_trans * p;
+    p[0] = v[0];
+    p[1] = v[1];
+    p[2] = v[2];
 
     if (m_parent) {
         m_parent->get_centre(p);
     }
-
 }
 
 void SceneNode::render_shadow_volume(Point3D cube[][4],
@@ -279,33 +281,21 @@ void SceneNode::set_shadow(bool b)
     }
 }
 
-void SceneNode::walk_gl2(const mat4x4& mat) const
+void SceneNode::walk_gl2(const mat4& mat) const
 {
     // Apply my transformation
-    bool pushAndMult = !m_trans.isIdentity();
+    bool pushAndMult = m_trans != glm::mat4();
 
-    if (m_dirty) {
-        m_transTranspose = m_trans.transpose();
-        m_dirty = false;
-    }
-
-    mat4x4 next(mat);
+    mat4 next(mat);
     if (pushAndMult) {
-        mat4x4 transpose;
-        for (int i = 0; i < 16; ++i)
-            transpose[i / 4][i % 4] = static_cast<float>(m_transTranspose.begin()[i]);
-
-        next = next * transpose;
+        next = next * m_trans;
         glUniformMatrix4fv(1, 1, GL_FALSE, value_ptr(next));
     }
 
     draw_gl();
 
-    // Default assumption - walk_gl on my children
-    ChildList::const_iterator it;
-    for (it = m_children.begin(); it != m_children.end(); it++) {
-        (*it)->walk_gl2(next);
-    }
+    for (auto& child : m_children)
+        child->walk_gl2(next);
 
     if (pushAndMult) {
         glUniformMatrix4fv(1, 1, GL_FALSE, value_ptr(mat));
@@ -446,12 +436,6 @@ bool SceneNode::pick(int id)
     return false;
 }
 
-void SceneNode::applyAction(Matrix4x4* pTransform)
-{
-    m_trans = m_trans * *pTransform;
-    m_dirty = true;
-}
-
 void SceneNode::rotatePicked(int degrees)
 {
 
@@ -486,9 +470,7 @@ void SceneNode::rotateHead(int degrees)
 void SceneNode::resetOrientation()
 {
 
-    Matrix4x4 reset;
-    m_trans = reset;
-    m_dirty = true;
+    m_trans = glm::mat4(1.0f);
 
 }
 
@@ -496,79 +478,22 @@ void SceneNode::rotate(char axis, double angle)
 {
     // std::cerr << "Stub: Rotate " << m_name << " around " << axis << " by " << angle << std::endl;
     // Fill me in
-    Matrix4x4 r;
-    size_t topRow = 0, bottomRow = 0;
-    size_t leftCol = 0, rightCol = 0;
-
     // Obtain the four locations for the trig functions
-    switch (axis) {
-
-    case 'x':
-        topRow = 1;
-        bottomRow = 2;
-        leftCol = 1;
-        rightCol = 2;
-        break;
-
-    case 'y':
-        topRow = 0;
-        bottomRow = 2;
-        leftCol = 0;
-        rightCol = 2;
-        break;
-
-    case 'z':
-        topRow = 0;
-        bottomRow = 1;
-        leftCol = 0;
-        rightCol = 1;
-        break;
-
-    default:
-        std::cerr << "Bad params!" << std::endl;
-
-    }
-
-    double radAngle = -(angle / 180 * M_PI);
-    // Add the classic cos and sin requirements
-    r[topRow][leftCol] = cos(radAngle);
-    r[bottomRow][leftCol] = sin(radAngle);
-    r[topRow][rightCol] = sin(radAngle) * -1;
-    r[bottomRow][rightCol] = cos(radAngle);
-
-    m_trans = m_trans * r;
-    m_dirty = true;
+    vec3 v(axis == 'x' ? 1.0f : 0.0f, axis == 'y' ? 1.0f : 0.0f, axis == 'z' ? 1.0f : 0.0f);
+    float rads = angle * M_PI / 180.0f;
+    m_trans = glm::rotate(m_trans, rads, v);
 }
 
 void SceneNode::scale(const Vector3D& amount)
 {
-    // std::cerr << "Stub: Scale " << m_name << " by " << amount << std::endl;
-    // Fill me in
-    Matrix4x4 s;
-
-    // Add the scale factors in to the main diagonal
-    for (int i = 0; i < 3; i++) {
-        s[i][i] = amount[i];
-    }
-
-    m_trans = m_trans * s;
-    m_dirty = true;
+    vec3 v(amount[0], amount[1], amount[2]);
+    m_trans = glm::scale(m_trans, v);
 }
 
 void SceneNode::translate(const Vector3D& amount)
 {
-    // std::cerr << "Stub: Translate " << m_name << " by " << amount << std::endl;
-
-    // Fill me in
-    Matrix4x4 t;
-
-    // Add the displacements to the right side of the matrix
-    for (int i = 0; i < 3; i++) {
-        t[i][3] = amount[i];
-    }
-
-    m_trans = m_trans * t;
-    m_dirty = true;
+    vec3 v(amount[0], amount[1], amount[2]);
+    m_trans = glm::translate(m_trans, v);
 }
 
 bool SceneNode::is_joint() const
