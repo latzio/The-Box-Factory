@@ -20,7 +20,6 @@ SceneNode::SceneNode(const std::string& name)
     , m_bPicked(false)
     , m_trans()
     , m_transTranspose()
-    , m_invtrans()
     , m_children()
     , m_parent(0)
     , m_nRadius(0.0)
@@ -278,34 +277,6 @@ void SceneNode::set_shadow(bool b)
     for (it = m_children.begin(); it != m_children.end(); it++) {
         (*it)->set_shadow(b);
     }
-}
-
-void SceneNode::walk_gl() const
-{
-    // Apply my transformation
-    bool pushAndMult = !m_trans.isIdentity();
-
-    if (pushAndMult)
-        glPushMatrix();
-
-    if (m_dirty) {
-        m_transTranspose = m_trans.transpose();
-        m_dirty = false;
-    }
-
-    if (pushAndMult)
-        glMultMatrixd(m_transTranspose.begin());
-
-    draw_gl();
-
-    // Default assumption - walk_gl on my children
-    ChildList::const_iterator it;
-    for (it = m_children.begin(); it != m_children.end(); it++) {
-        (*it)->walk_gl();
-    }
-
-    if (pushAndMult)
-        glPopMatrix();
 }
 
 void SceneNode::walk_gl2(const mat4x4& mat) const
@@ -642,11 +613,6 @@ void JointNode::draw_gl() const
     //}
 
 
-}
-
-void JointNode::walk_gl() const
-{
-    SceneNode::walk_gl();
 }
 
 bool JointNode::is_joint() const

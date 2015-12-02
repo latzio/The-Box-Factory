@@ -53,12 +53,6 @@ void Moveable::tick()
 {
 }
 
-void Moveable::walk_gl()
-{
-
-    m_pElement->walk_gl();
-}
-
 void Moveable::walk_gl2(const glm::mat4x4& mat)
 {
 
@@ -431,11 +425,6 @@ void Bullet::tick()
 
 }
 
-void Bullet::walk_gl()
-{
-    Moveable::walk_gl();
-}
-
 void Bullet::set_joint()
 {
     m_pDirectionNode = static_cast<JointNode*>(m_pElement->find("cog")) ;
@@ -779,12 +768,6 @@ NPC::OutputDir NPC::getTargetDirection()
 
     return NO_MOVEMENT;
 }
-
-void NPC::walk_gl()
-{
-    Moveable::walk_gl();
-}
-
 
 void NPC::updateAimingDirection(bool bCascade)
 {
@@ -1183,17 +1166,6 @@ const Point3D PC::get_gun_nozzle()
 
     return p;
     // m_pJoints[JOINT_RIGHT_WRIST]->get_transform() ;
-}
-
-void PC::walk_gl()
-{
-
-    NPC::walk_gl();
-
-    //if (m_pShield) {
-    //
-    // m_pShield->walk_gl();
-    //}
 }
 
 Moveable* PC::IsHit(const Point3D& p, double r)

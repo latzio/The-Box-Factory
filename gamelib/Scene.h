@@ -35,18 +35,8 @@ public:
     virtual SceneNode* clone();
 
     virtual void tick();
-    virtual void walk_gl() const;
     virtual void walk_gl2(const glm::mat4x4&) const;
     virtual void draw_gl() const;
-
-    const Matrix4x4& get_transform() const
-    {
-        return m_trans;
-    }
-    const Matrix4x4& get_inverse() const
-    {
-        return m_invtrans;
-    }
 
     void set_radius(double r)
     {
@@ -56,18 +46,9 @@ public:
 
     void get_centre(Point3D& p);
 
-    //const virtual Matrix4x4& get_
-
     void set_transform(const Matrix4x4& m)
     {
         m_trans = m;
-        m_invtrans = m.invert();
-    }
-
-    void set_transform(const Matrix4x4& m, const Matrix4x4& i)
-    {
-        m_trans = m;
-        m_invtrans = i;
     }
 
     void set_parent(SceneNode* parent)
@@ -151,7 +132,6 @@ protected:
     // Transformations
     Matrix4x4 m_trans;
     mutable Matrix4x4 m_transTranspose;
-    Matrix4x4 m_invtrans;
 
     // Hierarchy
     typedef std::list<SceneNode*> ChildList;
@@ -178,7 +158,6 @@ public:
     virtual SceneNode* clone();
 
     virtual void draw_gl() const;
-    virtual void walk_gl() const;
 
     virtual bool is_joint() const;
 

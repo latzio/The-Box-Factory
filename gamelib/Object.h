@@ -34,7 +34,6 @@ public:
 
     // draw me to gl buffers
     // (Called by renderer)
-    virtual void walk_gl();
     virtual void walk_gl2(const glm::mat4x4&);
 
     // see if this moveable hits this object
@@ -227,7 +226,6 @@ public:
                                 Moveable* source);
 
     virtual void tick();
-    virtual void walk_gl();
 
     void set_joint();
     void set_direction(double dDegrees);
@@ -264,7 +262,6 @@ public:
     MoveCtor(NPC)
 
     virtual void tick();
-    virtual void walk_gl();
 
     virtual bool isNPC()
     {
@@ -397,7 +394,6 @@ public:
     MoveCtor(PC)
 
     virtual void tick();
-    virtual void walk_gl();
 
     virtual bool isNPC()
     {
