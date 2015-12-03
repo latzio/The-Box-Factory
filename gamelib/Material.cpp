@@ -6,7 +6,7 @@ Material::~Material()
 {
 }
 
-PhongMaterial::PhongMaterial(const Colour& kd, const Colour& ks, double shininess)
+PhongMaterial::PhongMaterial(const Colour& kd, const Colour& ks, float shininess)
     : m_kd(kd), m_ks(ks), m_shininess(shininess)
 {
 }
@@ -39,11 +39,11 @@ void PhongMaterial::apply_gl() const
     // Turn off texture
     glBindTexture(GL_TEXTURE_2D, 0);
     */
-    glUniform4f(0, m_kd.R(), m_kd.G(), m_kd.B(), 1.0);
+    glUniform4f(0, m_kd[0], m_kd[1], m_kd[2], 1.0f);
 }
 
 TextureMaterial::TextureMaterial(const Colour& kd, const Colour& ks,
-                                 double shininess, int nTextureId)
+                                 float shininess, int nTextureId)
     : PhongMaterial(kd, ks, shininess)
     , m_nTextureIndex(nTextureId)
 {

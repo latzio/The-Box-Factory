@@ -1,8 +1,10 @@
 #ifndef CS488_MATERIAL_HPP
 #define CS488_MATERIAL_HPP
 
-#include "Algebra.h"
-#include <GL/gl.h>
+#include <glm/glm.hpp>
+
+using Colour = glm::vec3;
+
 
 class Material {
 public:
@@ -20,7 +22,7 @@ protected:
 
 class PhongMaterial : public Material {
 public:
-    PhongMaterial(const Colour& kd, const Colour& ks, double shininess);
+    PhongMaterial(const Colour& kd, const Colour& ks, float shininess);
     virtual ~PhongMaterial();
 
     virtual Type get_type()
@@ -34,12 +36,12 @@ public:
     Colour m_ks;
 
 private:
-    double m_shininess;
+    float m_shininess;
 };
 
 class TextureMaterial : public PhongMaterial {
 public:
-    TextureMaterial(const Colour& kd, const Colour& ks, double shininess, int nTextureIndex);
+    TextureMaterial(const Colour& kd, const Colour& ks, float shininess, int nTextureIndex);
     virtual ~TextureMaterial();
 
     virtual Type get_type()

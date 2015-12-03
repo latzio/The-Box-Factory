@@ -2,7 +2,6 @@
 #define SMASHTVOBJECT_H_
 
 #include "Scene.h"
-#include "Algebra.h"
 #include "SceneLua.h"
 #include "AI.h"
 
@@ -27,7 +26,7 @@ public:
     MoveCtor(Moveable)
 
     //void set_position(const Matrix4x4&);
-    void set_position(const Vector3D&);
+    void set_position(const glm::vec3&);
     // Step through my animation/movement
     // (Called by gamelogic)
     virtual void tick();
@@ -37,7 +36,7 @@ public:
     virtual void walk_gl2(const glm::mat4x4&);
 
     // see if this moveable hits this object
-    virtual Moveable* IsHit(const Point3D& p, double r);
+    virtual Moveable* IsHit(const glm::vec3& p, float r);
 
     virtual bool is_dead()
     {
@@ -49,7 +48,7 @@ public:
     }
 
     // Where is this unit
-    virtual void getCentre(Point3D& p);
+    virtual void getCentre(glm::vec3& p);
 
     static int WATERMARK_LOW;
     static int WATERMARK_HIGH;
@@ -87,7 +86,7 @@ public:
     // (Called by gamelogic)
     virtual void tick();
 
-    virtual Moveable* IsHit(const Point3D& p, double r);
+    virtual Moveable* IsHit(const glm::vec3& p, float r);
 
     void reset();
 
@@ -126,7 +125,7 @@ public:
 
     virtual void tick();
 
-    void set_velocity(const Vector3D& v)
+    void set_velocity(const glm::vec3& v)
     {
         m_velocity = v;
     }
@@ -140,8 +139,8 @@ protected:
 
     virtual void addGravity();
 
-    double m_nAngularVelocity;
-    Vector3D m_velocity;
+    float m_nAngularVelocity;
+    glm::vec3 m_velocity;
 
     int m_nTTL;
 };
@@ -195,22 +194,22 @@ protected:
 
 class Obstacle : public Moveable {
 public:
-    Obstacle(const Point3D& centre, double radius);
+    Obstacle(const glm::vec3& centre, float radius);
     virtual ~Obstacle();
 
     // see if this moveable hits this object
-    virtual void getCentre(Point3D& p)
+    virtual void getCentre(glm::vec3& p)
     {
         p = m_centre;
     }
-    virtual Moveable* IsHit(const Point3D& p, double r);
+    virtual Moveable* IsHit(const glm::vec3& p, float r);
     virtual Type getType()
     {
         return TYPE_OBSTACLE;
     }
 protected:
-    Point3D m_centre;
-    double m_nRadius;
+    glm::vec3 m_centre;
+    float m_nRadius;
 };
 
 class Bullet : public Moveable {
@@ -228,8 +227,8 @@ public:
     virtual void tick();
 
     void set_joint();
-    void set_direction(double dDegrees);
-    void set_velocity(double v);
+    void set_direction(float dDegrees);
+    void set_velocity(float v);
 
     virtual Type getType()
     {
@@ -243,10 +242,10 @@ protected:
     SceneNode* m_pTrajectoryNode;
     Type m_eSource;
 
-    //double m_direction;
+    //float m_direction;
 
-    double m_nVelocity;
-    double m_nWobble;
+    float m_nVelocity;
+    float m_nWobble;
     int m_nTTL;
     int m_nPower;       // Damage done by this bullet
 
@@ -310,16 +309,16 @@ public:
     bool isAiming();
 
     // Give me the point from which bullets come out of this Moveable
-    const virtual Point3D get_gun_nozzle() ;
+    const virtual glm::vec3 get_gun_nozzle() ;
 
     // see if this moveable hits this object
-    virtual Moveable* IsHit(const Point3D& p, double r);
+    virtual Moveable* IsHit(const glm::vec3& p, float r);
 
     // Move this unit, true if success, false if impeded
     virtual bool move(AI::Direction ePrimary, AI::Direction eSecondary);
 
     // Where is this unit
-    virtual void getCentre(Point3D& p);
+    virtual void getCentre(glm::vec3& p);
 
     // Revert to general purpose AI
     virtual void revertToAI();
@@ -339,7 +338,7 @@ public:
     {
         m_nCooldownReset = cooldown;
     }
-    virtual void setThrottle(double throttle)
+    virtual void setThrottle(float throttle)
     {
         m_nThrottle = throttle;
     }
@@ -347,7 +346,7 @@ public:
 protected:
 
     virtual Moveable* getCollidingMoveable();
-    virtual void doCollisionAction(Moveable* m, const Vector3D& v);
+    virtual void doCollisionAction(Moveable* m, const glm::vec3& v);
     virtual void doUniqueAction() { };
 
     // THE NEW WAY
@@ -356,7 +355,7 @@ protected:
 
     int m_nCooldown;
 
-    double m_nThrottle; // Multiplied by the unit step each movement
+    float m_nThrottle; // Multiplied by the unit step each movement
 
     // Pointers to important nodes, must be size of Joint enum
     JointNode* m_pJoints[12];
@@ -399,10 +398,10 @@ public:
     {
         return false;
     }
-    const virtual Point3D get_gun_nozzle();
+    const virtual glm::vec3 get_gun_nozzle();
 
     // see if this moveable hits this object
-    virtual Moveable* IsHit(const Point3D& p, double r);
+    virtual Moveable* IsHit(const glm::vec3& p, float r);
     virtual Type getType()
     {
         return TYPE_PC;
@@ -421,7 +420,7 @@ public:
 
 protected:
     virtual Moveable* getCollidingMoveable();
-    virtual void doCollisionAction(Moveable* m, const Vector3D& v);
+    virtual void doCollisionAction(Moveable* m, const glm::vec3& v);
 
 private:
 
@@ -439,7 +438,7 @@ public:
     virtual ~MoveableSubscriber() { }
 
     // These are required for shooting
-    virtual void CreateBullet(const Point3D& origin, double dDegrees, NPC* source) = 0;
+    virtual void CreateBullet(const glm::vec3& origin, float dDegrees, NPC* source) = 0;
     virtual void DeleteBullet(Bullet* pBullet) = 0;
     virtual void CreateAI(NPC* npc) = 0;
 
@@ -450,12 +449,12 @@ public:
     // virtual void RegisterMoveable(Moveable* moveable, int radius) = 0;
 
     // detect collision
-    virtual Moveable* DetectCollision(Point3D p, double r, Moveable* pExcluded = NULL) = 0;
-    virtual void DamageEnemy(NPC* pNPC, int nDamage, const Point3D& p3d) = 0;
+    virtual Moveable* DetectCollision(const glm::vec3& p, float r, Moveable* pExcluded = NULL) = 0;
+    virtual void DamageEnemy(NPC* pNPC, int nDamage, const glm::vec3& p3d) = 0;
     virtual void CreateObstacle(Moveable* pObstacle) = 0;
 
     enum ParticleSize { SIZE_LITTLE = 0, SIZE_MEDIUM = 1, SIZE_BIGGER = 2, SIZE_SPARKS = 3 };
-    virtual void CreateParticles(ParticleSize eSize, int nQuantity, const Vector3D& v) = 0;
+    virtual void CreateParticles(ParticleSize eSize, int nQuantity, const glm::vec3& v) = 0;
 
     enum SFX { SFX_BULLET, SFX_BLAST, SFX_BOMB, SFX_CAROM, SFX_HUMAN_DEATH, SFX_ROBOT_HIT, SFX_ROBOT_DEATH };
     virtual void PlaySFX(SFX id) = 0;

@@ -1,10 +1,12 @@
 #ifndef SMASHTVGAME_H_
 #define SMASHTVGAME_H_
 
-// #include "joystick/include.h"
+#include "AI.h"
 #include "Scene.h"
 #include "Object.h"
-#include "AI.h"
+
+#include <glm/glm.hpp>
+
 #include <vector>
 
 // This class is to hold all the gamelogic for the BoxFactory Game
@@ -48,13 +50,13 @@ public:
 
     // Create Enemies
     virtual AISubscriber* CreateEnemy(int x, int z);
-    virtual void DamageEnemy(NPC* pNPC, int nDamage, const Point3D& p3d);
+    virtual void DamageEnemy(NPC* pNPC, int nDamage, const glm::vec3& p3d);
 
     // Subscribe to game events
-    virtual void CreateBullet(const Point3D& origin, double dDegrees, NPC* source);
+    virtual void CreateBullet(const glm::vec3& origin, float dDegrees, NPC* source);
     virtual void DeleteBullet(Bullet* pBullet);
 
-    virtual Moveable* DetectCollision(Point3D p, double r, Moveable* pExcluded);
+    virtual Moveable* DetectCollision(const glm::vec3& p, float r, Moveable* pExcluded);
 
     virtual void CreateMob();
     virtual void CreateAI(NPC* npc);
@@ -62,7 +64,7 @@ public:
 
     virtual Shield* RequestShield(MoveableSubscriber::ShieldType s);
 
-    virtual void CreateParticles(ParticleSize eSize, int nQuantity, const Vector3D& v);
+    virtual void CreateParticles(ParticleSize eSize, int nQuantity, const glm::vec3& v);
     virtual void CreateObstacle(Moveable* pObstacle);
 
     virtual void PlaySFX(MoveableSubscriber::SFX id);

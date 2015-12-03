@@ -28,7 +28,7 @@
 //
 // For more information see the book "Programming In Lua," available
 // online at http://www.lua.org/pil/, and of course the Lua reference
-// manual at http://www.lua.org/manual/5.0/.
+// manual at http://www.lua.org/manual/5.0f/.
 //
 // http://lua-users.org/wiki/LauxLibDocumentation provides a useful
 // documentation of the "lauxlib" functions (beginning with luaL_).
@@ -115,7 +115,7 @@ int gr_joint_cmd(lua_State* L)
     luaL_checktype(L, 3, LUA_TTABLE);
     luaL_argcheck(L, luaL_getn(L, 3) == 3, 3, "Three-tuple expected");
 
-    double x[3], y[3];
+    float x[3], y[3];
     for (int i = 1; i <= 3; i++) {
         lua_rawgeti(L, 2, i);
         x[i - 1] = luaL_checknumber(L, -1);
@@ -204,7 +204,7 @@ int gr_material_cmd(lua_State* L)
     luaL_argcheck(L, luaL_getn(L, 2) == 3, 2, "Three-tuple expected");
     luaL_checktype(L, 3, LUA_TNUMBER);
 
-    double kd[3], ks[3];
+    float kd[3], ks[3];
     for (int i = 1; i <= 3; i++) {
         lua_rawgeti(L, 1, i);
         kd[i - 1] = luaL_checknumber(L, -1);
@@ -212,7 +212,7 @@ int gr_material_cmd(lua_State* L)
         ks[i - 1] = luaL_checknumber(L, -1);
         lua_pop(L, 2);
     }
-    double shininess = luaL_checknumber(L, 3);
+    float shininess = luaL_checknumber(L, 3);
 
     data->material = new PhongMaterial(Colour(kd[0], kd[1], kd[2]),
                                        Colour(ks[0], ks[1], ks[2]),
@@ -240,7 +240,7 @@ int gr_texturedmaterial_cmd(lua_State* L)
     luaL_checktype(L, 3, LUA_TNUMBER);
     luaL_checktype(L, 4, LUA_TNUMBER);
 
-    double kd[3], ks[3];
+    float kd[3], ks[3];
     for (int i = 1; i <= 3; i++) {
         lua_rawgeti(L, 1, i);
         kd[i - 1] = luaL_checknumber(L, -1);
@@ -248,7 +248,7 @@ int gr_texturedmaterial_cmd(lua_State* L)
         ks[i - 1] = luaL_checknumber(L, -1);
         lua_pop(L, 2);
     }
-    double shininess = luaL_checknumber(L, 3);
+    float shininess = luaL_checknumber(L, 3);
     int textureid = luaL_checknumber(L, 4);
 
     data->material = new TextureMaterial(Colour(kd[0], kd[1], kd[2]),
@@ -343,13 +343,13 @@ int gr_node_scale_cmd(lua_State* L)
 
     SceneNode* self = selfdata->node;
 
-    double values[3];
+    float values[3];
 
     for (int i = 0; i < 3; i++) {
         values[i] = luaL_checknumber(L, i + 2);
     }
 
-    self->scale(Vector3D(values[0], values[1], values[2]));
+    self->scale(glm::vec3(values[0], values[1], values[2]));
 
     return 0;
 }
@@ -365,13 +365,13 @@ int gr_node_translate_cmd(lua_State* L)
 
     SceneNode* self = selfdata->node;
 
-    double values[3];
+    float values[3];
 
     for (int i = 0; i < 3; i++) {
         values[i] = luaL_checknumber(L, i + 2);
     }
 
-    self->translate(Vector3D(values[0], values[1], values[2]));
+    self->translate(glm::vec3(values[0], values[1], values[2]));
 
     return 0;
 }
@@ -395,7 +395,7 @@ int gr_node_rotate_cmd(lua_State* L)
 
     luaL_argcheck(L, axis >= 'x' && axis <= 'z', 2, "Axis must be x, y or z");
 
-    double angle = luaL_checknumber(L, 3);
+    float angle = luaL_checknumber(L, 3);
 
     self->rotate(axis, angle);
 

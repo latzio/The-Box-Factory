@@ -6,6 +6,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 
+#include <glm/gtx/string_cast.hpp>
+
 #include <GLES3/gl3.h>
 
 using namespace glm;
@@ -22,7 +24,7 @@ SceneNode::SceneNode(const std::string& name)
     , m_trans(1.0f)
     , m_children()
     , m_parent(0)
-    , m_nRadius(0.0)
+    , m_nRadius(0.0f)
 {
 }
 
@@ -52,7 +54,7 @@ SceneNode* SceneNode::clone()
     return pNode;
 }
 
-void SceneNode::get_centre(Point3D& p)
+void SceneNode::get_centre(vec3& p)
 {
     vec4 v(p[0], p[1], p[2], 1.0f);
     v = m_trans * v;
@@ -66,9 +68,9 @@ void SceneNode::get_centre(Point3D& p)
     }
 }
 
-void SceneNode::render_shadow_volume(Point3D cube[][4],
-                                     Point3D& centre,
-                                     Point3D& light)
+void SceneNode::render_shadow_volume(vec3 cube[][4],
+                                     vec3& centre,
+                                     vec3& light)
 {
     //int i;
     //float v[4][3];
@@ -76,13 +78,13 @@ void SceneNode::render_shadow_volume(Point3D cube[][4],
 }
 
 
-double SceneNode::get_radius()
+float SceneNode::get_radius()
 {
     return m_nRadius;
 }
 
 // SPHERE STUFF
-#define SPHERE_RADIUS 1.0
+#define SPHERE_RADIUS 1.0f
 #define SPHERE_SLICES 20
 #define SPHERE_STACKS 20
 
@@ -92,7 +94,7 @@ double SceneNode::get_radius()
 
 static void makeSphere(int slices, int stacks, std::function<void(const vec3& position, const vec3& normal, const vec2& texcoord)> handleVertex)
 {
-    for (float t = 0 ; t < stacks ; t++) {
+    for (float t = 0; t < stacks; t++) {
         float theta1 = (t / stacks) * pi<float>() - half_pi<float>();
         float theta2 = ((t + 1) / stacks) * pi<float>() - half_pi<float>();
 
@@ -159,7 +161,7 @@ void SceneNode::setupDL()
 
     glBegin(GL_QUADS);
 
-    glNormal3d(0.0, 1.0, 0.0);
+    glNormal3d(0.0f, 1.0f, 0.0f);
     glTexCoord2f(0, 0);
     glVertex3d(-1, 0, -1);
 
@@ -474,23 +476,60 @@ void SceneNode::resetOrientation()
 
 }
 
-void SceneNode::rotate(char axis, double angle)
+void SceneNode::rotate(char axis, float degs)
 {
-    // std::cerr << "Stub: Rotate " << m_name << " around " << axis << " by " << angle << std::endl;
-    // Fill me in
+    // FIXME: THIS FUNCTION IS BROKEN.
+    // It should be identical to the code here, but it isn't.
+    // Since everything depends on it, I haven't changed it yet.
+    //
+    // vec3 v(axis == 'x' ? 1.0f : 0.0f, axis == 'y' ? 1.0f : 0.0f, axis == 'z' ? 1.0f : 0.0f);
+    // m_trans = glm::rotate(m_trans, radians(degs), v);
+    int topRow = 0;
+    int bottomRow = 0;
+    int leftCol = 0;
+    int rightCol = 0;
+
     // Obtain the four locations for the trig functions
-    vec3 v(axis == 'x' ? 1.0f : 0.0f, axis == 'y' ? 1.0f : 0.0f, axis == 'z' ? 1.0f : 0.0f);
-    float rads = angle * M_PI / 180.0f;
-    m_trans = glm::rotate(m_trans, rads, v);
+    switch (axis) {
+    case 'x':
+        topRow = 1;
+        bottomRow = 2;
+        leftCol = 1;
+        rightCol = 2;
+        break;
+    case 'y':
+        topRow = 0;
+        bottomRow = 2;
+        leftCol = 0;
+        rightCol = 2;
+        break;
+    case 'z':
+        topRow = 0;
+        bottomRow = 1;
+        leftCol = 0;
+        rightCol = 1;
+        break;
+    default:
+        std::cerr << "Bad params!" << std::endl;
+
+    }
+
+    mat4 rotation;
+    float rads = radians(degs);
+    rotation[topRow][leftCol] = cos(rads);
+    rotation[bottomRow][leftCol] = sin(rads);
+    rotation[topRow][rightCol] = -sin(rads);
+    rotation[bottomRow][rightCol] = cos(rads);
+    m_trans = m_trans * rotation;
 }
 
-void SceneNode::scale(const Vector3D& amount)
+void SceneNode::scale(const glm::vec3& amount)
 {
     vec3 v(amount[0], amount[1], amount[2]);
     m_trans = glm::scale(m_trans, v);
 }
 
-void SceneNode::translate(const Vector3D& amount)
+void SceneNode::translate(const glm::vec3& amount)
 {
     vec3 v(amount[0], amount[1], amount[2]);
     m_trans = glm::translate(m_trans, v);
@@ -545,14 +584,14 @@ bool JointNode::is_joint() const
     return true;
 }
 
-void JointNode::set_joint_x(double min, double init, double max)
+void JointNode::set_joint_x(float min, float init, float max)
 {
     m_joint_x.min = min;
     m_joint_x.init = init;
     m_joint_x.max = max;
 }
 
-void JointNode::set_joint_y(double min, double init, double max)
+void JointNode::set_joint_y(float min, float init, float max)
 {
     m_joint_y.min = min;
     m_joint_y.init = init;
@@ -616,8 +655,8 @@ void JointNode::tick()
             m_pDestFrame->m_nAngle += 360;
         }
 
-        double nDiffStep = (m_pDestFrame->m_nAngle - m_nAngle)
-                           / (double)m_pDestFrame->m_nRemainingFrames;
+        float nDiffStep = (m_pDestFrame->m_nAngle - m_nAngle)
+                           / (float)m_pDestFrame->m_nRemainingFrames;
 
         rotate(m_axis, nDiffStep);
 
@@ -650,7 +689,7 @@ void JointNode::tick()
 
 }
 
-const double& JointNode::get_angle()
+const float& JointNode::get_angle()
 {
     return m_nAngle;
 }

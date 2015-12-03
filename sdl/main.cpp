@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <iostream>
+
 static int width = 1024;
 static int height = 768;
 static GLboolean should_rotate = GL_TRUE;

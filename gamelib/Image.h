@@ -6,7 +6,7 @@
 /** An image, consisting of a rectangle of floating-point elements.
  * This class makes it easy to read PNG files and the like from
  * files.
- * Note that colours in the range [0.0, 1.0] are mapped to the integer
+ * Note that colours in the range [0.0f, 1.0f] are mapped to the integer
  * range [0, 255] when writing and reading PNG files.
  */
 class Image {
@@ -23,13 +23,13 @@ public:
 
     int width() const; ///< Determine the width of the image
     int height() const; ///< Determine the height of the image
-    int elements() const; ///< Determine the depth (doubles per pixel) of
+    int elements() const; ///< Determine the depth (floats per pixel) of
     ///the image
 
-    double operator()(int x, int y, int i) const; ///< Retrieve a
+    float operator()(int x, int y, int i) const; ///< Retrieve a
     ///particular component
     ///from the image.
-    double& operator()(int x, int y, int i);  ///< Retrieve a
+    float& operator()(int x, int y, int i);  ///< Retrieve a
     ///particular component
     ///from the image.
 
@@ -40,15 +40,15 @@ public:
     bool savePng(const std::string& filename); ///< Save this image into
     ///  the given PNG file
 
-    const double* data() const;
-    double* data();
+    const float* data() const;
+    float* data();
     const unsigned char* byteData() const;
     unsigned char* byteData();
 
 private:
     int m_width, m_height;
     int m_elements;
-    double* m_data;
+    float* m_data;
     unsigned char* m_byteData;
 };
 

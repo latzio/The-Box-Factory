@@ -1,7 +1,6 @@
 #ifndef SCENE_HPP
 #define SCENE_HPP
 
-#include "Algebra.h"
 #include "Primitive.h"
 #include "Material.h"
 #include "Macro.h"
@@ -10,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <list>
+#include <string>
 #include <vector>
 
 class AnnimationFrame {
@@ -17,7 +17,7 @@ public:
     AnnimationFrame() : m_nAngle(0), m_nFrames(0),
         m_nRemainingFrames(0), m_bLoopBack(false) {}
 
-    double m_nAngle;
+    float m_nAngle;
     int m_nFrames;
     int m_nRemainingFrames;
     bool m_bLoopBack;
@@ -38,13 +38,13 @@ public:
     virtual void walk_gl2(const glm::mat4x4&) const;
     virtual void draw_gl() const;
 
-    void set_radius(double r)
+    void set_radius(float r)
     {
         m_nRadius = r;
     }
-    double get_radius();
+    float get_radius();
 
-    void get_centre(Point3D& p);
+    void get_centre(glm::vec3& p);
 
     void resetTransform()
     {
@@ -74,9 +74,9 @@ public:
 
     // Callbacks to be implemented.
     // These will be called from Lua.
-    void rotate(char axis, double angle);
-    void scale(const Vector3D& amount);
-    void translate(const Vector3D& amount);
+    void rotate(char axis, float angle);
+    void scale(const glm::vec3& amount);
+    void translate(const glm::vec3& amount);
 
     void rotatePicked(int degrees);
     void rotateHead(int degrees);
@@ -109,7 +109,7 @@ public:
     static void setupDL();
 
     // render shadow volume
-    static void render_shadow_volume(Point3D cube[][4], Point3D& centre, Point3D& light);
+    static void render_shadow_volume(glm::vec3 cube[][4], glm::vec3& centre, glm::vec3& light);
 
     static int DL_INDEX;
     enum DL_INDEX { DL_SPHERE, DL_PLANE, DL_CUBE };
@@ -138,7 +138,7 @@ protected:
     SceneNode* m_parent;
 
     // Collisions
-    double m_nRadius;
+    float m_nRadius;
 
 };
 
@@ -160,15 +160,15 @@ public:
     {
         m_axis = a;
     }
-    void set_joint_x(double min, double init, double max);
-    void set_joint_y(double min, double init, double max);
+    void set_joint_x(float min, float init, float max);
+    void set_joint_y(float min, float init, float max);
 
     void freeze();
     void add_frame(AnnimationFrame* pFrame);
-    const double& get_angle();
+    const float& get_angle();
 
     struct JointRange {
-        double min, init, max;
+        float min, init, max;
     };
 
 
@@ -177,7 +177,7 @@ protected:
     char m_axis;
 
     typedef std::list<AnnimationFrame*> FrameList;
-    double m_nAngle;
+    float m_nAngle;
     AnnimationFrame* m_pDestFrame;
 
     FrameList m_KeyFrames;

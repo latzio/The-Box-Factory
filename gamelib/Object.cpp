@@ -1,5 +1,9 @@
 #include "Object.h"
+
+#include <glm/glm.hpp>
+
 #include <algorithm>
+#include <iostream>
 
 #define PLAYER_COOLDOWN 5 // 20 // Shotgun, return to 4 for uzi
 #define ENEMY_COOLDOWN 60 // one per second
@@ -11,6 +15,8 @@
 
 #define DOOR_FRAME_LENGTH 10
 #define SHIELD_FRAME_LENGTH 15
+
+using namespace glm;
 
 int Moveable::WATERMARK_LOW  = (RAND_MAX / 10) * 1;
 int Moveable::WATERMARK_HIGH = (RAND_MAX / 10) * 5;
@@ -36,12 +42,12 @@ Moveable::~Moveable()
     }
 }
 
-void Moveable::getCentre(Point3D& p)
+void Moveable::getCentre(vec3& p)
 {
     m_pElement->get_centre(p);
 }
 
-Moveable* Moveable::IsHit(const Point3D& p, double r)
+Moveable* Moveable::IsHit(const vec3& p, float r)
 {
     if (p[0] > r) {
         return 0;
@@ -100,7 +106,7 @@ Shield::~Shield() { }
 void Shield::tick()
 {
 
-    Point3D p;
+    vec3 p;
     m_pElement->get_centre(p);
 
     Moveable* m = m_pSubscriber->DetectCollision(p, 5);
@@ -111,9 +117,10 @@ void Shield::tick()
         if ((m->getType() == Moveable::TYPE_NPC ||
                 m->getType() == Moveable::TYPE_NPC_PISTOL)) {
 
-            Point3D pHit;
+            vec3 pHit;
             dynamic_cast<NPC*>(m)->getCentre(pHit);
 
+            std::cout << "Shield damaging enemy." << std::endl;
             m_pSubscriber->DamageEnemy((NPC*)(m), 10000, pHit);
         }
     }
@@ -134,15 +141,15 @@ void Shield::reset()
     m_nTTL = m_nTTLMax;
 }
 
-Moveable* Shield::IsHit(const Point3D& p, double r)
+Moveable* Shield::IsHit(const vec3& p, float r)
 {
 
-    Point3D pCentre;
+    vec3 pCentre;
     m_pElement->get_centre(pCentre);
 
 
-    double nRadius = r + 4; //std::max(r, m_pElement->get_radius());
-    double nDifference = (p - pCentre).length();
+    float nRadius = r + 4; //std::max(r, m_pElement->get_radius());
+    float nDifference = (p - pCentre).length();
 
     if (nRadius > nDifference) {
         return this;
@@ -167,10 +174,10 @@ Particle::~Particle() { }
 void Particle::reset()
 {
 
-    double xRand = ((rand() - (RAND_MAX / 2)) / (double)RAND_MAX);
-    double zRand = ((rand() - (RAND_MAX / 2)) / (double)RAND_MAX);
+    float xRand = ((rand() - (RAND_MAX / 2)) / (float)RAND_MAX);
+    float zRand = ((rand() - (RAND_MAX / 2)) / (float)RAND_MAX);
 
-    m_velocity = Vector3D(xRand, 4, zRand);
+    m_velocity = glm::vec3(xRand, 4, zRand);
 
     m_nTTL = PARTICLE_TTL;
 }
@@ -191,7 +198,7 @@ void Particle::tick()
 void Particle::addGravity()
 {
 
-    Point3D p;
+    vec3 p;
     m_pElement->get_centre(p);
     if (p[1] < 0) {
         m_velocity[0] = 0.5 * m_velocity[0];
@@ -206,7 +213,7 @@ void Particle::addGravity()
 Spark::Spark(SceneNode* element, MoveableSubscriber* subscriber)
     : Particle(element, subscriber)
 {
-    double rRand = ((rand() - (RAND_MAX / 2)) / (double)RAND_MAX);
+    float rRand = ((rand() - (RAND_MAX / 2)) / (float)RAND_MAX);
     m_nAngularVelocity = (rRand * 22.5);
 }
 
@@ -218,7 +225,7 @@ void Spark::reset()
 {
     Particle::reset();
 
-    double yRand = ((rand() - (RAND_MAX / 2)) / (double)RAND_MAX);
+    float yRand = ((rand() - (RAND_MAX / 2)) / (float)RAND_MAX);
     m_velocity[1] = yRand * 3;
     m_nTTL = SPARK_TTL;
 }
@@ -239,7 +246,7 @@ Level::Level(SceneNode* element, MoveableSubscriber* subscriber)
     Obstacle* o;
 
     for (ObjList::iterator it = m_Objs.begin(); it != m_Objs.end(); it++) {
-        Point3D p;
+        vec3 p;
         (*it)->get_centre(p);
         p[0] = 5 * p[0];
         p[1] = 5 * p[1];
@@ -256,16 +263,16 @@ Level::Level(SceneNode* element, MoveableSubscriber* subscriber)
 
     //create outer walls - top and bottom
     for (int i = -85; i < 90; i += 20) {
-        o = new Obstacle(Point3D(i, 5, -70), 10);
+        o = new Obstacle(vec3(i, 5, -70), 10);
         m_pSubscriber->CreateObstacle(o);
-        o = new Obstacle(Point3D(i, 5, 70), 10);
+        o = new Obstacle(vec3(i, 5, 70), 10);
         m_pSubscriber->CreateObstacle(o);
     }
     //create outer walls - left and right
     for (int i = -65; i < 70; i += 20) {
-        o = new Obstacle(Point3D(-90, 5, i), 10);
+        o = new Obstacle(vec3(-90, 5, i), 10);
         m_pSubscriber->CreateObstacle(o);
-        o = new Obstacle(Point3D(90, 5, i), 10);
+        o = new Obstacle(vec3(90, 5, i), 10);
         m_pSubscriber->CreateObstacle(o);
     }
 
@@ -321,18 +328,18 @@ void Level::tick()
 }
 
 
-Obstacle::Obstacle(const Point3D& centre, double radius)
+Obstacle::Obstacle(const vec3& centre, float radius)
     : m_centre(centre)
     , m_nRadius(radius)
 { }
 
 Obstacle::~Obstacle() { }
 
-Moveable* Obstacle::IsHit(const Point3D& p, double r)
+Moveable* Obstacle::IsHit(const vec3& p, float r)
 {
 
     bool bHit = true;
-    double nRadius = r + m_nRadius;
+    float nRadius = r + m_nRadius;
 
     // Check X
     if ((abs(p[0] - m_centre[0])) > nRadius ||
@@ -359,7 +366,7 @@ Bullet::Bullet(SceneNode* element, MoveableSubscriber* subscriber, NPC* source)
     , m_nTTL(BULLET_TTL)
     , m_nPower(35)
 {
-    m_nWobble = ((rand() / (double)RAND_MAX) - 0.5) * 0.5 * m_nVelocity;
+    m_nWobble = ((rand() / (float)RAND_MAX) - 0.5) * 0.5 * m_nVelocity;
 
 }
 
@@ -370,12 +377,12 @@ Bullet::~Bullet()
 void Bullet::tick()
 {
 
-    Point3D pNow;
+    vec3 pNow;
     m_pTrajectoryNode->get_centre(pNow);
 
-    m_pTrajectoryNode->translate(Vector3D(m_nWobble, 0, m_nVelocity));
+    m_pTrajectoryNode->translate(glm::vec3(m_nWobble, 0, m_nVelocity));
 
-    Point3D p;
+    vec3 p;
     m_pTrajectoryNode->get_centre(p);
 
     Moveable* m = m_pSubscriber->DetectCollision(p, 0.1);
@@ -387,7 +394,7 @@ void Bullet::tick()
     if (m) {
         // Have we hit a wall? Show sparks and die
         if (m->getType() == Moveable::TYPE_OBSTACLE) {
-            m_pSubscriber->CreateParticles(MoveableSubscriber::SIZE_SPARKS, 4, pNow - Point3D(0, 0, 0));
+            m_pSubscriber->CreateParticles(MoveableSubscriber::SIZE_SPARKS, 4, pNow - vec3(0, 0, 0));
             bDelete = true;
 
             if (m_eSource == Moveable::TYPE_PC) {
@@ -431,7 +438,7 @@ void Bullet::set_joint()
     m_pTrajectoryNode = static_cast<JointNode*>(m_pElement->find("travel")) ;
 }
 
-void Bullet::set_direction(double dDegrees)
+void Bullet::set_direction(float dDegrees)
 {
 
     m_nTTL = BULLET_TTL;
@@ -443,12 +450,12 @@ void Bullet::set_direction(double dDegrees)
 
 }
 
-void Bullet::set_velocity(double v)
+void Bullet::set_velocity(float v)
 {
     m_nVelocity = v;
 }
 
-void Moveable::set_position(const Vector3D& v)
+void Moveable::set_position(const glm::vec3& v)
 {
     m_pElement->resetTransform();
     m_pElement->translate(v);
@@ -514,14 +521,14 @@ bool NPC::damage(int nDamage)
 
 }
 
-Moveable* NPC::IsHit(const Point3D& p, double r)
+Moveable* NPC::IsHit(const vec3& p, float r)
 {
 
-    Point3D pCentre;
+    vec3 pCentre;
     m_pElement->get_centre(pCentre);
 
-    double nRadius = r + m_pElement->get_radius(); //std::max(r, m_pElement->get_radius());
-    double nDifference = (p - pCentre).length();
+    float nRadius = r + m_pElement->get_radius(); //std::max(r, m_pElement->get_radius());
+    float nDifference = (p - pCentre).length();
 
     if (nRadius > nDifference) {
         return this;
@@ -531,7 +538,7 @@ Moveable* NPC::IsHit(const Point3D& p, double r)
 
 }
 
-void NPC::getCentre(Point3D& p)
+void NPC::getCentre(vec3& p)
 {
     m_pElement->get_centre(p);
 }
@@ -614,7 +621,7 @@ void NPC::tick()
 
     OutputDir eOut = getOutputDirection();
 
-    double x = 0, z = 0;
+    float x = 0, z = 0;
 
     // Move Me
     switch (eOut) {
@@ -650,7 +657,7 @@ void NPC::tick()
         break;
     }
 
-    Vector3D v(x, 0, z);
+    glm::vec3 v(x, 0, z);
     v = m_nThrottle * v;
 
     // Move person
@@ -669,7 +676,7 @@ void NPC::tick()
 
     // See if we need to switch to normal AI
     if (m_pAI && m_pAI->isAuto()) {
-        Point3D p;
+        vec3 p;
         getCentre(p);
         if (abs(p[0]) < 50 && abs(p[2]) < 50) {
             revertToAI();
@@ -682,13 +689,13 @@ void NPC::tick()
 
 Moveable* NPC::getCollidingMoveable()
 {
-    Point3D p;
+    vec3 p;
     m_pElement->get_centre(p);
 
     return m_pSubscriber->DetectCollision(p, m_pElement->get_radius(), this);
 }
 
-void NPC::doCollisionAction(Moveable* m, const Vector3D& v)
+void NPC::doCollisionAction(Moveable* m, const glm::vec3& v)
 {
     if (!m) {
         if (v[0] == 0)
@@ -699,17 +706,17 @@ void NPC::doCollisionAction(Moveable* m, const Vector3D& v)
     switch (m->getType()) {
 
     case TYPE_OBSTACLE: { // bounce off
-        Point3D pMe, pThem;
+        vec3 pMe, pThem;
         m->getCentre(pThem);
         getCentre(pMe);
-        Vector3D v = (pMe - pThem);
+        glm::vec3 v = (pMe - pThem);
         v[1] = 0;
-        m_pElement->translate(.1 * v);
+        m_pElement->translate(.1f * v);
         break;
     }
     case TYPE_PC: // Kill the human
         if (isNPC()) {
-            Point3D pHit;
+            vec3 pHit;
             dynamic_cast<NPC*>(m)->getCentre(pHit);
             m_pSubscriber->DamageEnemy((NPC*)(m), 10000, pHit);
         }
@@ -1035,9 +1042,9 @@ void NPC::updateMovingAnimation()
 
 }
 
-const Point3D NPC::get_gun_nozzle()
+const vec3 NPC::get_gun_nozzle()
 {
-    Point3D p;
+    vec3 p;
     m_pJoints[JOINT_RIGHT_WRIST]->get_centre(p);
 
     return p;
@@ -1060,7 +1067,7 @@ void PistolNPC::doUniqueAction()
         m_nCooldown--;
     } else {
 
-        m_nCooldown = m_nCooldownReset * (rand() / ((double)RAND_MAX) * 4);
+        m_nCooldown = m_nCooldownReset * (rand() / ((float)RAND_MAX) * 4);
         m_pSubscriber->CreateBullet(get_gun_nozzle(), getOutputDirection() * 45 , this);
     }
 }
@@ -1132,22 +1139,22 @@ void PC::tick()
 
 Moveable* PC::getCollidingMoveable()
 {
-    Point3D p;
+    vec3 p;
     m_pElement->get_centre(p);
 
     return m_pSubscriber->DetectCollision(p, m_pElement->get_radius(), this);
 }
 
-void PC::doCollisionAction(Moveable* m, const Vector3D& v)
+void PC::doCollisionAction(Moveable* m, const glm::vec3& v)
 {
 
     NPC::doCollisionAction(m, v);
 
 }
 
-const Point3D PC::get_gun_nozzle()
+const vec3 PC::get_gun_nozzle()
 {
-    Point3D p;
+    vec3 p;
 
     if (m_bRightSideShot) {
         m_pNozzle[0]->get_centre(p);
@@ -1161,7 +1168,7 @@ const Point3D PC::get_gun_nozzle()
     // m_pJoints[JOINT_RIGHT_WRIST]->get_transform() ;
 }
 
-Moveable* PC::IsHit(const Point3D& p, double r)
+Moveable* PC::IsHit(const vec3& p, float r)
 {
 
     Moveable* m = 0;
@@ -1177,10 +1184,10 @@ void PC::die()
 {
     m_nHealth = 100;
 
-    Point3D p;
+    vec3 p;
     m_pElement->get_centre(p);
 
-    m_pElement->translate(Point3D(0, 0, 0) - p);
+    m_pElement->translate(vec3(0, 0, 0) - p);
 
     // Set size of radius (smaller than enemies)
     m_pElement->set_radius(2);

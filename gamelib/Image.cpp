@@ -19,7 +19,7 @@ Image::Image(int width, int height, int elements)
     : m_width(width)
     , m_height(height)
     , m_elements(elements)
-    , m_data(new double[m_width * m_height * m_elements])
+    , m_data(new float[m_width * m_height * m_elements])
     , m_byteData(0)
 {
 }
@@ -28,12 +28,12 @@ Image::Image(const Image& other)
     : m_width(other.m_width)
     , m_height(other.m_height)
     , m_elements(other.m_elements)
-    , m_data(other.m_data ? new double[m_width * m_height * m_elements] : 0)
+    , m_data(other.m_data ? new float[m_width * m_height * m_elements] : 0)
     , m_byteData(0)
 {
     if (m_data) {
         std::memcpy(m_data, other.m_data,
-                    m_width * m_height * m_elements * sizeof(double));
+                    m_width * m_height * m_elements * sizeof(float));
     }
 }
 
@@ -51,12 +51,12 @@ Image& Image::operator=(const Image& other)
     m_width = other.m_width;
     m_height = other.m_height;
     m_elements = other.m_elements;
-    m_data = (other.m_data ? new double[m_width * m_height * m_elements] : 0);
+    m_data = (other.m_data ? new float[m_width * m_height * m_elements] : 0);
 
     if (m_data) {
         std::memcpy(m_data,
                     other.m_data,
-                    m_width * m_height * m_elements * sizeof(double));
+                    m_width * m_height * m_elements * sizeof(float));
     }
 
     m_byteData = (other.m_byteData ? new unsigned char[m_width * m_height * m_elements] : 0);
@@ -85,12 +85,12 @@ int Image::elements() const
     return m_elements;
 }
 
-double Image::operator()(int x, int y, int i) const
+float Image::operator()(int x, int y, int i) const
 {
     return m_data[m_elements * (m_width * y + x) + i];
 }
 
-double& Image::operator()(int x, int y, int i)
+float& Image::operator()(int x, int y, int i)
 {
     return m_data[m_elements * (m_width * y + x) + i];
 }
@@ -150,10 +150,10 @@ bool Image::savePng(const std::string& filename)
         for (int j = 0; j < m_width; j++) {
             for (int k = 0; k < m_elements; k++) {
                 // Clamp the value
-                double value = std::min(1.0, std::max(0.0, (*this)(j, i, k)));
+                float value = std::min(1.0f, std::max(0.0f, (*this)(j, i, k)));
 
                 // Write it out
-                tempLine[m_elements * j + k] = static_cast<png_byte>(value * 255.0);
+                tempLine[m_elements * j + k] = static_cast<png_byte>(value * 255.0f);
             }
         }
         png_write_row(png_ptr, tempLine);
@@ -251,7 +251,7 @@ bool Image::loadPng(const std::string& filename)
 
     png_bytep* row_pointers = png_get_rows(png_ptr, info_ptr);
 
-    m_data = new double[m_width * m_height * m_elements];
+    m_data = new float[m_width * m_height * m_elements];
     m_byteData = new unsigned char[m_width * m_height * m_elements];
 
     for (int y = 0; y < m_height; y++) {
@@ -266,7 +266,7 @@ bool Image::loadPng(const std::string& filename)
                     element += row[(x * m_elements + i) * bit_depth / 8 + j];
                 }
 
-                m_data[index] = element / static_cast<double>((1 << bit_depth) - 1);
+                m_data[index] = element / static_cast<float>((1 << bit_depth) - 1);
                 m_byteData[index] = (unsigned char)(m_data[index] * 255);
             }
         }
@@ -277,12 +277,12 @@ bool Image::loadPng(const std::string& filename)
     return true;
 }
 
-const double* Image::data() const
+const float* Image::data() const
 {
     return m_data;
 }
 
-double* Image::data()
+float* Image::data()
 {
     return m_data;
 }

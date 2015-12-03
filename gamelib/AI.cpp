@@ -34,12 +34,12 @@ void AI::tick()
     AISubscriber* pLeader = m_pSubscribers[0];
 
     // Get source and destination
-    Point3D s, d;
+    glm::vec3 s, d;
     pLeader->getCentre(s);
     m_pTarget->getCentre(d);
 
-    double xDiff = d[0] - s[0];
-    double zDiff = d[2] - s[2];
+    float xDiff = d[0] - s[0];
+    float zDiff = d[2] - s[2];
 
     // Directions to move
     Direction ePrimary, eSecondary;

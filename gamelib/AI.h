@@ -1,8 +1,9 @@
 #ifndef __AI_H_
 #define __AI_H_
 
-#include "Algebra.h"
 #include "Macro.h"
+
+#include <glm/glm.hpp>
 
 #include <vector>
 
@@ -95,7 +96,7 @@ public:
     NoMoveOrCopy(AISubscriber)
 
     // Where is this unit
-    virtual void getCentre(Point3D& p) = 0;
+    virtual void getCentre(glm::vec3& p) = 0;
 
     // Move this unit, true if success, false if impeded
     virtual bool move(AI::Direction ePrimary, AI::Direction eSecondary) = 0;

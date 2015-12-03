@@ -5,7 +5,6 @@ cmake_minimum_required(VERSION 3.0)
 
 SET( GAMELIB_SRC
     AI.cpp
-    Algebra.cpp
     BoxFactory.cpp
     Game.cpp
     Image.cpp

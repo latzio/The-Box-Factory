@@ -34,6 +34,8 @@
 #define LEVEL_DELAY 300
 #define LIFE_CAP 10
 
+using namespace glm;
+
 Game::Game(int nPlayers)
     : m_pLevel(0)
     , m_Objs()
@@ -365,7 +367,7 @@ void Game::handleJoystick(Joystick* joy, PC * pc){
     }
 
     //get analog stick values
-    double x, y;
+    float x, y;
     joy->getDPad(x, y);
     if (x > 0) {
         pc->setMoving(NPC::RIGHT, true);
@@ -564,7 +566,7 @@ void Game::init_gl()
     glEnable(GL_NORMALIZE);
 
     // Light 0 // Ambient
-    GLfloat light0[] = { .42, .22, .08, 1 };
+    GLfloat light0[] = { .42, .22, .0f8, 1 };
     glLightfv(GL_LIGHT0, GL_AMBIENT, light0);
     glEnable(GL_LIGHT0);
 
@@ -597,7 +599,7 @@ glm::mat4 camera(float Translate, glm::vec2 const& Rotate)
 {
     glm::mat4 Projection;// = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
     glm::mat4 View = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Translate));
-    View = glm::rotate(View, Rotate.y, glm::vec3(-1.0f, 0.0f, 0.0f));
+    View = glm::rotate(View, Rotate.y, glm::vec3(1.0f, 0.0f, 0.0f));
     View = glm::rotate(View, Rotate.x, glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
     return Projection * View * Model;
@@ -614,7 +616,9 @@ void Game::walk_gl()
     glEnableVertexAttribArray(a_tex);
 
     auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
-    auto modelview = camera(20, glm::vec2(0, -1.22));
+
+    vec2 cameraAngle(0, radians(70.0f));
+    auto modelview = camera(20, cameraAngle);
     auto mvp = perspectiveProjection * modelview;
 
     glUniformMatrix4fv(u_projection, 1, GL_FALSE, glm::value_ptr(mvp));
@@ -674,7 +678,7 @@ void Game::walk_gl()
 
 }
 
-void Game::CreateBullet(const Point3D& origin, double dDegrees, NPC* source)
+void Game::CreateBullet(const vec3& origin, float dDegrees, NPC* source)
 {
     int nQuantity = 1;
 
@@ -695,13 +699,13 @@ void Game::CreateBullet(const Point3D& origin, double dDegrees, NPC* source)
 
         b->set_joint();
         b->set_direction(dDegrees);
-        b->set_position(origin - Point3D(0, 0, 0));
+        b->set_position(origin - vec3(0, 0, 0));
         b->set_dead(false);
 
         m_Bullets.push_back(b);
 
         // Muzzle flash
-        CreateParticles(SIZE_SPARKS, 1, origin - Point3D(0, 0, 0));
+        CreateParticles(SIZE_SPARKS, 1, origin - vec3(0, 0, 0));
     }
 }
 
@@ -722,7 +726,7 @@ void Game::DeleteBullet(Bullet* pBullet)
 #define LEVEL_MAX_X 80
 #define LEVEL_MAX_Z 60
 
-Moveable* Game::DetectCollision(Point3D p, double r, Moveable* pExcluded)
+Moveable* Game::DetectCollision(const vec3& p, float r, Moveable* pExcluded)
 {
     Moveable* m = 0;
 
@@ -782,10 +786,10 @@ AISubscriber* Game::CreateEnemy(int x, int z)
 
     npc->set_dead(false);
 
-    int xDiff = (int)(((double)rand() / (double)RAND_MAX - 0.5) * 40); //+ 70;
-    int zDiff = (int)(((double)rand() / (double)RAND_MAX - 0.5) * 30); //+ 70;
+    int xDiff = (int)(((float)rand() / (float)RAND_MAX - 0.5) * 40); //+ 70;
+    int zDiff = (int)(((float)rand() / (float)RAND_MAX - 0.5) * 30); //+ 70;
 
-    npc->set_position(Vector3D(x + xDiff, 0, z + zDiff));
+    npc->set_position(glm::vec3(x + xDiff, 0, z + zDiff));
 
     m_NPCs.push_back(npc);
 
@@ -793,9 +797,9 @@ AISubscriber* Game::CreateEnemy(int x, int z)
 
 }
 
-void Game::DamageEnemy(NPC* pNPC, int nDamage, const Point3D& p3d)
+void Game::DamageEnemy(NPC* pNPC, int nDamage, const vec3& p3d)
 {
-    Vector3D v = p3d - Point3D(0, 0, 0);
+    glm::vec3 v = p3d - vec3(0, 0, 0);
     CreateParticles(SIZE_LITTLE, 2, v);
     CreateParticles(SIZE_SPARKS, 3, v);
 
@@ -853,7 +857,7 @@ void Game::DamageEnemy(NPC* pNPC, int nDamage, const Point3D& p3d)
     }
 }
 
-void Game::CreateParticles(ParticleSize eSize, int nQuantity, const Vector3D& v)
+void Game::CreateParticles(ParticleSize eSize, int nQuantity, const glm::vec3& v)
 {
 
     for (int i = 0; i < nQuantity; i++) {
@@ -906,8 +910,8 @@ void Game::CreateMob()
         break;
     }
 
-    x += (int)(((double)rand() / (double)RAND_MAX - 0.5) * 5);
-    z += (int)(((double)rand() / (double)RAND_MAX - 0.5) * 5);
+    x += (int)(((float)rand() / (float)RAND_MAX - 0.5) * 5);
+    z += (int)(((float)rand() / (float)RAND_MAX - 0.5) * 5);
 
     if (!ai)
         return;
@@ -958,7 +962,7 @@ void Game::PlaySFX(MoveableSubscriber::SFX id)
         break;
 
     case MoveableSubscriber::SFX_CAROM: {
-        // int nRand = ((double)(rand() / (double)RAND_MAX) * 16) + SFX_CAROM0;
+        // int nRand = ((float)(rand() / (float)RAND_MAX) * 16) + SFX_CAROM0;
         // SM.PlaySound(m_nSFX[nRand]);
         break;
     }

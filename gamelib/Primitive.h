@@ -1,7 +1,6 @@
 #ifndef CS488_PRIMITIVE_HPP
 #define CS488_PRIMITIVE_HPP
 
-#include "Algebra.h"
 #include <GL/gl.h>
 
 class Primitive {
