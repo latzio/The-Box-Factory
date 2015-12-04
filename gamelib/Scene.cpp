@@ -88,11 +88,7 @@ float SceneNode::get_radius()
 #define SPHERE_SLICES 20
 #define SPHERE_STACKS 20
 
-// CUBE STUFF
-#define LBOUND -1
-#define HBOUND 1
-
-static void makeSphere(int slices, int stacks, std::function<void(const vec3& position, const vec3& normal, const vec2& texcoord)> handleVertex)
+static void makeSphere(int slices, int stacks, std::function<void(const vec3& position, const vec3& normal, const vec2& texcoord)> vertexToGeo)
 {
     for (float t = 0; t < stacks; t++) {
         float theta1 = (t / stacks) * pi<float>() - half_pi<float>();
@@ -116,20 +112,20 @@ static void makeSphere(int slices, int stacks, std::function<void(const vec3& po
 
             // facing out
             if (t == 0) {
-                handleVertex(vertex1, vertex1, tex1);
-                handleVertex(vertex3, vertex3, tex3);
-                handleVertex(vertex4, vertex4, tex4);
+                vertexToGeo(vertex1, vertex1, tex1);
+                vertexToGeo(vertex3, vertex3, tex3);
+                vertexToGeo(vertex4, vertex4, tex4);
             } else if (t + 1 == stacks) {
-                handleVertex(vertex3, vertex3, tex3);
-                handleVertex(vertex1, vertex1, tex1);
-                handleVertex(vertex2, vertex2, tex4);
+                vertexToGeo(vertex3, vertex3, tex3);
+                vertexToGeo(vertex1, vertex1, tex1);
+                vertexToGeo(vertex2, vertex2, tex4);
             } else {
-                handleVertex(vertex1, vertex1, tex1);
-                handleVertex(vertex2, vertex2, tex2);
-                handleVertex(vertex4, vertex4, tex4);
-                handleVertex(vertex2, vertex2, tex2);
-                handleVertex(vertex3, vertex3, tex3);
-                handleVertex(vertex4, vertex4, tex4);
+                vertexToGeo(vertex1, vertex1, tex1);
+                vertexToGeo(vertex2, vertex2, tex2);
+                vertexToGeo(vertex4, vertex4, tex4);
+                vertexToGeo(vertex2, vertex2, tex2);
+                vertexToGeo(vertex3, vertex3, tex3);
+                vertexToGeo(vertex4, vertex4, tex4);
             }
         }
     }
@@ -137,119 +133,99 @@ static void makeSphere(int slices, int stacks, std::function<void(const vec3& po
 
 void SceneNode::setupDL()
 {
-    // DISPLAY LIST
-    // create one display list
-    SceneNode::DL_INDEX = glGenLists(DL_INDEX);
+    std::vector<float> geometry;
+    geometry.reserve(10000);
 
-
-    // compile the display list, for a sphere
-    glNewList(DL_INDEX + DL_SPHERE, GL_COMPILE);
-    // Draw a simple sphere
-    glBegin(GL_TRIANGLES);
-    auto vertexToGL = [](const vec3 & position, const vec3 & normal, const vec2 & texcoord) {
-        glTexCoord2fv(value_ptr(texcoord));
-        glNormal3fv(value_ptr(normal));
-        glVertex3fv(value_ptr(position));
+    auto vertexToGeo = [&geometry](const vec3 & position, const vec3 & normal, const vec2 & texcoord) {
+        geometry.push_back(position[0]);
+        geometry.push_back(position[1]);
+        geometry.push_back(position[2]);
+        geometry.push_back(normal[0]);
+        geometry.push_back(normal[1]);
+        geometry.push_back(normal[2]);
+        geometry.push_back(texcoord[0]);
+        geometry.push_back(texcoord[1]);
     };
-    makeSphere(SPHERE_SLICES, SPHERE_STACKS, vertexToGL);
-    glEnd();
+    makeSphere(SPHERE_SLICES, SPHERE_STACKS, vertexToGeo);
 
-    glEndList();
+    std::cout << "Finished sphere geometry. Vertex Count " << geometry.size() / 8 << std::endl;
 
-    // compile the display list, for a plane
-    glNewList(DL_INDEX + DL_PLANE, GL_COMPILE);
+    // Make plane
+    vec3 vNorm(0.0f, 1.0f, 0.0f);
+    vertexToGeo(vec3(-1, 0, -1), vNorm, vec2(0, 0));
+    vertexToGeo(vec3(-1, 0, 1), vNorm, vec2(0, 1));
+    vertexToGeo(vec3(1, 0, 1), vNorm, vec2(1, 1));
+    vertexToGeo(vec3(-1, 0, -1), vNorm, vec2(0, 0));
+    vertexToGeo(vec3(1, 0, 1), vNorm, vec2(1, 1));
+    vertexToGeo(vec3(1, 0, -1), vNorm, vec2(1, 0));
 
-    glBegin(GL_QUADS);
-
-    glNormal3d(0.0f, 1.0f, 0.0f);
-    glTexCoord2f(0, 0);
-    glVertex3d(-1, 0, -1);
-
-    glTexCoord2f(0, 1);
-    glVertex3d(-1, 0, 1);
-
-    glTexCoord2f(1, 1);
-    glVertex3d(1, 0, 1);
-
-    glTexCoord2f(1, 0);
-    glVertex3d(1, 0, -1);
-
-    glEnd();
-
-    glEndList();
-
-    // compile the display list, for a cube
-    glNewList(DL_INDEX + DL_CUBE, GL_COMPILE);
-    glBegin(GL_QUADS);
+    std::cout << "Finished plane geometry. Vertex Count " << geometry.size() / 8 << std::endl;
 
     // Front
-    glNormal3d(0, 0, 1);
-    glTexCoord2f(0, 0);
-    glVertex3d(LBOUND, LBOUND, HBOUND);
-    glTexCoord2f(0, 1);
-    glVertex3d(HBOUND, LBOUND, HBOUND);
-    glTexCoord2f(1, 1);
-    glVertex3d(HBOUND, HBOUND, HBOUND);
-    glTexCoord2f(1, 0);
-    glVertex3d(LBOUND, HBOUND, HBOUND);
+    vNorm = vec3(0, 0, 1);
+    vertexToGeo(vec3(-1, -1, 1), vNorm, vec2(0, 0));
+    vertexToGeo(vec3(1, -1, 1), vNorm, vec2(0, 1));
+    vertexToGeo(vec3(1, 1, 1), vNorm, vec2(1, 1));
+    vertexToGeo(vec3(-1, -1, 1), vNorm, vec2(0, 0));
+    vertexToGeo(vec3(1, 1, 1), vNorm, vec2(1, 1));
+    vertexToGeo(vec3(-1, 1, 1), vNorm, vec2(1, 0));
 
     // Back
-    glNormal3d(0, 0, -1);
-    glTexCoord2f(0, 0);
-    glVertex3d(LBOUND, LBOUND, LBOUND);
-    glTexCoord2f(1, 0);
-    glVertex3d(LBOUND, HBOUND, LBOUND);
-    glTexCoord2f(1, 1);
-    glVertex3d(HBOUND, HBOUND, LBOUND);
-    glTexCoord2f(0, 1);
-    glVertex3d(HBOUND, LBOUND, LBOUND);
+    vNorm = vec3(0, 0, -1);
+    vertexToGeo(vec3(-1, -1, -1), vNorm, vec2(0, 0));
+    vertexToGeo(vec3(-1, 1, -1), vNorm, vec2(1, 0));
+    vertexToGeo(vec3(1, 1, -1), vNorm, vec2(1, 1));
+    vertexToGeo(vec3(-1, -1, -1), vNorm, vec2(0, 0));
+    vertexToGeo(vec3(1, 1, -1), vNorm, vec2(1, 1));
+    vertexToGeo(vec3(1, -1, -1), vNorm, vec2(0, 1));
 
     // Left
-    glNormal3d(-1, 0, 0);
-    glTexCoord2f(0, 0);
-    glVertex3d(LBOUND, LBOUND, HBOUND);
-    glTexCoord2f(1, 0);
-    glVertex3d(LBOUND, HBOUND, HBOUND);
-    glTexCoord2f(1, 1);
-    glVertex3d(LBOUND, HBOUND, LBOUND);
-    glTexCoord2f(0, 1);
-    glVertex3d(LBOUND, LBOUND, LBOUND);
+    vNorm = vec3(-1, 0, 0);
+    vertexToGeo(vec3(-1, -1, 1), vNorm, vec2(0, 0));
+    vertexToGeo(vec3(-1, 1, 1), vNorm, vec2(1, 0));
+    vertexToGeo(vec3(-1, 1, -1), vNorm, vec2(1, 1));
+    vertexToGeo(vec3(-1, -1, 1), vNorm, vec2(0, 0));
+    vertexToGeo(vec3(-1, 1, -1), vNorm, vec2(1, 1));
+    vertexToGeo(vec3(-1, -1, -1), vNorm, vec2(0, 1));
 
     // Right
-    glNormal3d(1, 0, 0);
-    glTexCoord2f(0, 0);
-    glVertex3d(HBOUND, LBOUND, HBOUND);
-    glTexCoord2f(0, 1);
-    glVertex3d(HBOUND, LBOUND, LBOUND);
-    glTexCoord2f(1, 1);
-    glVertex3d(HBOUND, HBOUND, LBOUND);
-    glTexCoord2f(1, 0);
-    glVertex3d(HBOUND, HBOUND, HBOUND);
+    vNorm = vec3(1, 0, 0);
+    vertexToGeo(vec3(1, -1, 1), vNorm, vec2(0, 0));
+    vertexToGeo(vec3(1, -1, -1), vNorm, vec2(0, 1));
+    vertexToGeo(vec3(1, 1, -1), vNorm, vec2(1, 1));
+    vertexToGeo(vec3(1, -1, 1), vNorm, vec2(0, 0));
+    vertexToGeo(vec3(1, 1, -1), vNorm, vec2(1, 1));
+    vertexToGeo(vec3(1, 1, 1), vNorm, vec2(1, 0));
 
     // Bottom
-    glNormal3d(0, -1, 0);
-    glTexCoord2f(0, 0);
-    glVertex3d(LBOUND, LBOUND, LBOUND);
-    glTexCoord2f(0, 1);
-    glVertex3d(HBOUND, LBOUND, LBOUND);
-    glTexCoord2f(1, 1);
-    glVertex3d(HBOUND, LBOUND, HBOUND);
-    glTexCoord2f(1, 0);
-    glVertex3d(LBOUND, LBOUND, HBOUND);
+    vNorm = vec3(0, -1, 0);
+    vertexToGeo(vec3(-1, -1, -1), vNorm, vec2(0, 0));
+    vertexToGeo(vec3(1, -1, -1), vNorm, vec2(0, 1));
+    vertexToGeo(vec3(1, -1, 1), vNorm, vec2(1, 1));
+    vertexToGeo(vec3(-1, -1, -1), vNorm, vec2(0, 0));
+    vertexToGeo(vec3(1, -1, 1), vNorm, vec2(1, 1));
+    vertexToGeo(vec3(-1, -1, 1), vNorm, vec2(1, 0));
 
     // Top
-    glNormal3d(0, 1, 0);
-    glTexCoord2f(0, 0);
-    glVertex3d(LBOUND, HBOUND, LBOUND);
-    glTexCoord2f(1, 0);
-    glVertex3d(LBOUND, HBOUND, HBOUND);
-    glTexCoord2f(1, 1);
-    glVertex3d(HBOUND, HBOUND, HBOUND);
-    glTexCoord2f(0, 1);
-    glVertex3d(HBOUND, HBOUND, LBOUND);
+    vNorm = vec3(0, 1, 0);
+    vertexToGeo(vec3(-1, 1, -1), vNorm, vec2(0, 0));
+    vertexToGeo(vec3(-1, 1, 1), vNorm, vec2(1, 0));
+    vertexToGeo(vec3(1, 1, 1), vNorm, vec2(1, 1));
+    vertexToGeo(vec3(-1, 1, -1), vNorm, vec2(0, 0));
+    vertexToGeo(vec3(1, 1, 1), vNorm, vec2(1, 1));
+    vertexToGeo(vec3(1, 1, -1), vNorm, vec2(0, 1));
 
-    glEnd();
-    glEndList();
+    std::cout << "Finished cube geometry. Vertex Count " << geometry.size() / 8 << std::endl;
+
+    // Stick the geometry in a vbo.
+    unsigned vbo = 0;
+    glGenBuffers(1, &vbo);
+
+    std::cout << "Generated vbo " << vbo << std::endl;
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, geometry.size() * sizeof(float), geometry.data(), GL_STATIC_DRAW);
+
 
 }
 

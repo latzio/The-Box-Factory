@@ -420,6 +420,8 @@ const char vsTexture[] =
 
 const char fsTexture[] =
     ""
+    "#version 130                                                         \n"
+    "                                                                     \n"
     "   uniform vec4 u_color;                                             \n"
     "   uniform sampler2D u_texture;                                      \n"
     "                                                                     \n"
@@ -428,7 +430,7 @@ const char fsTexture[] =
     "                                                                     \n"
     "   void main()                                                       \n"
     "   {                                                                 \n"
-    "      gl_FragColor = u_color;                                        \n"
+    "      gl_FragColor = mix(u_color, texture(u_texture, v_tex), 0.99);   \n"
     "   }                                                                 \n"
     "";
 
@@ -529,8 +531,11 @@ void Game::init_gl()
 
     glUseProgram(shaderProgram);        // and select it for usage
 
-    glActiveTexture(GL_TEXTURE0);
-    glUniform1i(u_texture, 0);
+    glEnableVertexAttribArray(a_position);
+    glVertexAttribPointer(a_position, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
+
+    glEnableVertexAttribArray(a_tex);
+    glVertexAttribPointer(a_tex, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
 
     // IMAGE LOADER
 
@@ -554,7 +559,11 @@ void Game::init_gl()
                      0, (image.elements() == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, image.byteData());
 
     }
-    glBindTexture(GL_TEXTURE_2D, 0);
+    //glBindTexture(GL_TEXTURE_2D, 0);
+
+    glActiveTexture(GL_TEXTURE0);
+    glUniform1i(u_texture, 0);
+
 #if 0
 
     // Set up lighting

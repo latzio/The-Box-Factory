@@ -21,8 +21,7 @@ Sphere::~Sphere()
 
 void Sphere::walk_gl() const
 {
-    // draw the display list
-    glCallList(SceneNode::DL_INDEX + SceneNode::DL_SPHERE);
+    glDrawArrays(GL_TRIANGLES, 0, 2280);
 }
 
 Plane::~Plane()
@@ -31,7 +30,7 @@ Plane::~Plane()
 
 void Plane::walk_gl() const
 {
-    glCallList(SceneNode::DL_INDEX + SceneNode::DL_PLANE);
+    glDrawArrays(GL_TRIANGLES, 2280, 6);
 }
 
 Cube::~Cube()
@@ -40,7 +39,7 @@ Cube::~Cube()
 
 void Cube::walk_gl() const
 {
-    glCallList(SceneNode::DL_INDEX + SceneNode::DL_CUBE);
+    glDrawArrays(GL_TRIANGLES, 2286, 36);
 
     if (m_bShadow) {
         std::cout << "Rendering shadow volume." << std::endl;
