@@ -656,7 +656,7 @@ void JointNode::tick()
         }
 
         float nDiffStep = (m_pDestFrame->m_nAngle - m_nAngle)
-                           / (float)m_pDestFrame->m_nRemainingFrames;
+                          / (float)m_pDestFrame->m_nRemainingFrames;
 
         rotate(m_axis, nDiffStep);
 

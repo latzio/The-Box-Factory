@@ -149,7 +149,7 @@ Moveable* Shield::IsHit(const vec3& p, float r)
 
 
     float nRadius = r + 4; //std::max(r, m_pElement->get_radius());
-    float nDifference = (p - pCentre).length();
+    float nDifference = length(p - pCentre);
 
     if (nRadius > nDifference) {
         return this;
@@ -528,7 +528,7 @@ Moveable* NPC::IsHit(const vec3& p, float r)
     m_pElement->get_centre(pCentre);
 
     float nRadius = r + m_pElement->get_radius(); //std::max(r, m_pElement->get_radius());
-    float nDifference = (p - pCentre).length();
+    float nDifference = length(p - pCentre);
 
     if (nRadius > nDifference) {
         return this;

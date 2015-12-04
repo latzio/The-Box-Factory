@@ -250,11 +250,9 @@ bool Game::tick()
     }
 
     // Attempt to move particles
-    for (ParticleList::iterator it = m_Particles.begin();
-            it != m_Particles.end(); it++) {
-
-        if (!(*it)->is_dead()) {
-            (*it)->tick();
+    for (auto& particle : m_Particles) {
+        if (!particle->is_dead()) {
+            particle->tick();
         }
     }
 
@@ -649,32 +647,23 @@ void Game::walk_gl()
     glUniformMatrix4fv(u_projection, 1, GL_FALSE, glm::value_ptr(mvp));
     //glTranslated(0, 7, 0);
 
-    for (PCList::iterator it = m_PCs.begin();
-            it != m_PCs.end(); it++) {
-        (*it)->walk_gl2(mvp);
-    }
+    for (auto& pc : m_PCs)
+        pc->walk_gl2(mvp);
 
     // Draw the enemies
-    for (EnemyList::iterator it = m_NPCs.begin();
-            it != m_NPCs.end(); it++) {
-        (*it)->walk_gl2(mvp);
-    }
+    for (auto& npc : m_NPCs)
+        npc->walk_gl2(mvp);
 
     // END DRAW PLAYERS AND ENEMIES
 
     // Draw all projectiles
-    for (BulletList::iterator it = m_Bullets.begin();
-            it != m_Bullets.end(); it++) {
-        (*it)->walk_gl2(mvp);
-    }
+    for (auto& bullet : m_Bullets)
+        bullet->walk_gl2(mvp);
 
     // Attempt to draw particles
-    for (ParticleList::iterator it = m_Particles.begin();
-            it != m_Particles.end(); it++) {
-        if (!(*it)->is_dead()) {
-            (*it)->walk_gl2(mvp);
-        }
-    }
+    for (auto& particle : m_Particles)
+        if (!particle->is_dead())
+            particle->walk_gl2(mvp);
 
 }
 
