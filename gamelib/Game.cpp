@@ -397,42 +397,64 @@ void Game::handleJoystick(Joystick* joy, PC * pc){
 }
 */
 
-const char vsTexture[] =
+constexpr int ShaderProgramCount = 2;
+
+const char vsSrc[] =
     ""
-    "   uniform mat4 u_projection;                                        \n"
+    "   uniform mat4 u_perspective;                                       \n"
+    "   uniform mat4 u_modelview;                                         \n"
+    "   uniform mat4 u_modelview_ivt;                                     \n"
     "                                                                     \n"
-    "   attribute vec3 a_position;                                        \n"
-    "   attribute vec3 a_normal;                                          \n"
-    "   attribute vec2 a_tex;                                             \n"
+    "   in vec3 a_position;                                        \n"
+    "   in vec3 a_normal;                                          \n"
+    "   in vec2 a_tex;                                             \n"
     "                                                                     \n"
-    "   varying vec3 v_normal;                                            \n"
-    "   varying vec2 v_tex;                                               \n"
+    "   varying out vec3 v_normal;                                            \n"
+    "   varying out vec2 v_tex;                                               \n"
     "                                                                     \n"
     "   void main()                                                       \n"
     "   {                                                                 \n"
-    "      gl_Position = u_projection * vec4(a_position, 1.0);            \n"
-    "      vec4 normal = u_projection * vec4(a_normal, 0.0);              \n"
+    "      gl_Position = u_perspective * u_modelview * vec4(a_position, 1.0);  \n"
+    "      vec4 normal = u_modelview_ivt * vec4(a_normal, 0.0);           \n"
     "      v_normal = normal.xyz;                                         \n"
     "      v_tex = a_tex;                                                 \n"
     "   }                                                                 \n"
     "";
 
 
-const char fsTexture[] =
+const char* fsSrc[] = {
     ""
     "#version 130                                                         \n"
     "                                                                     \n"
     "   uniform vec4 u_color;                                             \n"
     "   uniform sampler2D u_texture;                                      \n"
     "                                                                     \n"
-    "   varying vec3 v_normal;                                            \n"
-    "   varying vec2 v_tex;                                               \n"
+    "   in vec3 v_normal;                                            \n"
+    "   in vec2 v_tex;                                               \n"
+    "                                                                     \n"
+    "   out vec4 o_fragcolor;                                               \n"
     "                                                                     \n"
     "   void main()                                                       \n"
     "   {                                                                 \n"
-    "      gl_FragColor = mix(u_color, texture(u_texture, v_tex), 0.99);   \n"
+    "      o_fragcolor = mix(u_color, texture(u_texture, v_tex), 0.99);  \n"
     "   }                                                                 \n"
-    "";
+    "",
+
+    ""
+    "#version 130                                                         \n"
+    "                                                                     \n"
+    "   uniform vec4 u_color;                                             \n"
+    "                                                                     \n"
+    "   in vec3 v_normal;                                            \n"
+    "                                                                     \n"
+    "   out vec4 o_fragcolor;                                               \n"
+    "                                                                     \n"
+    "   void main()                                                       \n"
+    "   {                                                                 \n"
+    "      o_fragcolor = u_color;                                        \n"
+    "   }                                                                 \n"
+    ""
+};
 
 void
 print_info_log(
@@ -474,12 +496,13 @@ load_shader(
     return shader;
 }
 
-int u_projection;
-int u_color;
-int u_texture;
-int a_position;
-int a_normal;
-int a_tex;
+int u_perspective[ShaderProgramCount];
+int u_modelview[ShaderProgramCount];
+int u_color[ShaderProgramCount];
+int u_texture[ShaderProgramCount];
+int a_position[ShaderProgramCount];
+int a_normal[ShaderProgramCount];
+int a_tex[ShaderProgramCount];
 
 void Game::init_gl()
 {
@@ -494,50 +517,6 @@ void Game::init_gl()
 
     // DISPLAY LIST
     SceneNode::setupDL();
-
-    // Compile Programs
-    ///////  the openGL part  ///////////////////////////////////////////////////////////////
-
-    GLuint vertexShader   = load_shader(vsTexture , GL_VERTEX_SHADER);         // load vertex shader
-    GLuint fragmentShader = load_shader(fsTexture , GL_FRAGMENT_SHADER);     // load fragment shader
-
-    GLuint shaderProgram  = glCreateProgram();                  // create program object
-    glAttachShader(shaderProgram, vertexShader);                // and attach both...
-    glAttachShader(shaderProgram, fragmentShader);              // ... shaders to it
-
-    glLinkProgram(shaderProgram);       // link the program
-    print_info_log(shaderProgram);
-
-    int linkStatus = 0;
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &linkStatus);
-    if (linkStatus == GL_FALSE)
-        std::cerr << "Failed to link." << std::endl;
-
-
-    //// now get the locations (kind of handle) of the shaders variables
-    u_projection = glGetUniformLocation(shaderProgram , "u_projection");
-    u_texture = glGetUniformLocation(shaderProgram , "u_texture");
-    u_color = glGetUniformLocation(shaderProgram , "u_color");
-    a_position = glGetAttribLocation(shaderProgram , "a_position");
-    a_normal = glGetAttribLocation(shaderProgram , "a_normal");
-    a_tex = glGetAttribLocation(shaderProgram , "a_tex");
-
-    std::cerr << "a_tex " << a_tex << std::endl;
-    std::cerr << "a_normal " << a_normal << std::endl;
-    std::cerr << "a_pos " << a_position << std::endl;
-    std::cerr << "u_proj " << u_projection << std::endl;
-    std::cerr << "u_color " << u_color << std::endl;
-    std::cerr << "u_tex " << u_texture << std::endl;
-
-    glUseProgram(shaderProgram);        // and select it for usage
-
-    glEnableVertexAttribArray(a_position);
-    glVertexAttribPointer(a_position, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
-
-    glEnableVertexAttribArray(a_tex);
-    glVertexAttribPointer(a_tex, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
-
-    // IMAGE LOADER
 
     // Texture mapping
     std::cout << "Textures: " << TEXTURE_COUNT << std::endl;
@@ -562,7 +541,60 @@ void Game::init_gl()
     //glBindTexture(GL_TEXTURE_2D, 0);
 
     glActiveTexture(GL_TEXTURE0);
-    glUniform1i(u_texture, 0);
+    // Compile Programs
+    ///////  the openGL part  ///////////////////////////////////////////////////////////////
+
+    GLuint vertexShader = load_shader(vsSrc, GL_VERTEX_SHADER);         // load vertex shader
+    GLuint fragmentShaders[ShaderProgramCount];
+
+
+    GLuint shaderPrograms[ShaderProgramCount];
+
+    for (int i = 0; i < 1; ++i) {
+        shaderPrograms[i]  = glCreateProgram();                  // create program object
+        glAttachShader(shaderPrograms[i], vertexShader);                // and attach both...
+
+        fragmentShaders[i] = load_shader(fsSrc[i], GL_FRAGMENT_SHADER);     // load fragment shader
+        glAttachShader(shaderPrograms[i], fragmentShaders[i]);              // ... shaders to it
+
+        glLinkProgram(shaderPrograms[i]);       // link the program
+        print_info_log(shaderPrograms[i]);
+
+        int linkStatus = 0;
+        glGetProgramiv(shaderPrograms[i], GL_LINK_STATUS, &linkStatus);
+        if (linkStatus == GL_FALSE)
+            std::cerr << "Failed to link." << std::endl;
+        //// now get the locations (kind of handle) of the shaders variables
+        u_perspective[i] = glGetUniformLocation(shaderPrograms[i] , "u_perspective");
+        u_modelview[i] = glGetUniformLocation(shaderPrograms[i] , "u_modelview");
+        u_texture[i] = glGetUniformLocation(shaderPrograms[i] , "u_texture");
+        u_color[i] = glGetUniformLocation(shaderPrograms[i] , "u_color");
+        a_position[i] = glGetAttribLocation(shaderPrograms[i] , "a_position");
+        a_normal[i] = glGetAttribLocation(shaderPrograms[i] , "a_normal");
+        a_tex[i] = glGetAttribLocation(shaderPrograms[i] , "a_tex");
+
+        std::cerr << "ProgramName " << shaderPrograms[i] << std::endl;
+        std::cerr << "a_tex " << a_tex[i] << std::endl;
+        std::cerr << "a_normal " << a_normal[i] << std::endl;
+        std::cerr << "a_pos " << a_position[i] << std::endl;
+        std::cerr << "u_pers " << u_perspective[i] << std::endl;
+        std::cerr << "u_color " << u_color[i] << std::endl;
+        std::cerr << "u_tex " << u_texture[i] << std::endl;
+
+        glEnableVertexAttribArray(a_position[i]);
+        glVertexAttribPointer(a_position[i], 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
+
+        glEnableVertexAttribArray(a_tex[i]);
+        glVertexAttribPointer(a_tex[i], 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
+
+        glUniform1i(u_texture[i], 0);
+    }
+
+    glUseProgram(shaderPrograms[0]);        // and select it for usage
+
+    // IMAGE LOADER
+
+
 
 #if 0
 
@@ -619,16 +651,13 @@ void Game::walk_gl()
     if (!m_pLevel)
         return;
 
-    glEnableVertexAttribArray(a_position);
-    glEnableVertexAttribArray(a_tex);
-
     auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
 
     vec2 cameraAngle(0, radians(70.0f));
     auto modelview = camera(20, cameraAngle);
     auto mvp = perspectiveProjection * modelview;
 
-    glUniformMatrix4fv(u_projection, 1, GL_FALSE, glm::value_ptr(mvp));
+    glUniformMatrix4fv(u_perspective[0], 1, GL_FALSE, glm::value_ptr(mvp));
 
     m_frames++;
 
@@ -653,7 +682,8 @@ void Game::walk_gl()
     auto translateUp = glm::translate(glm::mat4x4(), glm::vec3(0.0f, 7.0f, 0.0f));
 
     mvp = mvp * scaleDown * translateUp;
-    glUniformMatrix4fv(u_projection, 1, GL_FALSE, glm::value_ptr(mvp));
+    glUniformMatrix4fv(u_perspective[0], 1, GL_FALSE, glm::value_ptr(mvp));
+    glUniformMatrix4fv(u_modelview[0], 1, GL_FALSE, glm::value_ptr(glm::mat4()));
     //glTranslated(0, 7, 0);
 
     for (auto& pc : m_PCs)

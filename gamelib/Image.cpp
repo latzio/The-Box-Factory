@@ -19,7 +19,7 @@ Image::Image(int width, int height, int elements)
     : m_width(width)
     , m_height(height)
     , m_elements(elements)
-    , m_data(new float[m_width * m_height * m_elements])
+    , m_data(new float[m_width* m_height* m_elements])
     , m_byteData(0)
 {
 }
@@ -28,7 +28,7 @@ Image::Image(const Image& other)
     : m_width(other.m_width)
     , m_height(other.m_height)
     , m_elements(other.m_elements)
-    , m_data(other.m_data ? new float[m_width * m_height * m_elements] : 0)
+    , m_data(other.m_data ? new float[m_width* m_height* m_elements] : 0)
     , m_byteData(0)
 {
     if (m_data) {

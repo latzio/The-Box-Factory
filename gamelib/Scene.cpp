@@ -267,7 +267,7 @@ void SceneNode::walk_gl2(const mat4& mat) const
     mat4 next(mat);
     if (pushAndMult) {
         next = next * m_trans;
-        glUniformMatrix4fv(1, 1, GL_FALSE, value_ptr(next));
+        glUniformMatrix4fv(2, 1, GL_FALSE, value_ptr(next));
     }
 
     draw_gl();
@@ -276,7 +276,7 @@ void SceneNode::walk_gl2(const mat4& mat) const
         child->walk_gl2(next);
 
     if (pushAndMult) {
-        glUniformMatrix4fv(1, 1, GL_FALSE, value_ptr(mat));
+        glUniformMatrix4fv(2, 1, GL_FALSE, value_ptr(mat));
     }
 }
 
