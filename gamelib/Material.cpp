@@ -1,5 +1,7 @@
 #include "Material.h"
 
+#include "Graphics.h"
+
 #include <GLES3/gl3.h>
 
 Material::~Material()
@@ -15,7 +17,7 @@ PhongMaterial::~PhongMaterial()
 {
 }
 
-void PhongMaterial::apply_gl() const
+void PhongMaterial::apply_gl(Graphics& gfx) const
 {
     // Set colorglNormal
     // glColor3d(
@@ -37,9 +39,10 @@ void PhongMaterial::apply_gl() const
     glMaterialf(GL_FRONT, GL_SHININESS, m_shininess);
 
     // Turn off texture
-    glBindTexture(GL_TEXTURE_2D, 0);
     */
-    glUniform4f(0, m_kd[0], m_kd[1], m_kd[2], 1.0f);
+    gfx.useProgram(ShaderProgram::Color);
+    glUniform4f(gfx.u_color[0], m_kd[0], m_kd[1], m_kd[2], 1.0f);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 TextureMaterial::TextureMaterial(const Colour& kd, const Colour& ks,
@@ -53,8 +56,11 @@ TextureMaterial::~TextureMaterial()
 {
 }
 
-void TextureMaterial::apply_gl() const
+void TextureMaterial::apply_gl(Graphics& gfx) const
 {
-    PhongMaterial::apply_gl();
+    //PhongMaterial::apply_gl(gfx);
+
+    gfx.useProgram(ShaderProgram::Texture);
     glBindTexture(GL_TEXTURE_2D, m_nTextureIndex);
+    glUniform4f(gfx.u_color[1], m_kd[0], m_kd[1], m_kd[2], 1.0f);
 }

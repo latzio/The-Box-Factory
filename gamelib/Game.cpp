@@ -1,8 +1,6 @@
 #include "Game.h"
-#include "Image.h"
 #include "Object.h"
 #include "SceneLua.h"
-#include "Textures.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -27,9 +25,9 @@
 #define SPARKS_PARTICLES 156
 #define PARTICLES        156
 
-#define MOBS     2
+#define MOBS     0
 #define MOB_SIZE 12
-#define ENEMY_WATERMARK 5
+#define ENEMY_WATERMARK 0
 
 #define LEVEL_DELAY 300
 #define LIFE_CAP 10
@@ -56,6 +54,7 @@ Game::Game(int nPlayers)
     , m_nScore(0)
     , m_frames(0)
     , m_movements(0)
+    , m_gfx()
 {
     // Import the level
     m_pLevel = new Level(import_lua("models/level.lua"), this);
@@ -397,113 +396,6 @@ void Game::handleJoystick(Joystick* joy, PC * pc){
 }
 */
 
-constexpr int ShaderProgramCount = 2;
-
-const char vsSrc[] =
-    ""
-    "   uniform mat4 u_perspective;                                       \n"
-    "   uniform mat4 u_modelview;                                         \n"
-    "   uniform mat4 u_modelview_ivt;                                     \n"
-    "                                                                     \n"
-    "   in vec3 a_position;                                        \n"
-    "   in vec3 a_normal;                                          \n"
-    "   in vec2 a_tex;                                             \n"
-    "                                                                     \n"
-    "   varying out vec3 v_normal;                                            \n"
-    "   varying out vec2 v_tex;                                               \n"
-    "                                                                     \n"
-    "   void main()                                                       \n"
-    "   {                                                                 \n"
-    "      gl_Position = u_perspective * u_modelview * vec4(a_position, 1.0);  \n"
-    "      vec4 normal = u_modelview_ivt * vec4(a_normal, 0.0);           \n"
-    "      v_normal = normal.xyz;                                         \n"
-    "      v_tex = a_tex;                                                 \n"
-    "   }                                                                 \n"
-    "";
-
-
-const char* fsSrc[] = {
-    ""
-    "#version 130                                                         \n"
-    "                                                                     \n"
-    "   uniform vec4 u_color;                                             \n"
-    "   uniform sampler2D u_texture;                                      \n"
-    "                                                                     \n"
-    "   in vec3 v_normal;                                            \n"
-    "   in vec2 v_tex;                                               \n"
-    "                                                                     \n"
-    "   out vec4 o_fragcolor;                                               \n"
-    "                                                                     \n"
-    "   void main()                                                       \n"
-    "   {                                                                 \n"
-    "      o_fragcolor = mix(u_color, texture(u_texture, v_tex), 0.99);  \n"
-    "   }                                                                 \n"
-    "",
-
-    ""
-    "#version 130                                                         \n"
-    "                                                                     \n"
-    "   uniform vec4 u_color;                                             \n"
-    "                                                                     \n"
-    "   in vec3 v_normal;                                            \n"
-    "                                                                     \n"
-    "   out vec4 o_fragcolor;                                               \n"
-    "                                                                     \n"
-    "   void main()                                                       \n"
-    "   {                                                                 \n"
-    "      o_fragcolor = u_color;                                        \n"
-    "   }                                                                 \n"
-    ""
-};
-
-void
-print_info_log(
-    GLuint  name      // handle to the
-)
-{
-    constexpr int maxLen = 2024;
-    int len = 0;
-    char buffer[maxLen];
-
-    if (glIsProgram(name)) {
-        glGetProgramInfoLog(name , 2014 , &len , buffer);
-        std::cout << "Program " << name << " Info: " <<  buffer << std::endl;
-    } else {
-        glGetShaderInfoLog(name , 2014 , &len , buffer);
-        if (len > 0) {
-            std::cout << "Shader Info: " <<  buffer << std::endl;
-
-            GLint success;
-            glGetShaderiv(name, GL_COMPILE_STATUS, &success);
-            if (success != GL_TRUE)   exit(1);
-        }
-    }
-}
-
-GLuint
-load_shader(
-    const char*  shader_source,
-    GLenum       type
-)
-{
-    GLuint  shader = glCreateShader(type);
-
-    glShaderSource(shader , 1 , &shader_source , NULL);
-    glCompileShader(shader);
-
-    print_info_log(shader);
-
-    return shader;
-}
-
-int u_perspective[ShaderProgramCount];
-int u_modelview[ShaderProgramCount];
-int u_color[ShaderProgramCount];
-int u_texture[ShaderProgramCount];
-int a_position[ShaderProgramCount];
-int a_normal[ShaderProgramCount];
-int a_tex[ShaderProgramCount];
-
 void Game::init_gl()
 {
     glClearColor(0, 0, 0, 0);
@@ -518,82 +410,7 @@ void Game::init_gl()
     // DISPLAY LIST
     SceneNode::setupDL();
 
-    // Texture mapping
-    std::cout << "Textures: " << TEXTURE_COUNT << std::endl;
-    glEnable(GL_TEXTURE_2D);
-
-    Image image;
-    for (int c = 1; c < TEXTURE_COUNT; c++) {
-
-        // Load into OpenGL
-        image.loadPng(Textures::texFolder + Textures::texPaths[ c ]);
-        std::cout << "Loading texture from: " << Textures::texFolder + Textures::texPaths[ c ] << std::endl;
-        glBindTexture(GL_TEXTURE_2D, Textures::TEX_NO_TEXTURE + c);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width(), image.height(),
-                     0, (image.elements() == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, image.byteData());
-
-    }
-    //glBindTexture(GL_TEXTURE_2D, 0);
-
-    glActiveTexture(GL_TEXTURE0);
-    // Compile Programs
-    ///////  the openGL part  ///////////////////////////////////////////////////////////////
-
-    GLuint vertexShader = load_shader(vsSrc, GL_VERTEX_SHADER);         // load vertex shader
-    GLuint fragmentShaders[ShaderProgramCount];
-
-
-    GLuint shaderPrograms[ShaderProgramCount];
-
-    for (int i = 0; i < 1; ++i) {
-        shaderPrograms[i]  = glCreateProgram();                  // create program object
-        glAttachShader(shaderPrograms[i], vertexShader);                // and attach both...
-
-        fragmentShaders[i] = load_shader(fsSrc[i], GL_FRAGMENT_SHADER);     // load fragment shader
-        glAttachShader(shaderPrograms[i], fragmentShaders[i]);              // ... shaders to it
-
-        glLinkProgram(shaderPrograms[i]);       // link the program
-        print_info_log(shaderPrograms[i]);
-
-        int linkStatus = 0;
-        glGetProgramiv(shaderPrograms[i], GL_LINK_STATUS, &linkStatus);
-        if (linkStatus == GL_FALSE)
-            std::cerr << "Failed to link." << std::endl;
-        //// now get the locations (kind of handle) of the shaders variables
-        u_perspective[i] = glGetUniformLocation(shaderPrograms[i] , "u_perspective");
-        u_modelview[i] = glGetUniformLocation(shaderPrograms[i] , "u_modelview");
-        u_texture[i] = glGetUniformLocation(shaderPrograms[i] , "u_texture");
-        u_color[i] = glGetUniformLocation(shaderPrograms[i] , "u_color");
-        a_position[i] = glGetAttribLocation(shaderPrograms[i] , "a_position");
-        a_normal[i] = glGetAttribLocation(shaderPrograms[i] , "a_normal");
-        a_tex[i] = glGetAttribLocation(shaderPrograms[i] , "a_tex");
-
-        std::cerr << "ProgramName " << shaderPrograms[i] << std::endl;
-        std::cerr << "a_tex " << a_tex[i] << std::endl;
-        std::cerr << "a_normal " << a_normal[i] << std::endl;
-        std::cerr << "a_pos " << a_position[i] << std::endl;
-        std::cerr << "u_pers " << u_perspective[i] << std::endl;
-        std::cerr << "u_color " << u_color[i] << std::endl;
-        std::cerr << "u_tex " << u_texture[i] << std::endl;
-
-        glEnableVertexAttribArray(a_position[i]);
-        glVertexAttribPointer(a_position[i], 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
-
-        glEnableVertexAttribArray(a_tex[i]);
-        glVertexAttribPointer(a_tex[i], 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
-
-        glUniform1i(u_texture[i], 0);
-    }
-
-    glUseProgram(shaderPrograms[0]);        // and select it for usage
-
-    // IMAGE LOADER
-
+    m_gfx.initialize();
 
 
 #if 0
@@ -653,11 +470,14 @@ void Game::walk_gl()
 
     auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
 
-    vec2 cameraAngle(0, radians(70.0f));
-    auto modelview = camera(20, cameraAngle);
-    auto mvp = perspectiveProjection * modelview;
+    vec2 cameraAngle(0, radians(20.0f));
+    auto modelview = camera(5, cameraAngle);
+    ///auto mvp = perspectiveProjection * modelview;
 
-    glUniformMatrix4fv(u_perspective[0], 1, GL_FALSE, glm::value_ptr(mvp));
+    //glUniformMatrix4fv(2, 1, GL_FALSE, glm::value_ptr(mvp));
+    //m_gfx.setUniformMatrix(Uniform::Perspective, mvp);
+    m_gfx.setUniformMatrix(Uniform::Perspective, perspectiveProjection);
+    m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
 
     m_frames++;
 
@@ -673,7 +493,7 @@ void Game::walk_gl()
 
 
     // draw the level
-    m_pLevel->walk_gl2(mvp);
+    m_pLevel->walk_gl2(m_gfx);
 
     // DRAW PLAYERS
     // They require scaling down from the lua file
@@ -681,28 +501,31 @@ void Game::walk_gl()
     auto scaleDown = glm::scale(glm::mat4x4(), glm::vec3(.2f, .2f, .2f));
     auto translateUp = glm::translate(glm::mat4x4(), glm::vec3(0.0f, 7.0f, 0.0f));
 
-    mvp = mvp * scaleDown * translateUp;
-    glUniformMatrix4fv(u_perspective[0], 1, GL_FALSE, glm::value_ptr(mvp));
-    glUniformMatrix4fv(u_modelview[0], 1, GL_FALSE, glm::value_ptr(glm::mat4()));
+    modelview = modelview * scaleDown * translateUp;
+
+    m_gfx.setUniformMatrix(Uniform::Perspective, perspectiveProjection);
+    m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
+    //glUniformMatrix4fv(2, 1, GL_FALSE, glm::value_ptr(mvp));
+    //glUniformMatrix4fv(1, 1, GL_FALSE, glm::value_ptr(glm::mat4()));
     //glTranslated(0, 7, 0);
 
     for (auto& pc : m_PCs)
-        pc->walk_gl2(mvp);
+        pc->walk_gl2(m_gfx);
 
     // Draw the enemies
     for (auto& npc : m_NPCs)
-        npc->walk_gl2(mvp);
+        npc->walk_gl2(m_gfx);
 
     // END DRAW PLAYERS AND ENEMIES
 
     // Draw all projectiles
     for (auto& bullet : m_Bullets)
-        bullet->walk_gl2(mvp);
+        bullet->walk_gl2(m_gfx);
 
     // Attempt to draw particles
     for (auto& particle : m_Particles)
         if (!particle->is_dead())
-            particle->walk_gl2(mvp);
+            particle->walk_gl2(m_gfx);
 
 }
 

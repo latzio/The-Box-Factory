@@ -14,6 +14,7 @@
 // flying bullets, Movable children will possibly support animation
 // as well as collision detection to make it playable
 
+class Graphics;
 class MoveableSubscriber;
 class NPC;
 
@@ -33,7 +34,7 @@ public:
 
     // draw me to gl buffers
     // (Called by renderer)
-    virtual void walk_gl2(const glm::mat4x4&);
+    virtual void walk_gl2(Graphics&);
 
     // see if this moveable hits this object
     virtual Moveable* IsHit(const glm::vec3& p, float r);

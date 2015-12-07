@@ -2,6 +2,7 @@
 #define SMASHTVGAME_H_
 
 #include "AI.h"
+#include "Graphics.h"
 #include "Scene.h"
 #include "Object.h"
 
@@ -159,6 +160,6 @@ protected:
     int m_frames;
     int m_movements;
 
-
+    Graphics m_gfx;
 };
 #endif

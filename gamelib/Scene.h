@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 
+class Graphics;
+
 class AnnimationFrame {
 public:
     AnnimationFrame() : m_nAngle(0), m_nFrames(0),
@@ -35,8 +37,8 @@ public:
     virtual SceneNode* clone();
 
     virtual void tick();
-    virtual void walk_gl2(const glm::mat4x4&) const;
-    virtual void draw_gl() const;
+    virtual void walk_gl2(Graphics&) const;
+    virtual void draw_gl(Graphics&) const;
 
     void set_radius(float r)
     {
@@ -152,7 +154,7 @@ public:
     virtual void tick();
     virtual SceneNode* clone();
 
-    virtual void draw_gl() const;
+    virtual void draw_gl(Graphics&) const;
 
     virtual bool is_joint() const;
 
@@ -193,7 +195,7 @@ public:
 
     CopyDefault(GeometryNode)
 
-    virtual void draw_gl() const;
+    virtual void draw_gl(Graphics&) const;
     // Return a complete copy of this scenenode
     virtual SceneNode* clone();
 

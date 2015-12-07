@@ -1,4 +1,6 @@
 #include "Primitive.h"
+
+#include "Graphics.h"
 #include "Scene.h"
 #include "Textures.h"
 
@@ -19,27 +21,27 @@ Sphere::~Sphere()
 {
 }
 
-void Sphere::walk_gl() const
+void Sphere::walk_gl(Graphics& gfx) const
 {
-    glDrawArrays(GL_TRIANGLES, 0, 2280);
+    gfx.draw(Geometry::Sphere);
 }
 
 Plane::~Plane()
 {
 }
 
-void Plane::walk_gl() const
+void Plane::walk_gl(Graphics& gfx) const
 {
-    glDrawArrays(GL_TRIANGLES, 2280, 6);
+    gfx.draw(Geometry::Plane);
 }
 
 Cube::~Cube()
 {
 }
 
-void Cube::walk_gl() const
+void Cube::walk_gl(Graphics& gfx) const
 {
-    glDrawArrays(GL_TRIANGLES, 2286, 36);
+    gfx.draw(Geometry::Cube);
 
     if (m_bShadow) {
         std::cout << "Rendering shadow volume." << std::endl;

@@ -59,10 +59,9 @@ void Moveable::tick()
 {
 }
 
-void Moveable::walk_gl2(const glm::mat4x4& mat)
+void Moveable::walk_gl2(Graphics& gfx)
 {
-
-    m_pElement->walk_gl2(mat);
+    m_pElement->walk_gl2(gfx);
 }
 
 Shield::Shield(SceneNode* element, MoveableSubscriber* subscriber)

@@ -7,13 +7,13 @@ SET( GAMELIB_SRC
     AI.cpp
     BoxFactory.cpp
     Game.cpp
+    Graphics.cpp
     Image.cpp
     Material.cpp
     Object.cpp
     Primitive.cpp
     Scene.cpp
     SceneLua.cpp
-#    SoundManager.cpp
 )
 
 SET( GAMELIB_LIB

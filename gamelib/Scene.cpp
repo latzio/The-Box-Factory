@@ -1,4 +1,7 @@
 #include "Scene.h"
+
+#include "Graphics.h"
+
 #include <iostream>
 #include <functional>
 
@@ -259,24 +262,26 @@ void SceneNode::set_shadow(bool b)
     }
 }
 
-void SceneNode::walk_gl2(const mat4& mat) const
+void SceneNode::walk_gl2(Graphics& gfx) const
 {
     // Apply my transformation
     bool pushAndMult = m_trans != glm::mat4();
 
-    mat4 next(mat);
+    mat4 mat(gfx.m_modelviewMatrix);
     if (pushAndMult) {
-        next = next * m_trans;
-        glUniformMatrix4fv(2, 1, GL_FALSE, value_ptr(next));
+        mat4 next = mat * m_trans;
+        //glUniformMatrix4fv(2, 1, GL_FALSE, value_ptr(next));
+        gfx.setUniformMatrix(Uniform::Modelview, next);
     }
 
-    draw_gl();
+    draw_gl(gfx);
 
     for (auto& child : m_children)
-        child->walk_gl2(next);
+        child->walk_gl2(gfx);
 
     if (pushAndMult) {
-        glUniformMatrix4fv(2, 1, GL_FALSE, value_ptr(mat));
+        //glUniformMatrix4fv(2, 1, GL_FALSE, value_ptr(mat));
+        gfx.setUniformMatrix(Uniform::Modelview, mat);
     }
 }
 
@@ -316,7 +321,7 @@ void SceneNode::find_all(std::vector<SceneNode*>& v, const std::string& name)
 
 }
 
-void SceneNode::draw_gl() const
+void SceneNode::draw_gl(Graphics&) const
 {
 
 }
@@ -546,7 +551,7 @@ SceneNode* JointNode::clone()
     return pNode;
 }
 
-void JointNode::draw_gl() const
+void JointNode::draw_gl(Graphics&) const
 {
     //if (picking) {
     // return;
@@ -707,7 +712,7 @@ SceneNode* GeometryNode::clone()
     return pNode;
 }
 
-void GeometryNode::draw_gl() const
+void GeometryNode::draw_gl(Graphics& gfx) const
 {
 
     // Blend if we have a bump map
@@ -716,13 +721,13 @@ void GeometryNode::draw_gl() const
         //glBlendFunc(GL_ONE, GL_ZERO);
 
         // Set my bumpmap
-        m_map->apply_gl();
+        //m_map->apply_gl();
 
         // Choose fifty fifty
         //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
 
         // Draw my primitive
-        m_primitive->walk_gl();
+       // m_primitive->walk_gl();
 
     }
 
@@ -730,10 +735,10 @@ void GeometryNode::draw_gl() const
     // glBlendFunc(GL_ONE, GL_ZERO);
 
     // Set my texture
-    m_material->apply_gl();
+    m_material->apply_gl(gfx);
 
     // Draw my primitive
-    m_primitive->walk_gl();
+    m_primitive->walk_gl(gfx);
 }
 
 void GeometryNode::set_shadow(bool b)
@@ -746,7 +751,7 @@ void GeometryNode::set_shadow(bool b)
 void GeometryNode::colour(const Colour& d)
 {
 
-    ((PhongMaterial*)m_material)->m_kd = d;
+    static_cast<PhongMaterial*>(m_material)->m_kd = d;
 
     SceneNode::colour(d);
 }

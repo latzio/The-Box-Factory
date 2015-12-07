@@ -5,11 +5,12 @@
 
 using Colour = glm::vec3;
 
+class Graphics;
 
 class Material {
 public:
     virtual ~Material();
-    virtual void apply_gl() const = 0;
+    virtual void apply_gl(Graphics&) const = 0;
     enum Type { PHONG, TEXTURE };
     virtual Type get_type() = 0;
 
@@ -30,7 +31,7 @@ public:
         return PHONG;
     }
 
-    virtual void apply_gl() const;
+    virtual void apply_gl(Graphics&) const;
 
     Colour m_kd;
     Colour m_ks;
@@ -49,7 +50,7 @@ public:
         return TEXTURE;
     }
 
-    virtual void apply_gl() const;
+    virtual void apply_gl(Graphics&) const;
 
 private:
     int m_nTextureIndex;
