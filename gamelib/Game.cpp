@@ -25,9 +25,9 @@
 #define SPARKS_PARTICLES 156
 #define PARTICLES        156
 
-#define MOBS     0
+#define MOBS     2
 #define MOB_SIZE 12
-#define ENEMY_WATERMARK 0
+#define ENEMY_WATERMARK 20
 
 #define LEVEL_DELAY 300
 #define LIFE_CAP 10
@@ -468,14 +468,15 @@ void Game::walk_gl()
     if (!m_pLevel)
         return;
 
-    auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
 
-    vec2 cameraAngle(0, radians(20.0f));
-    auto modelview = camera(5, cameraAngle);
+    vec2 cameraAngle(0, radians(70.0f));
+    auto cameraTransform = camera(20, cameraAngle);
+    auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f) * cameraTransform;
     ///auto mvp = perspectiveProjection * modelview;
 
     //glUniformMatrix4fv(2, 1, GL_FALSE, glm::value_ptr(mvp));
     //m_gfx.setUniformMatrix(Uniform::Perspective, mvp);
+    auto modelview = glm::mat4();
     m_gfx.setUniformMatrix(Uniform::Perspective, perspectiveProjection);
     m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
 

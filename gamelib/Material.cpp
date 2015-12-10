@@ -41,8 +41,11 @@ void PhongMaterial::apply_gl(Graphics& gfx) const
     // Turn off texture
     */
     gfx.useProgram(ShaderProgram::Color);
-    glUniform4f(gfx.u_color[0], m_kd[0], m_kd[1], m_kd[2], 1.0f);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    gfx.applyUniforms();
+    if (gfx.u_color[0] >= 0) {
+        glUniform4f(gfx.u_color[0], m_kd[0], m_kd[1], m_kd[2], 1.0f);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 }
 
 TextureMaterial::TextureMaterial(const Colour& kd, const Colour& ks,
@@ -61,6 +64,7 @@ void TextureMaterial::apply_gl(Graphics& gfx) const
     //PhongMaterial::apply_gl(gfx);
 
     gfx.useProgram(ShaderProgram::Texture);
+    gfx.applyUniforms();
     glBindTexture(GL_TEXTURE_2D, m_nTextureIndex);
     glUniform4f(gfx.u_color[1], m_kd[0], m_kd[1], m_kd[2], 1.0f);
 }

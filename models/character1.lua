@@ -6,15 +6,13 @@ myroot = gr.node('root') -- The root node of the pupppet
 shirt = gr.material({ 0.1, 0.2, 0.4}, { 0.2, 0.2, 0.2}, 20, 9)
 flesh = gr.material({ 0.4, 0.2, 0.1}, { 0.1, 0.1, 0.1}, 80)
 pants = gr.material({ 0.05, 0.05, 0.075}, { 0.2, 0.2, 0.2}, 10)
-shoes = gr.material({ 0.03, 0.03, 0.03}, { 0.4, 0.4, 0.4}, 40)
+shoes = gr.material({ 0.03, .13, 0.43}, { 0.4, 0.4, 0.4}, 40)
 soles = gr.material({ 0.0, 0.0, 0.0}, { 0.1, 0.1, 0.1}, 10)
 buttn = gr.material({ 0.6, 0.6, 0.0}, { 0.8, 0.8, 0.8}, 20)
 beard = gr.material({ 0.2, 0.1, 0.0}, { 0.1, 0.1, 0.1}, 10)
 eye   = gr.material({ 0.0, 0.0, 0.0}, { 0.8, 0.8, 0.8}, 20)
 metal = gr.texturedmaterial({ 0.3, 0.35, 0.3}, { 0.9, 0.9, 0.9}, 10, 9)
 mag   = gr.texturedmaterial({ 0.3, 0.35, 0.3}, { 0.5, 0.5, 0.5}, 10, 9)
-
-brick = gr.texturedmaterial({ 1.0, 1.0, 1.0}, { 0.1, 0.1, 0.1}, 10, 1)
 
 xjoint = {1,2,3};
 yjoint = {1,2,3};

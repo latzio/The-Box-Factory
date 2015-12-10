@@ -17,7 +17,7 @@
 using namespace glm;
 
 
-static const char* vsPath = "common.vs.glsl";
+static const char* vsPath[] = { "texture.vs.glsl", "texture.vs.glsl" };
 static const char* fsPath[] = { "texture.fs.glsl", "color.fs.glsl" };
 
 static void print_info_log(GLuint  name)
@@ -96,16 +96,14 @@ void Graphics::initialize()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    // Compile Programs
-    GLuint vertexShader = load_shader(vsPath, GL_VERTEX_SHADER);         // load vertex shader
-    GLuint fragmentShaders[ShaderProgramCount];
-
     for (int i = 0; i < ShaderProgramCount; ++i) {
         m_shaderPrograms[i]  = glCreateProgram();                  // create program object
+
+        GLuint vertexShader = load_shader(vsPath[i], GL_VERTEX_SHADER);         // load vertex shader
         glAttachShader(m_shaderPrograms[i], vertexShader);                // and attach both...
 
-        fragmentShaders[i] = load_shader(fsPath[i], GL_FRAGMENT_SHADER);     // load fragment shader
-        glAttachShader(m_shaderPrograms[i], fragmentShaders[i]);              // ... shaders to it
+        GLuint fragmentShader = load_shader(fsPath[i], GL_FRAGMENT_SHADER);     // load fragment shader
+        glAttachShader(m_shaderPrograms[i], fragmentShader);              // ... shaders to it
 
         glLinkProgram(m_shaderPrograms[i]);       // link the program
         print_info_log(m_shaderPrograms[i]);
@@ -146,8 +144,9 @@ void Graphics::initialize()
             glEnableVertexAttribArray(a_tex[i]);
             glVertexAttribPointer(a_tex[i], 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
         }
-
-        glUniform1i(u_texture[i], 0);
+        if (u_texture[i] >= 0) {
+            glUniform1i(u_texture[i], 0);
+        }
     }
 
     useProgram(ShaderProgram::Texture);
@@ -167,21 +166,13 @@ void Graphics::setUniformMatrix(Uniform uniform, const glm::mat4& m)
     case Uniform::Modelview:
         m_modelviewMatrix = m;
         m_modelviewMatrixIvt = inverseTranspose(m);
-
-        for (auto modelview : u_modelview)
-            glUniformMatrix4fv(modelview, 1, GL_FALSE, value_ptr(m_modelviewMatrix));
-
-        for (auto modelviewIvt : u_modelview_ivt)
-            glUniformMatrix4fv(modelviewIvt, 1, GL_FALSE, value_ptr(m_modelviewMatrixIvt));
-
         break;
     case Uniform::ModelviewInverseTranspose:
+        m_modelviewMatrixIvt = m;
+        m_modelviewMatrix = inverseTranspose(m);
+        break;
     case Uniform::Perspective:
         m_perspectiveMatrix = m;
-
-        glUniformMatrix4fv(u_perspective[0], 1, GL_FALSE, value_ptr(m_perspectiveMatrix));
-        glUniformMatrix4fv(u_perspective[1], 1, GL_FALSE, value_ptr(m_perspectiveMatrix));
-
         break;
     case Uniform::Texture:
     case Uniform::Color:
@@ -192,7 +183,9 @@ void Graphics::setUniformMatrix(Uniform uniform, const glm::mat4& m)
 
 void Graphics::applyUniforms()
 {
-
+    glUniformMatrix4fv(u_perspective[m_programInUse], 1, GL_FALSE, value_ptr(m_perspectiveMatrix));
+    glUniformMatrix4fv(u_modelview[m_programInUse], 1, GL_FALSE, value_ptr(m_modelviewMatrix));
+    glUniformMatrix4fv(u_modelview_ivt[m_programInUse], 1, GL_FALSE, value_ptr(m_modelviewMatrixIvt));
 }
 
 void Graphics::draw(Geometry geometry)
