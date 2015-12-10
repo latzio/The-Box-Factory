@@ -727,7 +727,7 @@ void GeometryNode::draw_gl(Graphics& gfx) const
         //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
 
         // Draw my primitive
-       // m_primitive->walk_gl();
+        // m_primitive->walk_gl();
 
     }
 

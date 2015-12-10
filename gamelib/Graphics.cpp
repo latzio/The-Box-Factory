@@ -11,65 +11,14 @@
 
 #include <GLES3/gl3.h>
 
+#include <fstream>
 #include <iostream>
 
 using namespace glm;
 
-static const char vsSrc[] =
-    ""
-    "   uniform mat4 u_perspective;                                       \n"
-    "   uniform mat4 u_modelview;                                         \n"
-    "   uniform mat4 u_modelview_ivt;                                     \n"
-    "                                                                     \n"
-    "   in vec3 a_position;                                        \n"
-    "   in vec3 a_normal;                                          \n"
-    "   in vec2 a_tex;                                             \n"
-    "                                                                     \n"
-    "   varying out vec3 v_normal;                                            \n"
-    "   varying out vec2 v_tex;                                               \n"
-    "                                                                     \n"
-    "   void main()                                                       \n"
-    "   {                                                                 \n"
-    "      gl_Position = u_perspective * u_modelview * vec4(a_position, 1.0);  \n"
-    "      vec4 normal = u_modelview_ivt * vec4(a_normal, 0.0);           \n"
-    "      v_normal = normal.xyz;                                         \n"
-    "      v_tex = a_tex;                                                 \n"
-    "   }                                                                 \n"
-    "";
 
-static const char* fsSrc[] = {
-    ""
-    "#version 130                                                         \n"
-    "                                                                     \n"
-    "   uniform vec4 u_color;                                             \n"
-    "   uniform sampler2D u_texture;                                      \n"
-    "                                                                     \n"
-    "   in vec3 v_normal;                                            \n"
-    "   in vec2 v_tex;                                               \n"
-    "                                                                     \n"
-    "   out vec4 o_fragcolor;                                               \n"
-    "                                                                     \n"
-    "   void main()                                                       \n"
-    "   {                                                                 \n"
-    "      o_fragcolor = mix(u_color, texture(u_texture, v_tex), 0.99);  \n"
-    "   }                                                                 \n"
-    "",
-
-    ""
-    "#version 130                                                         \n"
-    "                                                                     \n"
-    "   uniform vec4 u_color;                                             \n"
-    "                                                                     \n"
-    "   in vec3 v_normal;                                            \n"
-    "                                                                     \n"
-    "   out vec4 o_fragcolor;                                               \n"
-    "                                                                     \n"
-    "   void main()                                                       \n"
-    "   {                                                                 \n"
-    "      o_fragcolor = u_color;                                        \n"
-    "   }                                                                 \n"
-    ""
-};
+static const char* vsPath = "common.vs.glsl";
+static const char* fsPath[] = { "texture.fs.glsl", "color.fs.glsl" };
 
 static void print_info_log(GLuint  name)
 {
@@ -92,23 +41,29 @@ static void print_info_log(GLuint  name)
     }
 }
 
-static GLuint load_shader(const char* shader_source, GLenum type)
+static GLuint load_shader(const char* shader_file, GLenum type)
 {
+    std::string glslDir = "glsl/";
+    std::string path = glslDir + shader_file;
+    std::ifstream t(path);
+
+    const std::string src((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
+    const char* srcArray = &src[0];
+
     GLuint  shader = glCreateShader(type);
 
-    glShaderSource(shader , 1 , &shader_source , NULL);
+    glShaderSource(shader, 1, &srcArray, 0);
     glCompileShader(shader);
-
     print_info_log(shader);
 
     return shader;
 }
 
 Graphics::Graphics()
-: m_programInUse(-1)
-, m_perspectiveMatrix()
-, m_modelviewMatrix()
-, m_modelviewMatrixIvt()
+    : m_programInUse(-1)
+    , m_perspectiveMatrix()
+    , m_modelviewMatrix()
+    , m_modelviewMatrixIvt()
 {
 }
 
@@ -142,14 +97,14 @@ void Graphics::initialize()
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Compile Programs
-    GLuint vertexShader = load_shader(vsSrc, GL_VERTEX_SHADER);         // load vertex shader
+    GLuint vertexShader = load_shader(vsPath, GL_VERTEX_SHADER);         // load vertex shader
     GLuint fragmentShaders[ShaderProgramCount];
 
     for (int i = 0; i < ShaderProgramCount; ++i) {
         m_shaderPrograms[i]  = glCreateProgram();                  // create program object
         glAttachShader(m_shaderPrograms[i], vertexShader);                // and attach both...
 
-        fragmentShaders[i] = load_shader(fsSrc[i], GL_FRAGMENT_SHADER);     // load fragment shader
+        fragmentShaders[i] = load_shader(fsPath[i], GL_FRAGMENT_SHADER);     // load fragment shader
         glAttachShader(m_shaderPrograms[i], fragmentShaders[i]);              // ... shaders to it
 
         glLinkProgram(m_shaderPrograms[i]);       // link the program
@@ -230,7 +185,7 @@ void Graphics::setUniformMatrix(Uniform uniform, const glm::mat4& m)
         break;
     case Uniform::Texture:
     case Uniform::Color:
-    break;
+        break;
     }
 
 }
@@ -243,7 +198,7 @@ void Graphics::applyUniforms()
 void Graphics::draw(Geometry geometry)
 {
 
-    switch(geometry) {
+    switch (geometry) {
     case Geometry::Sphere:
         glDrawArrays(GL_TRIANGLES, 0, 2280);
         break;
