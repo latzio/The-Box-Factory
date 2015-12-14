@@ -25,9 +25,9 @@
 #define SPARKS_PARTICLES 156
 #define PARTICLES        156
 
-#define MOBS     2
+#define MOBS     0
 #define MOB_SIZE 12
-#define ENEMY_WATERMARK 20
+#define ENEMY_WATERMARK 0
 
 #define LEVEL_DELAY 300
 #define LIFE_CAP 10
@@ -469,14 +469,14 @@ void Game::walk_gl()
         return;
 
 
-    vec2 cameraAngle(0, radians(70.0f));
-    auto cameraTransform = camera(20, cameraAngle);
-    auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f) * cameraTransform;
+    vec2 cameraAngle(0, radians(45.0f));
+    auto cameraTransform = camera(15, cameraAngle);
+    auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
     ///auto mvp = perspectiveProjection * modelview;
 
     //glUniformMatrix4fv(2, 1, GL_FALSE, glm::value_ptr(mvp));
     //m_gfx.setUniformMatrix(Uniform::Perspective, mvp);
-    auto modelview = glm::mat4();
+    auto modelview = cameraTransform;
     m_gfx.setUniformMatrix(Uniform::Perspective, perspectiveProjection);
     m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
 
@@ -494,17 +494,23 @@ void Game::walk_gl()
 
 
     // draw the level
-    m_pLevel->walk_gl2(m_gfx);
 
     // DRAW PLAYERS
     // They require scaling down from the lua file
     //glScaled(.2, .2, .2);
+    auto rotation = glm::rotate(glm::mat4x4(), m_frames * pi<float>() / 180.0f / 10.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     auto scaleDown = glm::scale(glm::mat4x4(), glm::vec3(.2f, .2f, .2f));
     auto translateUp = glm::translate(glm::mat4x4(), glm::vec3(0.0f, 7.0f, 0.0f));
 
-    modelview = modelview * scaleDown * translateUp;
+
+    modelview = modelview * rotation;
 
     m_gfx.setUniformMatrix(Uniform::Perspective, perspectiveProjection);
+    m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
+
+    m_pLevel->walk_gl2(m_gfx);
+
+    modelview = modelview * scaleDown * translateUp;
     m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
     //glUniformMatrix4fv(2, 1, GL_FALSE, glm::value_ptr(mvp));
     //glUniformMatrix4fv(1, 1, GL_FALSE, glm::value_ptr(glm::mat4()));

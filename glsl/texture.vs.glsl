@@ -19,9 +19,11 @@ void main()
 
    v_normal = normal.xyz;
 
-   vec3 light = vec3(2.0, 20.0, 2.0) - position.xyz;
-   float intensity = smoothstep(0.0, 20.0, length(light));
-   v_illumination = intensity * max(0.0, dot(v_normal, normalize(light)));
+   vec4 light = u_modelview * vec4(.0, 20.0, .0, 1.0);
+
+   vec3 lightVector = normalize(light.xyz - position.xyz);
+   //float intensity = smoothstep(0.0, 20.0, length(light));
+   v_illumination = dot(v_normal, normalize(lightVector));
    v_tex = a_tex;
 
    gl_Position = u_perspective * position;

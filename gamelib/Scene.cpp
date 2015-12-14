@@ -88,8 +88,8 @@ float SceneNode::get_radius()
 
 // SPHERE STUFF
 #define SPHERE_RADIUS 1.0f
-#define SPHERE_SLICES 20
-#define SPHERE_STACKS 20
+#define SPHERE_SLICES 4
+#define SPHERE_STACKS 4
 
 static void makeSphere(int slices, int stacks, std::function<void(const vec3& position, const vec3& normal, const vec2& texcoord)> vertexToGeo)
 {
