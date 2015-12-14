@@ -40,11 +40,15 @@ void PhongMaterial::apply_gl(Graphics& gfx) const
 
     // Turn off texture
     */
-    gfx.useProgram(ShaderProgram::Color);
+    ShaderProgram program = get_type() == PHONG ? ShaderProgram::Color : ShaderProgram::Texture;
+    gfx.useProgram(program);
     gfx.applyUniforms();
-    if (gfx.u_color[0] >= 0) {
-        glUniform4f(gfx.u_color[0], m_kd[0], m_kd[1], m_kd[2], 1.0f);
+    if (gfx.u_color[gfx.m_programInUse] >= 0) {
+        glUniform4f(gfx.u_color[gfx.m_programInUse], m_kd[0], m_kd[1], m_kd[2], 1.0f);
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    if (gfx.u_shininess[gfx.m_programInUse] >= 0) {
+        glUniform1f(gfx.u_shininess[gfx.m_programInUse], m_shininess);
     }
 }
 
@@ -61,10 +65,8 @@ TextureMaterial::~TextureMaterial()
 
 void TextureMaterial::apply_gl(Graphics& gfx) const
 {
-    //PhongMaterial::apply_gl(gfx);
+    PhongMaterial::apply_gl(gfx);
 
-    gfx.useProgram(ShaderProgram::Texture);
-    gfx.applyUniforms();
     glBindTexture(GL_TEXTURE_2D, m_nTextureIndex);
-    glUniform4f(gfx.u_color[1], m_kd[0], m_kd[1], m_kd[2], 1.0f);
+
 }

@@ -12,7 +12,7 @@ public:
     virtual ~Material();
     virtual void apply_gl(Graphics&) const = 0;
     enum Type { PHONG, TEXTURE };
-    virtual Type get_type() = 0;
+    virtual Type get_type() const = 0;
 
 
 protected:
@@ -26,7 +26,7 @@ public:
     PhongMaterial(const Colour& kd, const Colour& ks, float shininess);
     virtual ~PhongMaterial();
 
-    virtual Type get_type()
+    virtual Type get_type() const
     {
         return PHONG;
     }
@@ -45,7 +45,7 @@ public:
     TextureMaterial(const Colour& kd, const Colour& ks, float shininess, int nTextureIndex);
     virtual ~TextureMaterial();
 
-    virtual Type get_type()
+    virtual Type get_type() const
     {
         return TEXTURE;
     }

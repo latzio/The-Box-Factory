@@ -1,16 +1,19 @@
 #version 130
 
 uniform vec4 u_color;
+uniform float u_shininess;
 
 in vec3 v_normal;
 in float v_illumination;
 
 out vec4 o_fragcolor;
 
+const vec3 c_ambient = vec3(.42, .22, .22);
+
 void main()
 {
     vec3 color = u_color.rgb ;//* v_illumination;
-    vec3 pigment = color;
+    vec3 pigment = mix(c_ambient, color, 0.8);
 
-    o_fragcolor = vec4(pigment.r, pigment.g, pigment.b, 1.0);
+    o_fragcolor = vec4(pigment, 1.0);
 }

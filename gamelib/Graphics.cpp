@@ -118,6 +118,7 @@ void Graphics::initialize()
         u_modelview_ivt[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_modelview_ivt");
         u_texture[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_texture");
         u_color[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_color");
+        u_shininess[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_shininess");
         a_position[i] = glGetAttribLocation(m_shaderPrograms[i] , "a_position");
         a_normal[i] = glGetAttribLocation(m_shaderPrograms[i] , "a_normal");
         a_tex[i] = glGetAttribLocation(m_shaderPrograms[i] , "a_tex");

@@ -49,6 +49,7 @@ class Graphics {
         int u_modelview_ivt[ShaderProgramCount];
         int u_color[ShaderProgramCount];
         int u_texture[ShaderProgramCount];
+        int u_shininess[ShaderProgramCount];
 
         int m_programInUse;
         glm::mat4 m_perspectiveMatrix;

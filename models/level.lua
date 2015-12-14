@@ -9,7 +9,7 @@ _wall     = gr.texturedmaterial({ 0.4, 0.4, 0.5}, { 0.2, 0.2, 0.2}, 60,  1)
 _wall_map = gr.texturedmaterial({ 1.0, 1.0, 1.0}, { 0.0, 0.0, 0.0}, 100, 16)
 _door     = gr.texturedmaterial({ 0.4, 0.4, 0.4}, { 0.7, 0.7, 0.7}, 20, 14)
 _ceiling  = gr.texturedmaterial({ 0.3, 0.3, 0.3}, { 0.2, 0.2, 0.2}, 40, 7)
-_floor    = gr.texturedmaterial({ 0.05, 0.05, 0.05}, { 0.1, 0.1, 0.1}, 100, 6)
+_floor    = gr.texturedmaterial({ 0.2, 0.2, 0.2}, { 0.1, 0.1, 0.1}, 100, 6)
 _box      = gr.texturedmaterial({ 0.5, 0.5, 0.5}, { 0.2, 0.2, 0.2}, 40, 13)
 _wood     = gr.texturedmaterial({ 0.4, 0.4, 0.2}, { 0.1, 0.1, 0.1}, 40, 15)
 

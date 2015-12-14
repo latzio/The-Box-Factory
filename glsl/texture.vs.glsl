@@ -19,7 +19,7 @@ void main()
 
    v_normal = normal.xyz;
 
-   vec4 light = u_modelview * vec4(.0, 20.0, .0, 1.0);
+   vec4 light = u_modelview * vec4(5.0, 5.0, 5.0, 1.0);
 
    vec3 lightVector = normalize(light.xyz - position.xyz);
    //float intensity = smoothstep(0.0, 20.0, length(light));
