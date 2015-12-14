@@ -7,7 +7,6 @@
 #include "Object.h"
 
 #include <glm/glm.hpp>
-
 #include <vector>
 
 // This class is to hold all the gamelogic for the BoxFactory Game
@@ -18,7 +17,7 @@ class Game : public MoveableSubscriber {
 
 public:
     // Create a new game
-    Game(int nPlayers);
+    Game(int argc, char** argv);
     ~Game();
     NoMoveOrCopy(Game)
 

@@ -34,7 +34,9 @@
 
 using namespace glm;
 
-Game::Game(int nPlayers)
+static bool debug = false;
+
+Game::Game(int argc, char** argv)
     : m_pLevel(0)
     , m_Objs()
     , m_PCs()
@@ -49,13 +51,14 @@ Game::Game(int nPlayers)
     , m_nEnemyCounter(0)
     , m_nKeyboardPlayer(0)
     , m_bRunning(true)
-    , m_nPlayers(nPlayers)
+    , m_nPlayers(1)
     , m_nLives(LIFE_CAP)
     , m_nScore(0)
     , m_frames(0)
     , m_movements(0)
     , m_gfx()
 {
+    int nPlayers = 1;
     // Import the level
     m_pLevel = new Level(import_lua("models/level.lua"), this);
     std::cout << "Creating " << nPlayers << " players." << std::endl;
@@ -86,6 +89,10 @@ Game::Game(int nPlayers)
         PC* pc3 = new PC(import_lua("models/character4.lua"), this);
         m_PCs.push_back(pc3);
         pc3->setHumanControlled(true);
+    }
+
+    if (argc > 1) {
+        debug = true;
     }
 
     m_Bullets.reserve(BULLET_CAP);
@@ -469,14 +476,20 @@ void Game::walk_gl()
         return;
 
 
-    vec2 cameraAngle(0, radians(45.0f));
-    auto cameraTransform = camera(15, cameraAngle);
-    auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
+    vec2 cameraAngle(0, radians(70.0f));
+    auto cameraTransform = camera(20, cameraAngle);
+
+    if (debug) {
+        cameraAngle = vec2(0, radians(45.0f));
+        cameraTransform = camera(15, cameraAngle);
+    }
+
+    auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f) * cameraTransform;
     ///auto mvp = perspectiveProjection * modelview;
 
     //glUniformMatrix4fv(2, 1, GL_FALSE, glm::value_ptr(mvp));
     //m_gfx.setUniformMatrix(Uniform::Perspective, mvp);
-    auto modelview = cameraTransform;
+    auto modelview = glm::mat4();
     m_gfx.setUniformMatrix(Uniform::Perspective, perspectiveProjection);
     m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
 
@@ -498,20 +511,22 @@ void Game::walk_gl()
     // DRAW PLAYERS
     // They require scaling down from the lua file
     //glScaled(.2, .2, .2);
-    auto rotation = glm::rotate(glm::mat4x4(), m_frames * pi<float>() / 180.0f / 10.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-    auto scaleDown = glm::scale(glm::mat4x4(), glm::vec3(.2f, .2f, .2f));
-    auto translateUp = glm::translate(glm::mat4x4(), glm::vec3(0.0f, 7.0f, 0.0f));
-
-
-    modelview = modelview * rotation;
+    if (debug) {
+        auto rotation = glm::rotate(glm::mat4x4(), m_frames * pi<float>() / 180.0f / 5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+        modelview = modelview * rotation;
+    }
 
     m_gfx.setUniformMatrix(Uniform::Perspective, perspectiveProjection);
     m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
 
     m_pLevel->walk_gl2(m_gfx);
 
+    auto scaleDown = glm::scale(glm::mat4x4(), glm::vec3(.2f, .2f, .2f));
+    auto translateUp = glm::translate(glm::mat4x4(), glm::vec3(0.0f, 7.0f, 0.0f));
+
     modelview = modelview * scaleDown * translateUp;
     m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
+
     //glUniformMatrix4fv(2, 1, GL_FALSE, glm::value_ptr(mvp));
     //glUniformMatrix4fv(1, 1, GL_FALSE, glm::value_ptr(glm::mat4()));
     //glTranslated(0, 7, 0);

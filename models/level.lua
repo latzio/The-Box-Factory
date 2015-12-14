@@ -128,7 +128,7 @@ wall_back:rotate( 'x', -90 )
 wall_front:translate( i, 0, 0 )
 wall_front:scale( 2, room_y / 2, 1 )
 wall_front:translate( 0, 1, 0 )
-wall_front:rotate( 'x', -90 )
+wall_front:rotate( 'x', 90 )
 
 
 end

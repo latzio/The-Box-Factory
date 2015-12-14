@@ -199,7 +199,7 @@ int main(int argc, char* argv[])
     std::cout << "Initialzing " << argv[0] << ". GL Ver: " << glGetString(GL_VERSION) << ", GLSL Ver: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
     // Create one player game now.
-    Game bf(1);
+    Game bf(argc, argv);
 
     /*
      * At this point, we should have a properly setup

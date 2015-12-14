@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
 
     glViewport(0, 0, 800, 600);
     // Create one player game now.
-    Game bf(1);
+    Game bf(argc, argv);
 
     bf.init_gl();
 
