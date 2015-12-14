@@ -25,9 +25,9 @@
 #define SPARKS_PARTICLES 156
 #define PARTICLES        156
 
-#define MOBS     0
+#define MOBS     2
 #define MOB_SIZE 12
-#define ENEMY_WATERMARK 0
+#define ENEMY_WATERMARK 4
 
 #define LEVEL_DELAY 300
 #define LIFE_CAP 10
@@ -484,33 +484,14 @@ void Game::walk_gl()
         cameraTransform = camera(15, cameraAngle);
     }
 
-    auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f) * cameraTransform;
+    auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
     ///auto mvp = perspectiveProjection * modelview;
 
     //glUniformMatrix4fv(2, 1, GL_FALSE, glm::value_ptr(mvp));
     //m_gfx.setUniformMatrix(Uniform::Perspective, mvp);
-    auto modelview = glm::mat4();
-    m_gfx.setUniformMatrix(Uniform::Perspective, perspectiveProjection);
-    m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
-
+    auto modelview = cameraTransform; // glm::mat4();
     m_frames++;
 
-
-
-    //glMultMatrixf(glm::value_ptr(mvp));
-
-    //glTranslated( 0, 0, -40 );
-    //glRotated( 70, 1, 0, 0 );
-
-
-    //auto projection = camera(40, glm::vec2(0, 0));
-
-
-    // draw the level
-
-    // DRAW PLAYERS
-    // They require scaling down from the lua file
-    //glScaled(.2, .2, .2);
     if (debug) {
         auto rotation = glm::rotate(glm::mat4x4(), m_frames * pi<float>() / 180.0f / 5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
         modelview = modelview * rotation;

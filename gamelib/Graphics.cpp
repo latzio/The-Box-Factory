@@ -17,7 +17,7 @@
 using namespace glm;
 
 
-static const char* vsPath[] = { "texture.vs.glsl", "texture.vs.glsl" };
+static const char* vsPath[] = { "common.vs.glsl", "common.vs.glsl" };
 static const char* fsPath[] = { "texture.fs.glsl", "color.fs.glsl" };
 
 static void print_info_log(GLuint  name)

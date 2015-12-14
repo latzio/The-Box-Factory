@@ -15,15 +15,16 @@ out float v_illumination;
 void main()
 {
    vec4 position = u_modelview * vec4(a_position, 1.0);
-   vec4 normal = normalize(u_modelview_ivt * vec4(a_normal, 1.0));
+   vec4 normal = u_modelview_ivt * vec4(a_normal, 0.0);
 
-   v_normal = normal.xyz;
+   v_normal = normalize(normal.xyz);
 
-   vec4 light = u_modelview * vec4(5.0, 5.0, 5.0, 1.0);
+   vec4 light = vec4(10.0, 10.0, 10.0, 1.0);
 
    vec3 lightVector = normalize(light.xyz - position.xyz);
    //float intensity = smoothstep(0.0, 20.0, length(light));
-   v_illumination = dot(v_normal, normalize(lightVector));
+   v_illumination = dot(v_normal, lightVector);
+
    v_tex = a_tex;
 
    gl_Position = u_perspective * position;
