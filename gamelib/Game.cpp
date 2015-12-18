@@ -16,21 +16,20 @@
 // #include "SoundManager.h"
 // #include "joystick/include.h"
 
-#define BULLET_CAP 128
-#define ENEMY_CAP  64
+static unsigned    BULLET_CAP = 128;
+static int    ENEMY_CAP = 64;
 
-#define LITTLE_PARTICLES 92
-#define MEDIUM_PARTICLES 116
-#define BIGGER_PARTICLES 128
-#define SPARKS_PARTICLES 156
-#define PARTICLES        156
+static int    LITTLE_PARTICLES = 92;
+static int    MEDIUM_PARTICLES = 116;
+static int    BIGGER_PARTICLES = 128;
+static int    SPARKS_PARTICLES = 156;
+static int    PARTICLES       = 156;
 
-#define MOBS     2
-#define MOB_SIZE 12
-#define ENEMY_WATERMARK 4
+static int    MOBS    = 2;
+static int    MOB_SIZE = 12;
+static unsigned    ENEMY_WATERMARK = 3;
 
-#define LEVEL_DELAY 300
-#define LIFE_CAP 10
+static int    LIFE_CAP = 10;
 
 using namespace glm;
 
@@ -93,6 +92,11 @@ Game::Game(int argc, char** argv)
 
     if (argc > 1) {
         debug = true;
+    }
+
+    if (debug) {
+        MOBS = 0;
+        ENEMY_WATERMARK = 0;
     }
 
     m_Bullets.reserve(BULLET_CAP);
@@ -464,8 +468,7 @@ glm::mat4 camera(float Translate, glm::vec2 const& Rotate)
     glm::mat4 View = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Translate));
     View = glm::rotate(View, Rotate.y, glm::vec3(1.0f, 0.0f, 0.0f));
     View = glm::rotate(View, Rotate.x, glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
-    return Projection * View * Model;
+    return Projection * View;
 }
 
 void Game::walk_gl()
@@ -475,27 +478,20 @@ void Game::walk_gl()
     if (!m_pLevel)
         return;
 
+    m_frames++;
 
     vec2 cameraAngle(0, radians(70.0f));
-    auto cameraTransform = camera(20, cameraAngle);
-
-    if (debug) {
-        cameraAngle = vec2(0, radians(45.0f));
-        cameraTransform = camera(15, cameraAngle);
-    }
-
-    auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
-    ///auto mvp = perspectiveProjection * modelview;
-
-    //glUniformMatrix4fv(2, 1, GL_FALSE, glm::value_ptr(mvp));
-    //m_gfx.setUniformMatrix(Uniform::Perspective, mvp);
-    auto modelview = cameraTransform; // glm::mat4();
-    m_frames++;
+    auto cameraTransform = camera(40, cameraAngle);
 
     if (debug) {
         auto rotation = glm::rotate(glm::mat4x4(), m_frames * pi<float>() / 180.0f / 5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-        modelview = modelview * rotation;
+
+        cameraAngle = vec2(0, radians(45.0f));
+        cameraTransform = camera(15, cameraAngle) * rotation;
     }
+
+    auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f) * cameraTransform;
+    auto modelview = glm::mat4();
 
     m_gfx.setUniformMatrix(Uniform::Perspective, perspectiveProjection);
     m_gfx.setUniformMatrix(Uniform::Modelview, modelview);

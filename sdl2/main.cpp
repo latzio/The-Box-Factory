@@ -67,6 +67,10 @@ static void handle_key_press(SDL_Keysym* keysym, bool pressed, Game* bf)
     case SDLK_j:
         action = Game::ACTION_SHOOT_LEFT;
         break;
+    case SDLK_p:
+        if (pressed)
+            bf->togglePause();
+        break;
     }
 
     if (!pressed)
