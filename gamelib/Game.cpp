@@ -462,13 +462,12 @@ void Game::init_gl()
     }
 #endif
 }
-glm::mat4 camera(float Translate, glm::vec2 const& Rotate)
+glm::mat4 camera(const glm::vec3& trans, const glm::vec2& rot)
 {
-    glm::mat4 Projection;// = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
-    glm::mat4 View = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Translate));
-    View = glm::rotate(View, Rotate.y, glm::vec3(1.0f, 0.0f, 0.0f));
-    View = glm::rotate(View, Rotate.x, glm::vec3(0.0f, 1.0f, 0.0f));
-    return Projection * View;
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), trans);
+    view = glm::rotate(view, rot.y, glm::vec3(1.0f, 0.0f, 0.0f));
+    view = glm::rotate(view, rot.x, glm::vec3(0.0f, 1.0f, 0.0f));
+    return view;
 }
 
 void Game::walk_gl()
@@ -481,28 +480,26 @@ void Game::walk_gl()
     m_frames++;
 
     vec2 cameraAngle(0, radians(70.0f));
-    auto cameraTransform = camera(40, cameraAngle);
-
-    vec3 lightPosition(0, 10, 5);
+    vec3 cameraTranslation(0, 0, -40);
 
     if (debug) {
-        auto rotation = glm::rotate(glm::mat4x4(), m_frames * pi<float>() / 180.0f / 5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-
-        cameraAngle = vec2(0, radians(45.0f));
-        cameraTransform = camera(5, cameraAngle) * rotation;
+        cameraAngle = vec2(radians(m_frames / 4.0f), radians(45.0f));
+        cameraTranslation = vec3(0, -1.0f, -5.0f);
     }
 
+    auto cameraTransform = camera(cameraTranslation, cameraAngle);
     auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 1.f, 100.f) * cameraTransform;
+    m_gfx.setUniformMatrix(Uniform::Perspective, perspectiveProjection);
+
     auto modelview = glm::mat4();
+    m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
 
     const vec4 openglEyePosition(0, 0, 1, 1);
     const vec4 worldEyePosition = inverse(cameraTransform) * openglEyePosition;
     vec3 eyePosition(worldEyePosition[0], worldEyePosition[1], worldEyePosition[2]);
-
-    m_gfx.setUniformMatrix(Uniform::Perspective, perspectiveProjection);
-    m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
-
     m_gfx.setUniform(Uniform::EyePosition, eyePosition);
+
+    const vec3 lightPosition(0, 10, 5);
     m_gfx.setUniform(Uniform::LightPosition, lightPosition);
 
     m_pLevel->walk_gl2(m_gfx);
@@ -513,28 +510,18 @@ void Game::walk_gl()
     modelview = modelview * scaleDown * translateUp;
     m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
 
-    //glUniformMatrix4fv(2, 1, GL_FALSE, glm::value_ptr(mvp));
-    //glUniformMatrix4fv(1, 1, GL_FALSE, glm::value_ptr(glm::mat4()));
-    //glTranslated(0, 7, 0);
-
     for (auto& pc : m_PCs)
         pc->walk_gl2(m_gfx);
 
-    // Draw the enemies
     for (auto& npc : m_NPCs)
         npc->walk_gl2(m_gfx);
 
-    // END DRAW PLAYERS AND ENEMIES
-
-    // Draw all projectiles
     for (auto& bullet : m_Bullets)
         bullet->walk_gl2(m_gfx);
 
-    // Attempt to draw particles
     for (auto& particle : m_Particles)
         if (!particle->is_dead())
             particle->walk_gl2(m_gfx);
-
 }
 
 void Game::CreateBullet(const vec3& origin, float dDegrees, NPC* source)
