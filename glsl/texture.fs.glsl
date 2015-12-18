@@ -18,11 +18,14 @@ void main()
 {
     vec3 texel = texture(u_texture, v_tex).rgb;
     vec3 diffuse = u_diffuse.rgb * texel * v_lambert;
+    vec3 ambient = u_ambient.rgb * texel * u_diffuse.rgb;
 
     vec3 toEye = normalize(v_toEye);
     vec3 toLight = normalize(v_toLight);
-    float shininess = max(0.0, pow(dot(reflect(-toLight, v_normal), v_toEye), u_shininess));
+    vec3 normal = normalize(v_normal);
+
+    float shininess = max(0.0, pow(dot(reflect(-toLight, normal), toEye), u_shininess));
     vec3 specular = u_specular.rgb * texel * shininess;
 
-    o_fragcolor = vec4(u_ambient.rgb + diffuse + specular, 1.0);
+    o_fragcolor = vec4(ambient + diffuse + specular, 1.0);
 }

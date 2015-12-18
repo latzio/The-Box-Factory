@@ -44,7 +44,7 @@ void PhongMaterial::apply_gl(Graphics& gfx) const
     gfx.useProgram(program);
     gfx.applyUniforms();
     if (gfx.u_ambient[gfx.m_programInUse] >= 0) {
-        glUniform4f(gfx.u_ambient[gfx.m_programInUse], 0.06f, 0.05f, 0.05f, 1.0f);
+        glUniform4f(gfx.u_ambient[gfx.m_programInUse], 0.5f, 0.5f, 0.5f, 1.0f);
     }
     if (gfx.u_diffuse[gfx.m_programInUse] >= 0) {
         glUniform4f(gfx.u_diffuse[gfx.m_programInUse], m_kd[0], m_kd[1], m_kd[2], 1.0f);

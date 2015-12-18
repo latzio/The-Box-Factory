@@ -20,10 +20,10 @@ out float v_lambert;
 void main()
 {
    vec4 position = u_modelview * vec4(a_position, 1.0);
-   vec3 normal = normalize(u_modelview_ivt * vec4(a_normal, 0.0)).xyz;
+   vec4 normal = u_modelview_ivt * vec4(a_normal, 0.0);
 
    v_tex = a_tex;
-   v_normal = normal.xyz;
+   v_normal = normalize(normal.xyz);
    v_toEye = normalize(u_eye - position.xyz);
    v_toLight = normalize(u_light - position.xyz);
    v_lambert = max(dot(v_toLight, v_normal), 0.0);

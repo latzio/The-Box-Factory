@@ -220,13 +220,13 @@ void Graphics::draw(Geometry geometry)
 
     switch (geometry) {
     case Geometry::Sphere:
-        glDrawArrays(GL_TRIANGLES, 0, 72);
+        glDrawArrays(GL_TRIANGLES, 0, 540);
         break;
     case Geometry::Plane:
-        glDrawArrays(GL_TRIANGLES, 72, 6);
+        glDrawArrays(GL_TRIANGLES, 540, 6);
         break;
     case Geometry::Cube:
-        glDrawArrays(GL_TRIANGLES, 78, 36);
+        glDrawArrays(GL_TRIANGLES, 546, 36);
         break;
     }
 }
