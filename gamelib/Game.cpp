@@ -494,7 +494,7 @@ void Game::walk_gl()
     auto modelview = glm::mat4();
     m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
 
-    const vec4 openglEyePosition(0, 0, 1, 1);
+    const vec4 openglEyePosition(0, 0, 0, 1);
     const vec4 worldEyePosition = inverse(cameraTransform) * openglEyePosition;
     vec3 eyePosition(worldEyePosition[0], worldEyePosition[1], worldEyePosition[2]);
     m_gfx.setUniform(Uniform::EyePosition, eyePosition);
