@@ -64,6 +64,8 @@ Graphics::Graphics()
     , m_perspectiveMatrix()
     , m_modelviewMatrix()
     , m_modelviewMatrixIvt()
+    , m_eyePosition()
+    , m_lightPosition()
 {
 }
 
@@ -116,8 +118,12 @@ void Graphics::initialize()
         u_perspective[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_perspective");
         u_modelview[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_modelview");
         u_modelview_ivt[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_modelview_ivt");
+        u_eye[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_eye");
+        u_light[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_light");
         u_texture[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_texture");
-        u_color[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_color");
+        u_ambient[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_ambient");
+        u_diffuse[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_diffuse");
+        u_specular[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_specular");
         u_shininess[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_shininess");
         a_position[i] = glGetAttribLocation(m_shaderPrograms[i] , "a_position");
         a_normal[i] = glGetAttribLocation(m_shaderPrograms[i] , "a_normal");
@@ -130,7 +136,11 @@ void Graphics::initialize()
                   << ", u_pers " << u_perspective[i]
                   << ", u_mv " << u_modelview[i]
                   << ", u_mv_ivt " << u_modelview_ivt[i]
-                  << ", u_color " << u_color[i]
+                  << ", u_eye " << u_eye[i]
+                  << ", u_light " << u_light[i]
+                  << ", u_ambient " << u_ambient[i]
+                  << ", u_diffuse " << u_diffuse[i]
+                  << ", u_specular " << u_specular[i]
                   << ", u_tex " << u_texture[i] << std::endl;
 
         if (a_position[i] >= 0) {
@@ -175,8 +185,22 @@ void Graphics::setUniformMatrix(Uniform uniform, const glm::mat4& m)
     case Uniform::Perspective:
         m_perspectiveMatrix = m;
         break;
-    case Uniform::Texture:
-    case Uniform::Color:
+    default:
+        break;
+    }
+
+}
+
+void Graphics::setUniform(Uniform uniform, const glm::vec3& v)
+{
+    switch (uniform) {
+    case Uniform::EyePosition:
+        m_eyePosition = v;
+        break;
+    case Uniform::LightPosition:
+        m_lightPosition = v;
+        break;
+    default:
         break;
     }
 
@@ -187,6 +211,8 @@ void Graphics::applyUniforms()
     glUniformMatrix4fv(u_perspective[m_programInUse], 1, GL_FALSE, value_ptr(m_perspectiveMatrix));
     glUniformMatrix4fv(u_modelview[m_programInUse], 1, GL_FALSE, value_ptr(m_modelviewMatrix));
     glUniformMatrix4fv(u_modelview_ivt[m_programInUse], 1, GL_FALSE, value_ptr(m_modelviewMatrixIvt));
+    glUniform3fv(u_eye[m_programInUse], 1, value_ptr(m_eyePosition));
+    glUniform3fv(u_light[m_programInUse], 1, value_ptr(m_lightPosition));
 }
 
 void Graphics::draw(Geometry geometry)

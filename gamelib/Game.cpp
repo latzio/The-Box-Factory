@@ -483,6 +483,9 @@ void Game::walk_gl()
     vec2 cameraAngle(0, radians(70.0f));
     auto cameraTransform = camera(40, cameraAngle);
 
+    vec3 lightPosition(10, 5, 5);
+    vec3 eyePosition(0, 31, 25);
+
     if (debug) {
         auto rotation = glm::rotate(glm::mat4x4(), m_frames * pi<float>() / 180.0f / 5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -495,6 +498,9 @@ void Game::walk_gl()
 
     m_gfx.setUniformMatrix(Uniform::Perspective, perspectiveProjection);
     m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
+
+    m_gfx.setUniform(Uniform::EyePosition, eyePosition);
+    m_gfx.setUniform(Uniform::LightPosition, lightPosition);
 
     m_pLevel->walk_gl2(m_gfx);
 

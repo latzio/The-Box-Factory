@@ -43,9 +43,14 @@ void PhongMaterial::apply_gl(Graphics& gfx) const
     ShaderProgram program = get_type() == PHONG ? ShaderProgram::Color : ShaderProgram::Texture;
     gfx.useProgram(program);
     gfx.applyUniforms();
-    if (gfx.u_color[gfx.m_programInUse] >= 0) {
-        glUniform4f(gfx.u_color[gfx.m_programInUse], m_kd[0], m_kd[1], m_kd[2], 1.0f);
-        glBindTexture(GL_TEXTURE_2D, 0);
+    if (gfx.u_ambient[gfx.m_programInUse] >= 0) {
+        glUniform4f(gfx.u_ambient[gfx.m_programInUse], 0.06f, 0.05f, 0.05f, 1.0f);
+    }
+    if (gfx.u_diffuse[gfx.m_programInUse] >= 0) {
+        glUniform4f(gfx.u_diffuse[gfx.m_programInUse], m_kd[0], m_kd[1], m_kd[2], 1.0f);
+    }
+    if (gfx.u_specular[gfx.m_programInUse] >= 0) {
+        glUniform4f(gfx.u_specular[gfx.m_programInUse], m_ks[0], m_ks[1], m_ks[2], 1.0f);
     }
     if (gfx.u_shininess[gfx.m_programInUse] >= 0) {
         glUniform1f(gfx.u_shininess[gfx.m_programInUse], m_shininess);
@@ -68,5 +73,4 @@ void TextureMaterial::apply_gl(Graphics& gfx) const
     PhongMaterial::apply_gl(gfx);
 
     glBindTexture(GL_TEXTURE_2D, m_nTextureIndex);
-
 }
