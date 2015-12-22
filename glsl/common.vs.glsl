@@ -11,6 +11,7 @@ in vec3 a_position;
 in vec3 a_normal;
 in vec2 a_tex;
 
+out vec3 v_position;
 out vec2 v_tex;
 out vec3 v_normal;
 out vec3 v_toEye;
@@ -23,6 +24,7 @@ void main()
    vec4 normal = u_modelview_ivt * vec4(a_normal, 0.0);
 
    v_tex = a_tex;
+   v_position = position.xyz;
    v_normal = normalize(normal.xyz);
    v_toEye = normalize(u_eye - position.xyz);
    v_toLight = normalize(u_light - position.xyz);

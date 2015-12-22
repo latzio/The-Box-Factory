@@ -60,6 +60,7 @@ class Graphics {
         int u_diffuse[ShaderProgramCount];
         int u_specular[ShaderProgramCount];
         int u_texture[ShaderProgramCount];
+        int u_shadow[ShaderProgramCount];
         int u_shininess[ShaderProgramCount];
 
         int m_programInUse;

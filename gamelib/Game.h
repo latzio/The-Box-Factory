@@ -86,6 +86,9 @@ public:
     void dumpStats();
     void clearStats();
 
+private:
+    void drawScene();
+
 protected:
 
     // This is the level we are playing

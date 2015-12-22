@@ -121,6 +121,7 @@ void Graphics::initialize()
         u_eye[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_eye");
         u_light[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_light");
         u_texture[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_texture");
+        u_shadow[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_shadow");
         u_ambient[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_ambient");
         u_diffuse[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_diffuse");
         u_specular[i] = glGetUniformLocation(m_shaderPrograms[i] , "u_specular");

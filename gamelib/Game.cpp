@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
+#include <glm/gtx/string_cast.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 
 #include <GLES3/gl3.h>
 
@@ -407,6 +408,10 @@ void Game::handleJoystick(Joystick* joy, PC * pc){
 }
 */
 
+unsigned fbo;
+unsigned depthTextureID;
+
+
 void Game::init_gl()
 {
     glClearColor(0, 0, 0, 0);
@@ -424,44 +429,22 @@ void Game::init_gl()
     m_gfx.initialize();
 
 
-#if 0
+    glGenTextures(1, &depthTextureID);
+    glBindTexture(GL_TEXTURE_2D, depthTextureID);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 512, 512, 0, GL_DEPTH_COMPONENT,	GL_FLOAT, 0);
 
-    // Set up lighting
-    glEnable(GL_LIGHTING) ;
-    glEnable(GL_COLOR_MATERIAL) ;
 
-    glEnable(GL_NORMALIZE);
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTextureID, 0/*mipmap level*/);
 
-    // Light 0 // Ambient
-    GLfloat light0[] = { .42, .22, .0f8, 1 };
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light0);
-    glEnable(GL_LIGHT0);
-
-    GLfloat light[] = { 0.9, 0.9, 0.7, 1 };
-//                                  { 0.8, 0.8, 0.6, 1 },
-//                                  { 0.8, 0.8, 0.6, 1 },
-//                                  { 0.8, 0.8, 0.6, 1 } };
-
-    GLfloat pos[][4]  =  { { -8, 10, -8, 1 },
-        { 7, 10, -7, 1 },
-        { -7, 10, 7, 1 },
-        { 8, 10, 8, 1 }
-    };
-
-    GLfloat dir[] = {0, -1, 0};
-
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 2; j++) {
-            glLightfv(GL_LIGHT1 + i, GL_DIFFUSE, light);
-            glLightfv(GL_LIGHT1 + i, GL_POSITION, pos[i]);
-            glLightfv(GL_LIGHT1 + i, GL_SPOT_DIRECTION, dir);
-            glLightf(GL_LIGHT1 + i, GL_SPOT_CUTOFF, 45.f);
-            //glLightf ( GL_LIGHT1 + i, GL_CONSTANT_ATTENUATION, 0.95);
-            glEnable(GL_LIGHT1 + i);
-        }
-    }
-#endif
+    std::cout << "Framebuffer Status " << glCheckFramebufferStatus(GL_FRAMEBUFFER) << " Complete is " << GL_FRAMEBUFFER_COMPLETE << std::endl;
 }
+
 glm::mat4 camera(const glm::vec3& trans, const glm::vec2& rot)
 {
     glm::mat4 view = glm::translate(glm::mat4(1.0f), trans);
@@ -470,8 +453,10 @@ glm::mat4 camera(const glm::vec3& trans, const glm::vec2& rot)
     return view;
 }
 
+
 void Game::walk_gl()
 {
+    glDisable(GL_SCISSOR_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (!m_pLevel)
@@ -479,28 +464,40 @@ void Game::walk_gl()
 
     m_frames++;
 
+    vec3 lightPosition(0, 10, 2);
+    m_gfx.setUniform(Uniform::LightPosition, lightPosition);
+
     vec2 cameraAngle(0, radians(70.0f));
     vec3 cameraTranslation(0, 0, -40);
-
-    if (debug) {
-        cameraAngle = vec2(radians(m_frames / 4.0f), radians(45.0f));
-        cameraTranslation = vec3(0, -1.0f, -5.0f);
-    }
-
     auto cameraTransform = camera(cameraTranslation, cameraAngle);
     auto perspectiveProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 1.f, 100.f) * cameraTransform;
+
+    if (debug) {
+        //cameraAngle = vec2(radians(m_frames / 4.0f), radians(45.0f));
+        //cameraTranslation = vec3(0, -1.0f, -5.0f);
+        cameraTransform = lookAt(lightPosition, vec3(0,0,2), vec3(0,0,-1));
+        perspectiveProjection = glm::perspective(glm::pi<float>() * .825f, 4.0f / 3.0f, 1.f, 100.f) * cameraTransform;
+    }
+
     m_gfx.setUniformMatrix(Uniform::Perspective, perspectiveProjection);
 
-    auto modelview = glm::mat4();
-    m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
-
-    const vec4 openglEyePosition(0, 0, 0, 1);
-    const vec4 worldEyePosition = inverse(cameraTransform) * openglEyePosition;
+    vec4 openglEyePosition(0, 0, 0, 1);
+    vec4 worldEyePosition = inverse(cameraTransform) * openglEyePosition;
     vec3 eyePosition(worldEyePosition[0], worldEyePosition[1], worldEyePosition[2]);
     m_gfx.setUniform(Uniform::EyePosition, eyePosition);
 
-    const vec3 lightPosition(0, 10, 5);
-    m_gfx.setUniform(Uniform::LightPosition, lightPosition);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    drawScene();
+
+    glBindTexture(GL_TEXTURE_2D, depthTextureID);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    drawScene();
+}
+
+void Game::drawScene()
+{
+    auto modelview = glm::mat4();
+    m_gfx.setUniformMatrix(Uniform::Modelview, modelview);
 
     m_pLevel->walk_gl2(m_gfx);
 

@@ -1,11 +1,16 @@
 #version 130
 
 uniform sampler2D u_texture;
+uniform sampler2D u_shadow;
+
+uniform mat4 u_lightTransform;
+
 uniform vec4 u_ambient;
 uniform vec4 u_diffuse;
 uniform vec4 u_specular;
 uniform float u_shininess;
 
+in vec3 v_position;
 in vec2 v_tex;
 in vec3 v_normal;
 in vec3 v_toEye;

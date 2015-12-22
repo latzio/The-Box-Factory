@@ -72,5 +72,5 @@ void TextureMaterial::apply_gl(Graphics& gfx) const
 {
     PhongMaterial::apply_gl(gfx);
 
-    glBindTexture(GL_TEXTURE_2D, m_nTextureIndex);
+    //glBindTexture(GL_TEXTURE_2D, m_nTextureIndex);
 }
